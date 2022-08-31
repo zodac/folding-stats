@@ -35,6 +35,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
+import me.zodac.folding.api.tc.Role;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.bean.api.FoldingRepository;
@@ -392,7 +393,7 @@ class TeamValidatorTest {
             "https://www.google.com",
             generateHardware(),
             existingTeam,
-            false
+            Role.MEMBER
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -435,7 +436,7 @@ class TeamValidatorTest {
             "https://www.google.com",
             generateHardware(),
             userTeam,
-            false
+            Role.MEMBER
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();

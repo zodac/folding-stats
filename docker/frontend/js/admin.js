@@ -280,8 +280,8 @@ function loadUsersAdmin() {
     .then(function(jsonResponse) {
         // Build users
         jsonResponse.sort(sortJsonByKey("id"))
-        const usersHeaders = ["ID", "User", "Folding Name", "Passkey", "Category", "Profile Link", "Live Stats Link", "Hardware", "Team", "Is Captain"]
-        const usersProperties = ["id", "displayName", "foldingUserName", "passkey", "category", "profileLink", "liveStatsLink", "hardware", "team", "userIsCaptain"]
+        const usersHeaders = ["ID", "User", "Folding Name", "Passkey", "Category", "Profile Link", "Live Stats Link", "Hardware", "Team", "Role"]
+        const usersProperties = ["id", "displayName", "foldingUserName", "passkey", "category", "profileLink", "liveStatsLink", "hardware", "team", "role"]
 
         // Empty div of existing content, if any
         usersDiv = document.getElementById("users_div")
@@ -335,6 +335,8 @@ function loadUsersAdmin() {
                     usersTableBodyCell.innerHTML = usersItem['team']['teamName'].toLocaleString()
                 } else if (usersProperty === "category") {
                     usersTableBodyCell.innerHTML = getCategoryFrontend(usersItem[usersProperty])
+                } else if (usersProperty === "role") {
+                    usersTableBodyCell.innerHTML = getRoleFrontend(usersItem[usersProperty])
                 } else {
                     if (usersProperty in usersItem) {
                         usersTableBodyCell.innerHTML = usersItem[usersProperty].toLocaleString()

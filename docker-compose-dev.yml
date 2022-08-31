@@ -1,30 +1,30 @@
 services:
 
-#  frontend_dev:
-#    build:
-#      context: .
-#      dockerfile: docker/frontend/Dockerfile
-#      args:
-#        # Docker image versions
-#        NODE_VERSION: "18.8"
-#        # Build arguments
-#        FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
-#        REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
-#        ROOT_URL: "http://127.0.0.1:81/"
-#        TITLE: "Extreme Team Folding"
-#        UPDATE_ENABLED: "false"
-#    container_name: frontend_dev
-#    hostname: frontend_dev
-#    depends_on:
-#      - backend_dev
-#    links:
-#      - backend_dev
-#    networks:
-#      - development
-#    ports:
-#      - "81:80"
-#    volumes_from:
-#      - backend_dev
+  frontend_dev:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+      args:
+        # Docker image versions
+        NODE_VERSION: "18.8"
+        # Build arguments
+        FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
+        REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
+        ROOT_URL: "http://127.0.0.1:81/"
+        TITLE: "Extreme Team Folding"
+        UPDATE_ENABLED: "false"
+    container_name: frontend_dev
+    hostname: frontend_dev
+    depends_on:
+      - backend_dev
+    links:
+      - backend_dev
+    networks:
+      - development
+    ports:
+      - "81:80"
+    volumes_from:
+      - backend_dev
 
   backend_dev:
     build:

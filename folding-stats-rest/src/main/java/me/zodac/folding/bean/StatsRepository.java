@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import me.zodac.folding.api.state.SystemState;
+import me.zodac.folding.api.tc.Role;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.result.MonthlyResult;
@@ -400,7 +401,7 @@ public class StatsRepository {
 
     private static String getCaptainDisplayName(final String teamName, final Iterable<User> usersOnTeam) {
         for (final User user : usersOnTeam) {
-            if (user.userIsCaptain()) {
+            if (user.role() == Role.CAPTAIN) {
                 return user.displayName();
             }
         }

@@ -117,7 +117,7 @@ public class UserChangeValidator {
             userChangeRequest.getLiveStatsLink(),
             newHardware,
             previousUser.team(),
-            previousUser.userIsCaptain()
+            previousUser.role()
         );
         final UserChangeState userChangeState =
             userChangeRequest.isImmediate() ? UserChangeState.REQUESTED_NOW : UserChangeState.REQUESTED_NEXT_MONTH;

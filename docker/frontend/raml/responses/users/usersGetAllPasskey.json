@@ -20,7 +20,7 @@
       "id": 1,
       "teamName": "Team1"
     },
-    "userIsCaptain": true
+    "role": "CAPTAIN"
   },
   {
     "id": 2,
@@ -41,6 +41,6 @@
       "id": 1,
       "teamName": "Team1"
     },
-    "userIsCaptain": false
+    "role": "MEMBER"
   }
 ]

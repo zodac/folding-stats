@@ -35,6 +35,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
+import me.zodac.folding.api.tc.Role;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.tc.TeamSummary;
@@ -104,7 +105,7 @@ class MonthlyResultTest {
                                     "",
                                     ""
                                 ),
-                                true
+                                Role.CAPTAIN
                             ),
                             5L,
                             500L,

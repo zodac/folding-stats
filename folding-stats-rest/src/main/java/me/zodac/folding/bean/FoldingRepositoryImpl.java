@@ -224,7 +224,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     @Override
     public User updateUser(final User userToUpdate, final User existingUser) {
         if (isUserCaptainAndCaptainExistsOnTeam(userToUpdate)) {
-            final boolean isCaptainChange = userToUpdate.userIsCaptain() != existingUser.userIsCaptain();
+            final boolean isCaptainChange = userToUpdate.role().isCaptain() != existingUser.role().isCaptain();
             final boolean isTeamChange = userToUpdate.team().id() != existingUser.team().id();
 
             if (isCaptainChange || isTeamChange) {
@@ -347,7 +347,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     }
 
     private boolean isUserCaptainAndCaptainExistsOnTeam(final User user) {
-        if (!user.userIsCaptain()) {
+        if (!user.role().isCaptain()) {
             return false;
         }
 
@@ -379,7 +379,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     private Optional<User> getCaptainOfTeam(final Team team) {
         return getUsersOnTeam(team)
             .stream()
-            .filter(User::userIsCaptain)
+            .filter(user -> user.role().isCaptain())
             .findAny();
     }
 

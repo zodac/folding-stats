@@ -30,6 +30,7 @@ import static me.zodac.folding.test.integration.util.rest.request.TeamUtils.TEAM
 import static me.zodac.folding.test.integration.util.rest.request.UserUtils.USER_REQUEST_SENDER;
 
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.Role;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
@@ -75,39 +76,39 @@ public final class SystemCleaner {
     public static void cleanSystemForSimpleTests() throws FoldingRestException {
         DatabaseUtils.truncateTableAndResetId("retired_user_stats");
 
-        for (final User user : UserUtils.getAll()) {
-            if (!user.userIsCaptain()) {
-                USER_REQUEST_SENDER.delete(user.id(), ADMIN_USER.userName(), ADMIN_USER.password());
-                continue;
-            }
-
-            // Captains must be unset as captains before they can be deleted
-            final User userWithPasskey = UserUtils.getWithPasskey(user.id());
-            final UserRequest userNoLongerCaptain = UserRequest.builder()
-                .foldingUserName(userWithPasskey.foldingUserName())
-                .displayName(userWithPasskey.displayName())
-                .passkey(userWithPasskey.passkey())
-                .category(userWithPasskey.category().toString())
-                .profileLink(userWithPasskey.profileLink())
-                .liveStatsLink(userWithPasskey.liveStatsLink())
-                .hardwareId(userWithPasskey.hardware().id())
-                .teamId(userWithPasskey.team().id())
-                .userIsCaptain(false)
-                .build();
-
-            USER_REQUEST_SENDER.update(userWithPasskey.id(), userNoLongerCaptain, ADMIN_USER.userName(), ADMIN_USER.password());
-            USER_REQUEST_SENDER.delete(userWithPasskey.id(), ADMIN_USER.userName(), ADMIN_USER.password());
-        }
-
-        for (final Team team : TeamUtils.getAll()) {
-            TEAM_REQUEST_SENDER.delete(team.id(), ADMIN_USER.userName(), ADMIN_USER.password());
-        }
-
-        for (final Hardware hardware : HardwareUtils.getAll()) {
-            HARDWARE_REQUEST_SENDER.delete(hardware.id(), ADMIN_USER.userName(), ADMIN_USER.password());
-        }
-
-        DatabaseUtils.truncateTableAndResetId("hardware", "users", "teams");
+//        for (final User user : UserUtils.getAll()) {
+//            if (user.role() != Role.CAPTAIN) {
+//                USER_REQUEST_SENDER.delete(user.id(), ADMIN_USER.userName(), ADMIN_USER.password());
+//                continue;
+//            }
+//
+//            // Captains must be unset as captains before they can be deleted
+//            final User userWithPasskey = UserUtils.getWithPasskey(user.id());
+//            final UserRequest userNoLongerCaptain = UserRequest.builder()
+//                .foldingUserName(userWithPasskey.foldingUserName())
+//                .displayName(userWithPasskey.displayName())
+//                .passkey(userWithPasskey.passkey())
+//                .category(userWithPasskey.category().toString())
+//                .profileLink(userWithPasskey.profileLink())
+//                .liveStatsLink(userWithPasskey.liveStatsLink())
+//                .hardwareId(userWithPasskey.hardware().id())
+//                .teamId(userWithPasskey.team().id())
+//                .userIsCaptain(false)
+//                .build();
+//
+//            USER_REQUEST_SENDER.update(userWithPasskey.id(), userNoLongerCaptain, ADMIN_USER.userName(), ADMIN_USER.password());
+//            USER_REQUEST_SENDER.delete(userWithPasskey.id(), ADMIN_USER.userName(), ADMIN_USER.password());
+//        }
+//
+//        for (final Team team : TeamUtils.getAll()) {
+//            TEAM_REQUEST_SENDER.delete(team.id(), ADMIN_USER.userName(), ADMIN_USER.password());
+//        }
+//
+//        for (final Hardware hardware : HardwareUtils.getAll()) {
+//            HARDWARE_REQUEST_SENDER.delete(hardware.id(), ADMIN_USER.userName(), ADMIN_USER.password());
+//        }
+//
+//        DatabaseUtils.truncateTableAndResetId("hardware", "users", "teams");
     }
 
     /**
@@ -137,8 +138,7 @@ public final class SystemCleaner {
             "user_initial_stats",
             "user_offset_tc_stats",
             "user_tc_stats_hourly",
-            "user_total_stats",
-            "user_changes"
+            "user_total_stats"
         );
 
         TeamCompetitionStatsUtils.manuallyResetStats();

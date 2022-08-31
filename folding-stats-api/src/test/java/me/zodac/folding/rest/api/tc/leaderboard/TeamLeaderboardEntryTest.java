@@ -32,6 +32,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
+import me.zodac.folding.api.tc.Role;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.tc.TeamSummary;
@@ -97,6 +98,6 @@ class TeamLeaderboardEntryTest {
         final Hardware hardware = Hardware.create(1, "hardware", "hardware", HardwareMake.AMD, HardwareType.GPU, 1.0D, 1L);
         final Team team = Team.create(1, "team", "teamDescription", "https://google.com");
 
-        return User.create(1, "user", "user", "passkey", Category.AMD_GPU, "", "", hardware, team, true);
+        return User.create(1, "user", "user", "passkey", Category.AMD_GPU, "", "", hardware, team, Role.CAPTAIN);
     }
 }

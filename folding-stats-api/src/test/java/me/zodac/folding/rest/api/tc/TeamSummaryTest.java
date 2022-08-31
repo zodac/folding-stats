@@ -34,6 +34,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
+import me.zodac.folding.api.tc.Role;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
@@ -212,7 +213,7 @@ class TeamSummaryTest {
     private static UserSummary createUserSummary(final int rank, final int units) {
         final Hardware hardware = Hardware.create(1, "hardware", "hardware", HardwareMake.AMD, HardwareType.GPU, 1.0D, 1L);
         final Team team = Team.create(1, "team", "teamDescription", "https://google.com");
-        final User user = User.create(1, "user", "user", "passkey", Category.AMD_GPU, "", "", hardware, team, true);
+        final User user = User.create(1, "user", "user", "passkey", Category.AMD_GPU, "", "", hardware, team, Role.CAPTAIN);
 
         return UserSummary.create(user, units * 5L, units * 500L, units, rank);
     }

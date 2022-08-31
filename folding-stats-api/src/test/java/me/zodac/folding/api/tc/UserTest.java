@@ -45,11 +45,11 @@ class UserTest {
         final Team team = createTeam();
 
         final User user =
-            User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, hardware, team, true);
+            User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, hardware, team, Role.CAPTAIN);
 
         assertThat(user)
-            .extracting("id", "foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "userIsCaptain")
-            .containsExactly(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, true);
+            .extracting("id", "foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "role")
+            .containsExactly(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, Role.CAPTAIN);
 
         assertThat(user.hardware())
             .isEqualTo(hardware);
@@ -62,7 +62,8 @@ class UserTest {
     void testCreate_nullHardware() {
         final Team team = createTeam();
         assertThatThrownBy(
-            () -> User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, null, team, true))
+            () -> User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, null, team,
+                Role.CAPTAIN))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("hardware");
     }
@@ -71,7 +72,8 @@ class UserTest {
     void testCreate_nullTeam() {
         final Hardware hardware = createHardware();
         assertThatThrownBy(
-            () -> User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, hardware, null, true))
+            () -> User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, hardware, null,
+                Role.CAPTAIN))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("team");
     }
@@ -79,7 +81,8 @@ class UserTest {
     @Test
     void testCreate_noId() {
         final User user =
-            User.createWithoutId("user", "user", DUMMY_PASSKEY, Category.AMD_GPU, "", VALID_LIVE_STATS_LINK, createHardware(), createTeam(), true);
+            User.createWithoutId("user", "user", DUMMY_PASSKEY, Category.AMD_GPU, "", VALID_LIVE_STATS_LINK, createHardware(), createTeam(),
+                Role.CAPTAIN);
 
         assertThat(user.id())
             .isEqualTo(User.EMPTY_USER_ID);
@@ -88,7 +91,7 @@ class UserTest {
     @Test
     void testCreate_profileLinkBlank() {
         final User user =
-            User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, "", VALID_LIVE_STATS_LINK, createHardware(), createTeam(), true);
+            User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, "", VALID_LIVE_STATS_LINK, createHardware(), createTeam(), Role.CAPTAIN);
 
         assertThat(user.profileLink())
             .isNull();
@@ -97,7 +100,8 @@ class UserTest {
     @Test
     void testCreate_profileLinkNull() {
         final User user =
-            User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, null, VALID_LIVE_STATS_LINK, createHardware(), createTeam(), true);
+            User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, null, VALID_LIVE_STATS_LINK, createHardware(), createTeam(),
+                Role.CAPTAIN);
 
         assertThat(user.profileLink())
             .isNull();
@@ -106,7 +110,7 @@ class UserTest {
     @Test
     void testCreate_liveStatsLinkBlank() {
         final User user =
-            User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, "", createHardware(), createTeam(), true);
+            User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, "", createHardware(), createTeam(), Role.CAPTAIN);
 
         assertThat(user.liveStatsLink())
             .isNull();
@@ -115,7 +119,7 @@ class UserTest {
     @Test
     void testCreate_liveStatsLinkNull() {
         final User user =
-            User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, null, createHardware(), createTeam(), true);
+            User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, null, createHardware(), createTeam(), Role.CAPTAIN);
 
         assertThat(user.liveStatsLink())
             .isNull();
@@ -125,22 +129,22 @@ class UserTest {
     void testRemoveCaptaincy() {
         final User user =
             User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, createHardware(), createTeam(),
-                true);
+                Role.CAPTAIN);
 
         final User updatedUser = User.removeCaptaincyFromUser(user);
-        assertThat(updatedUser.userIsCaptain())
-            .isFalse();
+        assertThat(updatedUser.role())
+            .isEqualTo(Role.MEMBER);
 
         final User reupdatedUser = User.removeCaptaincyFromUser(updatedUser);
-        assertThat(reupdatedUser.userIsCaptain())
-            .isFalse();
+        assertThat(reupdatedUser.role())
+            .isEqualTo(Role.MEMBER);
     }
 
     @Test
     void testHidePasskey() {
         final User user =
             User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, createHardware(), createTeam(),
-                true);
+                Role.CAPTAIN);
 
         assertThat(user.passkey())
             .isEqualTo(DUMMY_PASSKEY);
@@ -158,7 +162,7 @@ class UserTest {
     void testHidePasskey_lessThan8Chars() {
         final User user =
             User.create(1, "user", "user", "1234", Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, createHardware(), createTeam(),
-                true);
+                Role.CAPTAIN);
 
         assertThat(user.passkey())
             .isEqualTo("1234");
@@ -172,7 +176,7 @@ class UserTest {
     void testIsEqualRequest_valid() {
         final User user =
             User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, createHardware(), createTeam(),
-                true);
+                Role.CAPTAIN);
         final UserRequest userRequest = UserRequest.builder()
             .foldingUserName("user")
             .displayName("user")
@@ -193,7 +197,7 @@ class UserTest {
     void testIsEqualRequest_invalid() {
         final User user =
             User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, createHardware(), createTeam(),
-                true);
+                Role.CAPTAIN);
         final UserRequest userRequest = UserRequest.builder()
             .foldingUserName("user")
             .displayName("user")

@@ -42,6 +42,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
+import me.zodac.folding.api.tc.Role;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
@@ -203,7 +204,7 @@ class PostgresDbManagerTest {
             retrievedUser.liveStatsLink(),
             retrievedUser.hardware(),
             retrievedUser.team(),
-            retrievedUser.userIsCaptain()
+            retrievedUser.role()
         );
 
         POSTGRES_DB_MANAGER.updateUser(userToUpdate);
@@ -579,7 +580,7 @@ class PostgresDbManagerTest {
     private static User generateUser() {
         final Hardware hardware = createHardware();
         final Team team = createTeam();
-        return User.createWithoutId(nextUserName(), "user", "passkey", Category.NVIDIA_GPU, "", "", hardware, team, true);
+        return User.createWithoutId(nextUserName(), "user", "passkey", Category.NVIDIA_GPU, "", "", hardware, team, Role.CAPTAIN);
     }
 
     private static User createUser() {

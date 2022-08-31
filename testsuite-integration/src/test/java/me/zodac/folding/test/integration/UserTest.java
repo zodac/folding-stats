@@ -42,6 +42,7 @@ import java.net.http.HttpResponse;
 import java.util.Collection;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
+import me.zodac.folding.api.tc.Role;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.client.java.response.HardwareResponseParser;
@@ -159,10 +160,9 @@ class UserTest {
         final User actual = UserResponseParser.create(response);
         assertThat(actual)
             .as("Did not receive created object as JSON response: " + response.body())
-            .extracting("foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "userIsCaptain")
+            .extracting("foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "role")
             .containsExactly(userToCreate.getFoldingUserName(), userToCreate.getDisplayName(), userToCreate.getPasskey(),
-                Category.get(userToCreate.getCategory()), userToCreate.getProfileLink(), userToCreate.getLiveStatsLink(),
-                userToCreate.isUserIsCaptain());
+                Category.get(userToCreate.getCategory()), userToCreate.getProfileLink(), userToCreate.getLiveStatsLink(), Role.MEMBER);
     }
 
     @Test
@@ -213,7 +213,7 @@ class UserTest {
             .liveStatsLink(createdUser.liveStatsLink())
             .hardwareId(createdUser.hardware().id())
             .teamId(createdUser.team().id())
-            .userIsCaptain(createdUser.userIsCaptain())
+            .userIsCaptain(createdUser.role().isCaptain())
             .build();
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
 
@@ -226,9 +226,9 @@ class UserTest {
         final User actual = UserResponseParser.update(response);
         assertThat(actual)
             .as("Did not receive created object as JSON response: " + response.body())
-            .extracting("id", "foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "userIsCaptain")
+            .extracting("id", "foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "role")
             .containsExactly(createdUser.id(), createdUser.foldingUserName(), createdUser.displayName(), updatedPasskey,
-                createdUser.category(), createdUser.profileLink(), createdUser.liveStatsLink(), createdUser.userIsCaptain());
+                createdUser.category(), createdUser.profileLink(), createdUser.liveStatsLink(), createdUser.role());
 
         final int allUsersAfterUpdate = UserUtils.getNumberOfUsers();
         assertThat(allUsersAfterUpdate)
@@ -360,7 +360,7 @@ class UserTest {
             .liveStatsLink(createdUser.liveStatsLink())
             .hardwareId(createdUser.hardware().id())
             .teamId(createdUser.team().id())
-            .userIsCaptain(createdUser.userIsCaptain())
+            .userIsCaptain(createdUser.role().isCaptain())
             .build();
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
 
@@ -431,7 +431,7 @@ class UserTest {
             .liveStatsLink(createdUser.liveStatsLink())
             .hardwareId(createdUser.hardware().id())
             .teamId(createdUser.team().id())
-            .userIsCaptain(createdUser.userIsCaptain())
+            .userIsCaptain(createdUser.role().isCaptain())
             .build();
 
         final HttpResponse<String> updateResponse =
@@ -444,9 +444,9 @@ class UserTest {
         final User actual = UserResponseParser.update(updateResponse);
 
         assertThat(actual)
-            .extracting("id", "foldingUserName", "displayName", "category", "profileLink", "liveStatsLink", "userIsCaptain")
+            .extracting("id", "foldingUserName", "displayName", "category", "profileLink", "liveStatsLink", "role")
             .containsExactly(createdUser.id(), createdUser.foldingUserName(), createdUser.displayName(), createdUser.category(),
-                createdUser.profileLink(), createdUser.liveStatsLink(), createdUser.userIsCaptain());
+                createdUser.profileLink(), createdUser.liveStatsLink(), createdUser.role());
         PasskeyChecker.assertPasskeyIsHidden(actual.passkey());
     }
 
@@ -548,7 +548,7 @@ class UserTest {
             .liveStatsLink(createdUser.liveStatsLink())
             .hardwareId(createdUser.hardware().id())
             .teamId(createdUser.team().id())
-            .userIsCaptain(createdUser.userIsCaptain())
+            .userIsCaptain(createdUser.role().isCaptain())
             .build();
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
 
@@ -678,7 +678,7 @@ class UserTest {
             .liveStatsLink("")
             .hardwareId(createdUser.hardware().id())
             .teamId(createdUser.team().id())
-            .userIsCaptain(createdUser.userIsCaptain())
+            .userIsCaptain(createdUser.role().isCaptain())
             .build();
 
         final HttpResponse<String> response =
@@ -791,7 +791,7 @@ class UserTest {
         final User existingCaptain = UserUtils.create(TestGenerator.generateCaptainUser());
 
         final User retrievedExistingCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.id()));
-        assertThat(retrievedExistingCaptain.userIsCaptain())
+        assertThat(retrievedExistingCaptain.role().isCaptain())
             .as("Expected existing user to be captain")
             .isTrue();
 
@@ -809,12 +809,12 @@ class UserTest {
         final User newCaptain = UserUtils.create(userRequest);
 
         final User retrievedOldCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.id()));
-        assertThat(retrievedOldCaptain.userIsCaptain())
+        assertThat(retrievedOldCaptain.role().isCaptain())
             .as("Expected original user to no longer be captain")
             .isFalse();
 
         final User retrievedNewCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(newCaptain.id()));
-        assertThat(retrievedNewCaptain.userIsCaptain())
+        assertThat(retrievedNewCaptain.role().isCaptain())
             .as("Expected new user to be captain")
             .isTrue();
     }
@@ -835,11 +835,11 @@ class UserTest {
             .build());
 
         final User retrievedExistingCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.id()));
-        assertThat(retrievedExistingCaptain.userIsCaptain())
+        assertThat(retrievedExistingCaptain.role().isCaptain())
             .as("Expected existing captain to be captain")
             .isTrue();
         final User retrievedExistingNonCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(nonCaptain.id()));
-        assertThat(retrievedExistingNonCaptain.userIsCaptain())
+        assertThat(retrievedExistingNonCaptain.role().isCaptain())
             .as("Expected other user to not be captain")
             .isFalse();
 
@@ -854,11 +854,11 @@ class UserTest {
             .build());
 
         final User retrievedOldCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.id()));
-        assertThat(retrievedOldCaptain.userIsCaptain())
+        assertThat(retrievedOldCaptain.role().isCaptain())
             .as("Expected original captain to no longer be captain")
             .isFalse();
         final User retrievedNewCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(newCaptain.id()));
-        assertThat(retrievedNewCaptain.userIsCaptain())
+        assertThat(retrievedNewCaptain.role().isCaptain())
             .as("Expected other user to be new captain")
             .isTrue();
     }
@@ -871,11 +871,11 @@ class UserTest {
         final User secondTeamCaptain = UserUtils.create(TestGenerator.generateCaptainUser());
 
         final User retrievedFirstTeamCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(firstTeamCaptain.id()));
-        assertThat(retrievedFirstTeamCaptain.userIsCaptain())
+        assertThat(retrievedFirstTeamCaptain.role().isCaptain())
             .as("Expected user of first team to be captain")
             .isTrue();
         final User retrievedSecondTeamCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(secondTeamCaptain.id()));
-        assertThat(retrievedSecondTeamCaptain.userIsCaptain())
+        assertThat(retrievedSecondTeamCaptain.role().isCaptain())
             .as("Expected user of second team to be captain")
             .isTrue();
 
@@ -886,15 +886,15 @@ class UserTest {
             .category(Category.WILDCARD.toString())
             .hardwareId(firstTeamCaptain.hardware().id())
             .teamId(secondTeamCaptain.team().id())
-            .userIsCaptain(firstTeamCaptain.userIsCaptain())
+            .userIsCaptain(firstTeamCaptain.role().isCaptain())
             .build());
 
         final User retrievedSecondTeamNewCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(firstUserMovingToSecondTeam.id()));
-        assertThat(retrievedSecondTeamNewCaptain.userIsCaptain())
+        assertThat(retrievedSecondTeamNewCaptain.role().isCaptain())
             .as("Expected moved user to be captain of new team")
             .isTrue();
         final User retrievedSecondTeamOldCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(secondTeamCaptain.id()));
-        assertThat(retrievedSecondTeamOldCaptain.userIsCaptain())
+        assertThat(retrievedSecondTeamOldCaptain.role().isCaptain())
             .as("Expected old captain of team to no longer be captain")
             .isFalse();
     }

@@ -33,6 +33,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
+import me.zodac.folding.api.tc.Role;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
@@ -457,7 +458,7 @@ class UserChangeValidatorTest {
                 "https://www.google.ie",
                 user.hardware(),
                 user.team(),
-                user.userIsCaptain()
+                user.role()
             ),
             UserChangeState.APPROVED_NEXT_MONTH
         );
@@ -507,7 +508,7 @@ class UserChangeValidatorTest {
                 "https://www.google.com",
                 user.hardware(),
                 user.team(),
-                user.userIsCaptain()
+                user.role()
             ),
             UserChangeState.APPROVED_NEXT_MONTH
         );
@@ -550,7 +551,7 @@ class UserChangeValidatorTest {
                 "https://www.google.ie",
                 user.hardware(),
                 user.team(),
-                user.userIsCaptain()
+                user.role()
             ),
             UserChangeState.APPROVED_NOW
         );
@@ -706,7 +707,7 @@ class UserChangeValidatorTest {
             "https://www.google.com",
             hardware,
             generateTeam(),
-            true
+            Role.CAPTAIN
         );
     }
 }

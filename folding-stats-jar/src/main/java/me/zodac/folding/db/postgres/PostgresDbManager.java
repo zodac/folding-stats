@@ -314,7 +314,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                     user.liveStatsLink(),
                     user.hardware().id(),
                     user.team().id(),
-                    user.userIsCaptain()
+                    user.role().isCaptain()
                 )
                 .returning(USERS.USER_ID);
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
@@ -382,7 +382,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                 .set(USERS.LIVE_STATS_LINK, userToUpdate.liveStatsLink())
                 .set(USERS.HARDWARE_ID, userToUpdate.hardware().id())
                 .set(USERS.TEAM_ID, userToUpdate.team().id())
-                .set(USERS.IS_CAPTAIN, userToUpdate.userIsCaptain())
+                .set(USERS.IS_CAPTAIN, userToUpdate.role().isCaptain())
                 .where(USERS.USER_ID.equal(userToUpdate.id()));
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
 

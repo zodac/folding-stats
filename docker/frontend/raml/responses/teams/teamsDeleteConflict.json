@@ -21,7 +21,7 @@
       "teamName": "Team1",
       "teamDescription": "Desc"
     },
-    "userIsCaptain": true
+    "role": "CAPTAIN"
   },
   "validationResult": "FAILURE_DUE_TO_CONFLICT",
   "errors": [

@@ -33,6 +33,7 @@ import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
+import me.zodac.folding.api.tc.Role;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.bean.api.FoldingRepository;
@@ -369,7 +370,7 @@ class UserValidatorTest {
             "https://www.google.com",
             otherHardware,
             otherTeam,
-            false
+            Role.MEMBER
         );
 
         final Hardware hardware = generateHardware();
@@ -417,7 +418,7 @@ class UserValidatorTest {
             "https://www.google.com",
             otherHardware,
             otherTeam,
-            true
+            Role.CAPTAIN
         );
 
         final Hardware hardware = generateHardware();
@@ -653,7 +654,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final UserRequest user = UserRequest.builder()
@@ -696,7 +697,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final UserRequest user = UserRequest.builder()
@@ -757,7 +758,7 @@ class UserValidatorTest {
                     "https://www.google.com",
                     hardware,
                     team,
-                    false
+                    Role.MEMBER
                 )
             );
         }
@@ -802,7 +803,7 @@ class UserValidatorTest {
                     "https://www.google.com",
                     hardware,
                     team,
-                    false
+                    Role.MEMBER
                 )
             );
         }
@@ -848,7 +849,7 @@ class UserValidatorTest {
                     "https://www.google.com",
                     hardware,
                     team,
-                    false
+                    Role.MEMBER
                 )
             );
         }
@@ -1008,7 +1009,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1051,7 +1052,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1092,7 +1093,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1133,7 +1134,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1174,7 +1175,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1215,7 +1216,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1256,7 +1257,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1297,7 +1298,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1338,7 +1339,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1381,7 +1382,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1422,7 +1423,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1465,7 +1466,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1494,7 +1495,7 @@ class UserValidatorTest {
             "https://www.google.com",
             otherHardware,
             otherTeam,
-            true
+            Role.CAPTAIN
         );
 
         final Hardware hardware = generateHardware();
@@ -1522,7 +1523,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1573,7 +1574,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1616,7 +1617,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1648,7 +1649,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final UserRequest user = UserRequest.builder()
@@ -1673,7 +1674,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             oldTeam,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1706,7 +1707,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final UserRequest user = UserRequest.builder()
@@ -1731,7 +1732,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            false
+            Role.MEMBER
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1763,7 +1764,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final UserRequest user = UserRequest.builder()
@@ -1788,7 +1789,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            false
+            Role.MEMBER
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1833,7 +1834,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             oldTeam,
-            false
+            Role.MEMBER
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1853,7 +1854,7 @@ class UserValidatorTest {
                     "https://www.google.com",
                     hardware,
                     team,
-                    false
+                    Role.MEMBER
                 )
             );
         }
@@ -1894,7 +1895,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             oldTeam,
-            false
+            Role.MEMBER
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1914,7 +1915,7 @@ class UserValidatorTest {
                     "https://www.google.com",
                     hardware,
                     team,
-                    false
+                    Role.MEMBER
                 )
             );
         }
@@ -1956,7 +1957,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            false
+            Role.MEMBER
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -1976,7 +1977,7 @@ class UserValidatorTest {
                     "https://www.google.com",
                     hardware,
                     team,
-                    false
+                    Role.MEMBER
                 )
             );
         }
@@ -2017,7 +2018,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            false
+            Role.MEMBER
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -2068,7 +2069,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            false
+            Role.MEMBER
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -2120,7 +2121,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -2160,7 +2161,7 @@ class UserValidatorTest {
             "https://www.google.com",
             generateHardware(),
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -2205,7 +2206,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -2245,7 +2246,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             generateTeam(),
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -2285,7 +2286,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -2328,7 +2329,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -2372,7 +2373,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -2415,7 +2416,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -2456,7 +2457,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -2492,7 +2493,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            false
+            Role.MEMBER
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -2520,7 +2521,7 @@ class UserValidatorTest {
             "https://www.google.com",
             hardware,
             team,
-            true
+            Role.CAPTAIN
         );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();

@@ -182,7 +182,7 @@ function populateUserUpdate(){
         document.getElementById("user_update_display_name").value = jsonResponse['displayName']
         document.getElementById("user_update_passkey").value = jsonResponse['passkey']
         document.getElementById("user_update_category_input").value = jsonResponse['category']
-        document.getElementById("user_update_is_captain").checked = jsonResponse["userIsCaptain"]
+        document.getElementById("user_update_is_captain").checked = jsonResponse["role"] === "CAPTAIN"
 
         if ("profileLink" in jsonResponse) {
             document.getElementById("user_update_profile_link").value = jsonResponse['profileLink']
@@ -257,7 +257,7 @@ function populateUserDelete(){
         document.getElementById("user_delete_display_name").value = jsonResponse['displayName']
         document.getElementById("user_delete_passkey").value = jsonResponse['passkey']
         document.getElementById("user_delete_category_input").value = jsonResponse['category']
-        document.getElementById("user_delete_is_captain").checked = jsonResponse["userIsCaptain"]
+        document.getElementById("user_delete_is_captain").checked = jsonResponse["role"] === "CAPTAIN"
 
         if ("profileLink" in jsonResponse) {
             document.getElementById("user_delete_profile_link").value = jsonResponse['profileLink']

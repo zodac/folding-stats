@@ -177,6 +177,9 @@ class LarsTest {
 
     @Test
     void whenUpdatingHardwareFromLars_givenLarsHasAddedSomeNewHardware_thenNewHardwareIsCreated() throws FoldingRestException {
+        final Collection<Hardware> initialHardware = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
+        final int numberOfInitialHardware = initialHardware.size();
+
         LarsUtils.addGpusToLarsDb(
             create("Hardware1", HardwareMake.NVIDIA, "Hardware #1", 1, 1_000L, 1.00D),
             create("Hardware2", HardwareMake.NVIDIA, "Hardware #2", 2, 900L, 1.11D)
@@ -187,7 +190,7 @@ class LarsTest {
         final Collection<Hardware> allHardwareAfterFirstUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareAfterFirstUpdate)
             .as("Expected two hardwares to have been added to the system after first update")
-            .hasSize(2);
+            .hasSize(numberOfInitialHardware + 2);
 
         LarsUtils.addGpusToLarsDb(
             create("Hardware3", HardwareMake.AMD, "Hardware #3", 3, 750L, 1.33D)
@@ -196,8 +199,8 @@ class LarsTest {
 
         final Collection<Hardware> allHardwareAfterSecondUpdate = HardwareResponseParser.getAll(HARDWARE_REQUEST_SENDER.getAll());
         assertThat(allHardwareAfterSecondUpdate)
-            .as("Expected one hardware to have been added to the system after second update")
-            .hasSize(3);
+            .as("Expected one more hardware to have been added to the system after second update")
+            .hasSize(allHardwareAfterFirstUpdate.size() + 1);
     }
 
     @Test

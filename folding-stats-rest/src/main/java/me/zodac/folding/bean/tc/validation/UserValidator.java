@@ -169,7 +169,7 @@ public class UserValidator {
      * @return the validated {@link User}
      */
     public User delete(final User user) {
-        if (user.userIsCaptain()) {
+        if (user.role().isCaptain()) {
             throw new ValidationException(user, String.format("Cannot delete user '%s' since they are team captain", user.displayName()));
         }
 

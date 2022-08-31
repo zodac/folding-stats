@@ -158,7 +158,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 1",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": false
+     *           "role": "MEMBER"
      *         },
      *         "points": 1495839,
      *         "multipliedPoints": 63947117,
@@ -189,7 +189,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 2",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": false
+     *           "role": "MEMBER"
      *         },
      *         "points": 487199,
      *         "multipliedPoints": 48096285,
@@ -220,7 +220,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 3",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": false
+     *           "role": "MEMBER"
      *         },
      *         "points": 1859293,
      *         "multipliedPoints": 45808851,
@@ -251,7 +251,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 5",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": false
+     *           "role": "MEMBER"
      *         },
      *         "points": 142885,
      *         "multipliedPoints": 28861341,
@@ -282,7 +282,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 4",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": false
+     *           "role": "MEMBER"
      *         },
      *         "points": 2142522,
      *         "multipliedPoints": 24103373,
@@ -316,7 +316,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 1",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": false
+     *           "role": "MEMBER"
      *         },
      *         "points": 3063596,
      *         "multipliedPoints": 43319247,
@@ -347,7 +347,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 4",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": false
+     *           "role": "MEMBER"
      *         },
      *         "points": 2984700,
      *         "multipliedPoints": 42203658,
@@ -378,7 +378,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 2",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": false
+     *           "role": "MEMBER"
      *         },
      *         "points": 2873022,
      *         "multipliedPoints": 40624531,
@@ -409,7 +409,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 5",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": false
+     *           "role": "MEMBER"
      *         },
      *         "points": 2500551,
      *         "multipliedPoints": 35357791,
@@ -439,7 +439,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 3",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": false
+     *           "role": "MEMBER"
      *         },
      *         "points": 8532556,
      *         "multipliedPoints": 27986784,
@@ -473,7 +473,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 1",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": false
+     *           "role": "MEMBER"
      *         },
      *         "points": 14137363,
      *         "multipliedPoints": 51318628,
@@ -503,7 +503,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 3",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": false
+     *           "role": "MEMBER"
      *         },
      *         "points": 15935091,
      *         "multipliedPoints": 47486571,
@@ -535,7 +535,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 5",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": true
+     *           "role": "CAPTAIN"
      *         },
      *         "points": 983412,
      *         "multipliedPoints": 47429961,
@@ -566,7 +566,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 4",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": true
+     *           "role": "CAPTAIN"
      *         },
      *         "points": 16206717,
      *         "multipliedPoints": 45865009,
@@ -597,7 +597,7 @@ public class UserStatsStorer {
      *             "teamName": "Team 2",
      *             "forumLink": "https://google.com"
      *           },
-     *           "userIsCaptain": true
+     *           "role": "CAPTAIN"
      *         },
      *         "points": 7115229,
      *         "multipliedPoints": 33583881,

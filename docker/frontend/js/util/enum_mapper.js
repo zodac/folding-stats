@@ -1,3 +1,15 @@
+function getRoleFrontend(value) {
+    if (value.toLowerCase() === "captain") {
+        return "Captain"
+    }
+
+    if (value.toLowerCase() === "member") {
+        return "Member"
+    }
+
+    return value
+}
+
 function getCategoryFrontend(value) {
     if (value.toLowerCase() === "amd_gpu") {
         return "AMD GPU"

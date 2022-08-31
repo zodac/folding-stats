@@ -48,7 +48,7 @@
         "id": 1,
         "teamName": "Team1"
       },
-      "userIsCaptain": false
+      "role": "MEMBER"
     },
     "newUser": {
       "id": 1,
@@ -71,7 +71,7 @@
         "id": 1,
         "teamName": "Team1"
       },
-      "userIsCaptain": false
+      "role": "MEMBER"
     },
     "state": "REQUESTED_NOW"
   }

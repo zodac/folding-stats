@@ -52,7 +52,7 @@ public record User(int id,
                    String liveStatsLink,
                    Hardware hardware,
                    Team team,
-                   boolean userIsCaptain
+                   Role role
 ) implements ResponsePojo {
 
     /**
@@ -79,10 +79,11 @@ public record User(int id,
      * @param liveStatsLink   a URL linking to the live Folding@Home stats (HFM, for example) for the {@link User}
      * @param hardware        the {@link Hardware} that this {@link User} is Folding on
      * @param team            the {@link Team} that the {@link User} is Folding for
-     * @param isCaptain       whether the {@link User} is the captain of their {@link Team}
+     * @param role            the {@link User}'s role in their {@link Team}
      * @return the created {@link User}
      * @throws IllegalArgumentException thrown if {@code hardware} or {@code team} is null
      */
+    // TODO: Make createCaptain(), createTeamMember()
     public static User create(final int userId,
                               final String foldingUserName,
                               final String displayName,
@@ -92,7 +93,7 @@ public record User(int id,
                               final String liveStatsLink,
                               final Hardware hardware,
                               final Team team,
-                              final boolean isCaptain) {
+                              final Role role) {
         if (hardware == null) {
             throw new IllegalArgumentException("'hardware' must not be null");
         }
@@ -103,7 +104,7 @@ public record User(int id,
 
         final String profileLinkOrNull = StringUtils.isBlank(profileLink) ? null : profileLink;
         final String liveStatsLinkOrNull = StringUtils.isBlank(liveStatsLink) ? null : liveStatsLink;
-        return new User(userId, foldingUserName, displayName, passkey, category, profileLinkOrNull, liveStatsLinkOrNull, hardware, team, isCaptain);
+        return new User(userId, foldingUserName, displayName, passkey, category, profileLinkOrNull, liveStatsLinkOrNull, hardware, team, role);
     }
 
     /**
@@ -120,7 +121,7 @@ public record User(int id,
      * @param liveStatsLink   a URL linking to the live Folding@Home stats (HFM, for example) for the {@link User}
      * @param hardware        the {@link Hardware} that this {@link User} is Folding on
      * @param team            the {@link Team} that the {@link User} is Folding for
-     * @param isCaptain       whether the {@link User} is the captain of their {@link Team}
+     * @param role            the {@link User}'s role in their {@link Team}
      * @return the created {@link User}
      * @throws IllegalArgumentException thrown if {@code hardware} or {@code team} is null
      */
@@ -132,8 +133,8 @@ public record User(int id,
                                        final String liveStatsLink,
                                        final Hardware hardware,
                                        final Team team,
-                                       final boolean isCaptain) { // TODO: Use 'Role' enum for team membership
-        return create(EMPTY_USER_ID, foldingUserName, displayName, passkey, category, profileLink, liveStatsLink, hardware, team, isCaptain);
+                                       final Role role) {
+        return create(EMPTY_USER_ID, foldingUserName, displayName, passkey, category, profileLink, liveStatsLink, hardware, team, role);
     }
 
     /**
@@ -161,7 +162,7 @@ public record User(int id,
             userRequest.getLiveStatsLink(),
             hardware,
             team,
-            userRequest.isUserIsCaptain()
+            userRequest.isUserIsCaptain() ? Role.CAPTAIN : Role.MEMBER
         );
     }
 
@@ -179,7 +180,7 @@ public record User(int id,
      */
     public static User updateWithId(final int userId, final User user) {
         return create(userId, user.foldingUserName, user.displayName, user.passkey, user.category, user.profileLink, user.liveStatsLink,
-            user.hardware, user.team, user.userIsCaptain);
+            user.hardware, user.team, user.role);
     }
 
     /**
@@ -195,7 +196,7 @@ public record User(int id,
      */
     public static User updateHardware(final User user, final Hardware hardware) {
         return create(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.profileLink, user.liveStatsLink, hardware,
-            user.team, user.userIsCaptain);
+            user.team, user.role);
     }
 
     /**
@@ -211,7 +212,7 @@ public record User(int id,
      */
     public static User updateTeam(final User user, final Team team) {
         return create(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.profileLink, user.liveStatsLink,
-            user.hardware, team, user.userIsCaptain);
+            user.hardware, team, user.role);
     }
 
     /**
@@ -223,7 +224,7 @@ public record User(int id,
      */
     public static User removeCaptaincyFromUser(final User user) {
         return create(user.id, user.foldingUserName, user.displayName, user.passkey, user.category, user.profileLink, user.liveStatsLink,
-            user.hardware, user.team, false);
+            user.hardware, user.team, Role.MEMBER);
     }
 
     /**
@@ -247,7 +248,7 @@ public record User(int id,
      */
     public static User hidePasskey(final User user) {
         return create(user.id, user.foldingUserName, user.displayName, hidePasskey(user.passkey), user.category, user.profileLink, user.liveStatsLink,
-            user.hardware, user.team, user.userIsCaptain);
+            user.hardware, user.team, user.role);
     }
 
     private static String hidePasskey(final String passkey) {
@@ -268,7 +269,7 @@ public record User(int id,
     public boolean isEqualRequest(final UserRequest userRequest) {
         return hardware.id() == userRequest.getHardwareId()
             && team.id() == userRequest.getTeamId()
-            && userIsCaptain == userRequest.isUserIsCaptain()
+            && ((userRequest.isUserIsCaptain() && role == Role.CAPTAIN) || (role == Role.MEMBER))
             && Objects.equals(foldingUserName, userRequest.getFoldingUserName())
             && Objects.equals(displayName, userRequest.getDisplayName())
             && Objects.equals(passkey, userRequest.getPasskey())
