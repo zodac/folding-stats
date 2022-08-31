@@ -76,61 +76,7 @@ class HardwareTest {
         SystemCleaner.cleanSystemForSimpleTests();
     }
 
-    @Test
-    void whenUpdatingHardware_givenValidHardwareId_andValidPayload_thenUpdatedHardwareIsReturned_andNoNewHardwareIsCreated_andHas200Status()
-        throws FoldingRestException {
-        final Hardware createdHardware = HardwareUtils.create(TestGenerator.generateHardware());
-        final int initialSize = HardwareUtils.getNumberOfHardware();
-
-        final HardwareRequest updatedHardware = HardwareRequest.builder()
-            .hardwareName(createdHardware.hardwareName())
-            .displayName(createdHardware.displayName())
-            .hardwareMake(createdHardware.hardwareMake().toString())
-            .hardwareType(createdHardware.hardwareType().toString())
-            .multiplier(createdHardware.multiplier())
-            .averagePpd(createdHardware.averagePpd())
-            .build();
-
-        final HttpResponse<String> response =
-            HARDWARE_REQUEST_SENDER.update(createdHardware.id(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_OK);
-
-        final Hardware actual = HardwareResponseParser.update(response);
-        assertThat(actual.isEqualRequest(updatedHardware))
-            .as("Did not receive created object as JSON response: " + response.body())
-            .isTrue();
-
-        final int allHardwareAfterUpdate = HardwareUtils.getNumberOfHardware();
-        assertThat(allHardwareAfterUpdate)
-            .as("Expected no new hardware instances to be created")
-            .isEqualTo(initialSize);
-    }
-
     // Negative/alternative test cases
-
-    @Test
-    void whenDeletingHardware_givenValidHardwareId_thenHardwareIsDeleted_andHas200Status_andHardwareCountIsReduced_andHardwareCannotBeRetrievedAgain()
-        throws FoldingRestException {
-        final int hardwareId = HardwareUtils.create(TestGenerator.generateHardware()).id();
-        final int initialSize = HardwareUtils.getNumberOfHardware();
-
-        final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(hardwareId, ADMIN_USER.userName(), ADMIN_USER.password());
-        assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_OK);
-
-        final HttpResponse<String> getResponse = HARDWARE_REQUEST_SENDER.get(hardwareId);
-        assertThat(getResponse.statusCode())
-            .as("Was able to retrieve the hardware instance, despite deleting it")
-            .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
-
-        final int newSize = HardwareUtils.getNumberOfHardware();
-        assertThat(newSize)
-            .as("Get all response did not return the initial hardware - deleted hardware")
-            .isEqualTo(initialSize - 1);
-    }
 
     @Test
     void whenCreatingHardware_givenHardwareWithTheSameNameAlreadyExists_then409ResponseIsReturned() throws FoldingRestException {

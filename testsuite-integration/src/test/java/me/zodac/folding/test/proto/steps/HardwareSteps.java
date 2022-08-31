@@ -28,6 +28,7 @@ import static me.zodac.folding.test.integration.util.TestAuthenticationData.ADMI
 import static me.zodac.folding.test.integration.util.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.HttpURLConnection;
 import java.net.http.HttpResponse;
 import java.util.Collection;
 import me.zodac.folding.api.tc.Hardware;
@@ -82,10 +83,13 @@ public final class HardwareSteps {
                     .as(String.format("Did not receive a %d HTTP response: %s", expectedHttpStatusCode, response.body()))
                     .isEqualTo(expectedHttpStatusCode);
 
-                final Hardware retrievedHardware = HardwareResponseParser.get(response);
-                assertThat(retrievedHardware)
-                    .as("Retrieved hardware was not the same as the created hardware")
-                    .isEqualTo(createdHardware);
+                // If a positive result is expected, verify the returned response is valid
+                if (expectedHttpStatusCode == HttpURLConnection.HTTP_OK) {
+                    final Hardware retrievedHardware = HardwareResponseParser.get(response);
+                    assertThat(retrievedHardware)
+                        .as("Retrieved hardware was not the same as the created hardware")
+                        .isEqualTo(createdHardware);
+                }
             }
         );
     }
@@ -118,6 +122,17 @@ public final class HardwareSteps {
     }
 
     /**
+     * Verifies that there are no {@link Hardware}s on the system.
+     *
+     * @return the {@link TestStep}
+     * @see #verifyNumberOfHardwareOnSystemEquals(int)
+     */
+    @NeedsHttpResponse
+    public static TestStep verifyNoHardwareOnSystem() {
+        return verifyNumberOfHardwareOnSystemEquals(0);
+    }
+
+    /**
      * Verifies that the number of {@link Hardware} on the system is the expected amount.
      *
      * @param expectedNumberOfHardware the expected number of {@link Hardware} to be returned
@@ -142,7 +157,7 @@ public final class HardwareSteps {
      *
      * <ol>
      *     <li>Verifies that the expected HTTP status code was returned</li>
-     *     <li>Extract the created {@link Hardware} and verify the fields 'hardwareName', 'displayName' and 'multiplier' match the input JSON</li>
+     *     <li>Extracts the created {@link Hardware} and verifies the fields 'hardwareName', 'displayName' and 'multiplier' match the input JSON</li>
      * </ol>
      *
      * @param expectedHttpStatusCode the expected HTTP status code
@@ -168,6 +183,76 @@ public final class HardwareSteps {
                     .containsExactly(hardwareToCreate.getHardwareName(), hardwareToCreate.getDisplayName(), hardwareToCreate.getMultiplier());
 
                 testContext.putHttpResponse(response);
+            }
+        );
+    }
+
+    /**
+     * Updates an existing {@link Hardware} in the system. Once created, performs the following checks:
+     *
+     * <ol>
+     *     <li>Verifies that the expected HTTP status code was returned</li>
+     *     <li>Extracts the updated {@link Hardware} and verifies the returned payload matches the wanted {@link Hardware}</li>
+     * </ol>
+     *
+     * @param newHardwareName        the new value for the 'hardwareName' and 'displayName' fields
+     * @param expectedHttpStatusCode the expected HTTP status code
+     * @see me.zodac.folding.client.java.request.HardwareRequestSender#update(int, HardwareRequest, String, String)
+     */
+    @NeedsHttpResponse
+    @SavesHttpResponse
+    public static TestStep updateHardwareFromPreviousResponse(final String newHardwareName, final int expectedHttpStatusCode) {
+        return new TestStep(
+            "Update the 'hardwareName' and 'displayName' of an existing hardware on the system",
+            (testContext) -> {
+                final HttpResponse<String> response = testContext.getHttpResponse();
+                final Hardware createdHardware = HardwareResponseParser.create(response);
+
+                final HardwareRequest updatedHardware = HardwareRequest.builder()
+                    .hardwareName(newHardwareName)
+                    .displayName(newHardwareName)
+                    .hardwareMake(createdHardware.hardwareMake().toString())
+                    .hardwareType(createdHardware.hardwareType().toString())
+                    .multiplier(createdHardware.multiplier())
+                    .averagePpd(createdHardware.averagePpd())
+                    .build();
+
+                final HttpResponse<String> updateResponse =
+                    HARDWARE_REQUEST_SENDER.update(createdHardware.id(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+                assertThat(updateResponse.statusCode())
+                    .as(String.format("Did not receive a %d HTTP response: %s", expectedHttpStatusCode, response.body()))
+                    .isEqualTo(expectedHttpStatusCode);
+
+                final Hardware actual = HardwareResponseParser.update(updateResponse);
+                assertThat(actual.isEqualRequest(updatedHardware))
+                    .as("Did not receive created object as JSON response: " + response.body())
+                    .isTrue();
+
+                testContext.putHttpResponse(updateResponse);
+            }
+        );
+    }
+
+    /**
+     * Deletes an existing {@link Hardware} in the system, and verifies that the expected HTTP status code was returned.
+     *
+     * @param expectedHttpStatusCode the expected HTTP status code
+     * @see me.zodac.folding.client.java.request.HardwareRequestSender#delete(int, String, String)
+     */
+    @NeedsHttpResponse
+    public static TestStep deleteHardwareFromPreviousResponse(final int expectedHttpStatusCode) {
+        return new TestStep(
+            "Delete an existing hardware on the system",
+            (testContext) -> {
+                final HttpResponse<String> response = testContext.getHttpResponse();
+                final Hardware createdHardware = HardwareResponseParser.create(response);
+
+                final HttpResponse<Void> deleteResponse =
+                    HARDWARE_REQUEST_SENDER.delete(createdHardware.id(), ADMIN_USER.userName(), ADMIN_USER.password());
+
+                assertThat(deleteResponse.statusCode())
+                    .as(String.format("Did not receive a %d HTTP response: %s", expectedHttpStatusCode, response.body()))
+                    .isEqualTo(HttpURLConnection.HTTP_OK);
             }
         );
     }

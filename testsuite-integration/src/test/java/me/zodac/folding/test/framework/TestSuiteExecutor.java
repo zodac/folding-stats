@@ -58,8 +58,8 @@ public final class TestSuiteExecutor {
                 |-------------------------------------|
                 | Property                    | Value |
                 |-------------------------------------|
-                | Continue On Failure         | {}     |
-                | Print Full Error Stacktrace | {}     |
+                | Continue On Failure         |   {}   |
+                | Print Full Error Stacktrace |   {}   |
                 |-------------------------------------|
                 """,
             testSuite.testSuiteName(),
@@ -75,23 +75,23 @@ public final class TestSuiteExecutor {
                 final List<TestStep> testSteps = testCase.getTestSteps();
                 LOGGER.info("""
                     Executing test case ({}/{}):
-                    {}
-                    """, testCaseNumber, testCases.size(), testCase.getTestCaseDescription());
+                    {}""", testCaseNumber, testCases.size(), testCase.getTestCaseDescription());
 
                 executeCommonTestSteps(testSuite, commonTestSteps, testCase);
                 executeTestCaseTestSteps(testSuite, testCase, testSteps);
             } catch (final Exception | AssertionError e) {
                 if (testSuite.continueOnTestFailure()) {
+                    LOGGER.warn("FAILED: {}\n", e.getMessage());
                     errors++;
                 } else {
                     throw e;
                 }
             }
-            LOGGER.info("----------------------------\n");
+            LOGGER.info("Test case {} PASSED\n----------------------------\n", testCaseNumber);
         }
 
         if (errors == 0) {
-            LOGGER.info("PASSED: {} test cases", testCases.size());
+            LOGGER.info("PASSED: {} test cases\n", testCases.size());
         } else {
             final String errorMessage = String.format("FAILED: %d/%d test cases", errors, testCases.size());
             LOGGER.error(errorMessage);
@@ -118,8 +118,7 @@ public final class TestSuiteExecutor {
         for (final TestStep testStep : testCase.getTestSteps()) {
             LOGGER.info("""
                 --> Executing test step ({}/{}) <--
-                {}
-                """, testStepNumber, testSteps.size(), testStep.getTestStepDescription());
+                {}""", testStepNumber, testSteps.size(), testStep.getTestStepDescription());
 
             // If the TestStep requires a HttpResponse but non exists in the TestContext, fail
             if (testStep.getClass().isAnnotationPresent(NeedsHttpResponse.class) && !testCase.getTestContext().hasHttpResponse()) {
@@ -135,7 +134,7 @@ public final class TestSuiteExecutor {
     private static void executeTestStep(final TestSuite testSuite, final TestStep testStep, final TestContext testContext) {
         try {
             testStep.execute(testContext);
-            LOGGER.info("PASSED");
+            LOGGER.info("PASSED\n");
         } catch (final AssertionError e) {
             if (testSuite.fullErrorStackTrace()) {
                 throw e;

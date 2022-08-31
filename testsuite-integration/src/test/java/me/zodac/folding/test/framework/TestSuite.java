@@ -47,4 +47,13 @@ public record TestSuite(String testSuiteName,
                         List<TestCase> testCases,
                         List<TestStep> commonTestSteps
 ) {
+
+    /**
+     * Executes this {@link TestSuite}.
+     *
+     * @see me.zodac.folding.test.framework.TestSuiteExecutor
+     */
+    public void execute() {
+        TestSuiteExecutor.execute(this);
+    }
 }

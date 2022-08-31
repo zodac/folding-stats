@@ -8,7 +8,6 @@
 
     <Loggers>
         <root level="INFO">
-            <Appender-ref ref="SERVER_LOG"/>
             <Appender-ref ref="CONSOLE"/>
         </root>
     </Loggers>
