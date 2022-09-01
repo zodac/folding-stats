@@ -30,12 +30,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.AllTeamsSummary;
+import me.zodac.folding.rest.api.tc.request.OffsetTcStatsRequest;
 import me.zodac.folding.rest.api.util.RestUtilConstants;
 
 /**
@@ -359,10 +359,14 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
      */
     public HttpResponse<Void> offset(final int userId, final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset,
                                      final String userName, final String password) throws FoldingRestException {
-        final OffsetTcStats offsetTcStats = OffsetTcStats.create(pointsOffset, multipliedPointsOffset, unitsOffset);
+        final OffsetTcStatsRequest offsetTcStatsRequest = OffsetTcStatsRequest.builder()
+            .pointsOffset(pointsOffset)
+            .multipliedPointsOffset(multipliedPointsOffset)
+            .unitsOffset(unitsOffset)
+            .build();
 
         final HttpRequest request = HttpRequest.newBuilder()
-            .method("PATCH", HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(offsetTcStats)))
+            .method("PATCH", HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(offsetTcStatsRequest)))
             .uri(URI.create(statsUrl + "/users/" + userId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))

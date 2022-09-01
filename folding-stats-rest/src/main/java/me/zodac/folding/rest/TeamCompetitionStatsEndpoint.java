@@ -53,6 +53,7 @@ import me.zodac.folding.rest.api.tc.CompetitionSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
+import me.zodac.folding.rest.api.tc.request.OffsetTcStatsRequest;
 import me.zodac.folding.rest.util.ReadRequired;
 import me.zodac.folding.rest.util.WriteRequired;
 import me.zodac.folding.state.SystemStateManager;
@@ -180,10 +181,10 @@ public class TeamCompetitionStatsEndpoint {
     }
 
     /**
-     * {@link PatchMapping} request to update an existing {@link UserSummary} with an {@link OffsetTcStats}.
+     * {@link PatchMapping} request to update an existing {@link UserSummary} with an {@link OffsetTcStatsRequest}.
      *
      * @param userId        the ID of the {@link UserSummary} to be updated
-     * @param offsetTcStats the {@link OffsetTcStats} to be applied
+     * @param offsetTcStatsRequest the {@link OffsetTcStatsRequest} to be applied
      * @param request       the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#ok()}
      */
@@ -191,12 +192,13 @@ public class TeamCompetitionStatsEndpoint {
     @RolesAllowed("admin")
     @PatchMapping(path = "/users/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> updateUserWithOffset(@PathVariable("userId") final int userId,
-                                                  @RequestBody final OffsetTcStats offsetTcStats,
+                                                  @RequestBody final OffsetTcStatsRequest offsetTcStatsRequest,
                                                   final HttpServletRequest request) {
-        AUDIT_LOGGER.info("PATCH request to update offset for user received at '{}' with request {}", request::getRequestURI, () -> offsetTcStats);
+        AUDIT_LOGGER.info("PATCH request to offset user stats received at '{}' with request {}", request::getRequestURI, () -> offsetTcStatsRequest);
 
         final User user = foldingRepository.getUserWithPasskey(userId);
         final Hardware hardware = user.hardware();
+        final OffsetTcStats offsetTcStats = OffsetTcStats.create(offsetTcStatsRequest);
         final OffsetTcStats offsetTcStatsToPersist = OffsetTcStats.updateWithHardwareMultiplier(offsetTcStats, hardware.multiplier());
 
         final OffsetTcStats createdOffsetStats = statsRepository.createOrUpdateOffsetStats(user, offsetTcStatsToPersist);

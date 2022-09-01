@@ -997,17 +997,17 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                 )
                 .values(
                     userId, currentUtcLocalDateTime,
-                    offsetTcStats.getPointsOffset(),
-                    offsetTcStats.getMultipliedPointsOffset(),
-                    offsetTcStats.getUnitsOffset()
+                    offsetTcStats.pointsOffset(),
+                    offsetTcStats.multipliedPointsOffset(),
+                    offsetTcStats.unitsOffset()
                 )
                 .onConflict(USER_OFFSET_TC_STATS.USER_ID)
                 .doUpdate()
                 .set(USER_OFFSET_TC_STATS.UTC_TIMESTAMP, currentUtcLocalDateTime)
-                .set(USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_POINTS.plus(offsetTcStats.getPointsOffset()))
+                .set(USER_OFFSET_TC_STATS.OFFSET_POINTS, USER_OFFSET_TC_STATS.OFFSET_POINTS.plus(offsetTcStats.pointsOffset()))
                 .set(USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS,
-                    USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS.plus(offsetTcStats.getMultipliedPointsOffset()))
-                .set(USER_OFFSET_TC_STATS.OFFSET_UNITS, USER_OFFSET_TC_STATS.OFFSET_UNITS.plus(offsetTcStats.getUnitsOffset()))
+                    USER_OFFSET_TC_STATS.OFFSET_MULTIPLIED_POINTS.plus(offsetTcStats.multipliedPointsOffset()))
+                .set(USER_OFFSET_TC_STATS.OFFSET_UNITS, USER_OFFSET_TC_STATS.OFFSET_UNITS.plus(offsetTcStats.unitsOffset()))
                 .returning();
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
 

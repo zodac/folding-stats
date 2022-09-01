@@ -324,9 +324,9 @@ class PostgresDbManagerTest {
             .isPresent();
 
         final OffsetTcStats expectedOffsetStats = OffsetTcStats.create(
-            offsetStats.getPointsOffset() + additionalOffsetStats.getPointsOffset(),
-            offsetStats.getMultipliedPointsOffset() + additionalOffsetStats.getMultipliedPointsOffset(),
-            offsetStats.getUnitsOffset() + additionalOffsetStats.getUnitsOffset()
+            offsetStats.pointsOffset() + additionalOffsetStats.pointsOffset(),
+            offsetStats.multipliedPointsOffset() + additionalOffsetStats.multipliedPointsOffset(),
+            offsetStats.unitsOffset() + additionalOffsetStats.unitsOffset()
         );
         final Optional<OffsetTcStats> thirdOffsetStats = POSTGRES_DB_MANAGER.getOffsetStats(userId);
         assertThat(thirdOffsetStats)

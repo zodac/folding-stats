@@ -32,6 +32,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import me.zodac.folding.rest.api.tc.request.OffsetTcStatsRequest;
 
 /**
  * POJO defining a stats offset for a {@link me.zodac.folding.api.tc.User} within the {@code Team Competition}. In the case of a manual change
@@ -39,12 +40,12 @@ import lombok.experimental.Accessors;
  */
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Accessors(fluent = false) // Need #get*()
+@Accessors(fluent = true)
 @Getter
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
-public class OffsetTcStats { // TODO: Make a request version of this for REST endpoint
+public class OffsetTcStats {
 
     private static final long DEFAULT_POINTS = 0L;
     private static final long DEFAULT_MULTIPLIED_POINTS = 0L;
@@ -64,6 +65,20 @@ public class OffsetTcStats { // TODO: Make a request version of this for REST en
      */
     public static OffsetTcStats create(final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset) {
         return new OffsetTcStats(pointsOffset, multipliedPointsOffset, unitsOffset);
+    }
+
+    /**
+     * Creates an instance of {@link OffsetTcStats} from a {@link OffsetTcStatsRequest}.
+     *
+     * @param offsetTcStatsRequest the {@link OffsetTcStatsRequest} REST payload
+     * @return the created {@link OffsetTcStats}
+     */
+    public static OffsetTcStats create(final OffsetTcStatsRequest offsetTcStatsRequest) {
+        return create(
+            offsetTcStatsRequest.getPointsOffset(),
+            offsetTcStatsRequest.getMultipliedPointsOffset(),
+            offsetTcStatsRequest.getUnitsOffset()
+        );
     }
 
     /**

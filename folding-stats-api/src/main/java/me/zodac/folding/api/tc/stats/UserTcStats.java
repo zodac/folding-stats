@@ -114,9 +114,9 @@ public class UserTcStats extends UserStats {
      * @return the new {@link UserTcStats} instances with {@link OffsetTcStats} applied
      */
     public UserTcStats add(final OffsetTcStats offsetTcStats) {
-        final long offsetPoints = Math.max(points() + offsetTcStats.getPointsOffset(), Stats.DEFAULT_POINTS);
-        final long offsetMultipliedPoints = Math.max(multipliedPoints + offsetTcStats.getMultipliedPointsOffset(), DEFAULT_MULTIPLIED_POINTS);
-        final int offsetUnits = Math.max(units() + offsetTcStats.getUnitsOffset(), Stats.DEFAULT_UNITS);
+        final long offsetPoints = Math.max(points() + offsetTcStats.pointsOffset(), Stats.DEFAULT_POINTS);
+        final long offsetMultipliedPoints = Math.max(multipliedPoints + offsetTcStats.multipliedPointsOffset(), DEFAULT_MULTIPLIED_POINTS);
+        final int offsetUnits = Math.max(units() + offsetTcStats.unitsOffset(), Stats.DEFAULT_UNITS);
 
         return create(userId(), timestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);
     }
