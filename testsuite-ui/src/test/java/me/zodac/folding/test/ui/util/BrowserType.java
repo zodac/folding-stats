@@ -26,6 +26,8 @@ package me.zodac.folding.test.ui.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.stream.Stream;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
@@ -75,10 +77,26 @@ public enum BrowserType {
     private static final String TEST_IP_ADDRESS = System.getProperty("testIpAddress", "127.0.0.1");
     private static final String WEB_DRIVER_URL_FORMAT = "http://%s:%s/wd/hub";
 
+    private static final Collection<BrowserType> ALL_VALUES = Stream.of(values())
+        .toList();
+
     private final String displayName;
 
     BrowserType(final String displayName) {
         this.displayName = displayName;
+    }
+
+    /**
+     * Retrieve all available {@link BrowserType}s.
+     *
+     * <p>
+     * Should be used instead of {@link BrowserType#values()}, as that recalculates the array for each call,
+     * while this method uses a static {@link BrowserType}.
+     *
+     * @return a {@link Collection} of all {@link BrowserType}s
+     */
+    public static Collection<BrowserType> getAllValues() {
+        return ALL_VALUES;
     }
 
     /**

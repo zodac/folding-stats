@@ -38,11 +38,6 @@ public enum FrontendLink {
     ADMIN_URL("http://frontend_dev/admin"),
 
     /**
-     * The URL for the RAML API of the frontend UI.
-     */
-    API_URL("http://frontend_dev/api.html"),
-
-    /**
      * The URL for the main page of the frontend UI.
      */
     INDEX_URL("http://frontend_dev/"),

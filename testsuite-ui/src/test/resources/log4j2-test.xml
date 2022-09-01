@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="60">
+    <Appenders>
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} %msg%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <root level="INFO">
+            <Appender-ref ref="CONSOLE"/>
+        </root>
+
+        <!-- Suppress logging for unwanted packages -->
+
+        <!-- Not interested in the Selenium messages -->
+        <Logger name="org.openqa.selenium" level="WARN">
+            <Appender-ref ref="CONSOLE"/>
+        </Logger>
+    </Loggers>
+</Configuration>

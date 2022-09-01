@@ -25,6 +25,7 @@
 package me.zodac.folding.test.ui.util;
 
 import java.net.MalformedURLException;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -50,6 +51,9 @@ public final class TestExecutor {
         final RemoteWebDriver driver = browserType.getDriver();
         try {
             test.accept(driver);
+            Thread.sleep(TimeUnit.SECONDS.toMillis(1L));
+        } catch (final InterruptedException e) {
+            Thread.currentThread().interrupt();
         } finally {
             driver.quit();
         }

@@ -25,16 +25,21 @@
 
 package me.zodac.folding.test.ui;
 
-import static me.zodac.folding.test.ui.util.Logger.log;
 import static me.zodac.folding.test.ui.util.Logger.logWithBlankLine;
 import static me.zodac.folding.test.ui.util.TestExecutor.executeWithDriver;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.MalformedURLException;
+import java.util.List;
+import java.util.stream.Stream;
+import me.zodac.folding.test.ui.model.NavigationBar;
+import me.zodac.folding.test.ui.model.Tag;
 import me.zodac.folding.test.ui.util.BrowserType;
 import me.zodac.folding.test.ui.util.FrontendLink;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.openqa.selenium.WebElement;
 
 /**
  * Verifies that each page of the UI can be loaded.
@@ -44,6 +49,7 @@ import org.junit.jupiter.params.provider.EnumSource;
  * <ul>
  *     <li>That the page can be loaded</li>
  *     <li>That the tab title is {@code "Extreme Team Folding"}</li>
+ *     <li>That the navigation bar contains the correct link titles</li>
  * </ul>
  *
  * @see FrontendLink
@@ -53,19 +59,47 @@ class PageLoadTest {
     private static final String EXPECTED_TAB_TITLE = "Extreme Team Folding";
 
     @ParameterizedTest
-    @EnumSource(BrowserType.class)
-    void loadPages(final BrowserType browserType) throws MalformedURLException {
-        logWithBlankLine("Loading '%s' browser", browserType.displayName());
+    @MethodSource("browserAndFrontendLinkProvider")
+    void loadAllPages(final BrowserType browserType, final FrontendLink frontendLink) throws MalformedURLException {
+        logWithBlankLine("Loading '%s' browser at '%s'", browserType.displayName(), frontendLink.url());
 
         executeWithDriver(browserType, driver -> {
-            for (final FrontendLink frontendLink : FrontendLink.getAllValues()) {
-                log("Visiting '%s'", frontendLink.url());
-                driver.navigate().to(frontendLink.url());
+            driver.navigate().to(frontendLink.url());
 
-                assertThat(driver.getTitle())
-                    .as(String.format("Unexpected tab title for '%s': %s", frontendLink.url(), driver.getPageSource()))
-                    .isEqualTo(EXPECTED_TAB_TITLE);
+            assertThat(driver.getTitle())
+                .as(String.format("Unexpected tab title for URL '%s'", frontendLink.url()))
+                .isEqualTo(EXPECTED_TAB_TITLE);
+
+            final WebElement navigationBar = driver.findElement(NavigationBar.NAVIGATION_BAR);
+
+            // Check navigation bar title
+            final WebElement navigationBarTitle = navigationBar.findElement(NavigationBar.TITLE);
+            assertThat(navigationBarTitle.getText())
+                .as(String.format("Unexpected navigation bar title for URL '%s'", frontendLink.url()))
+                .isEqualTo(NavigationBar.EXPECTED_NAVIGATION_BAR_TITLE);
+
+            final WebElement navigationBarLinksParent = navigationBar.findElement(NavigationBar.LINKS_PARENT);
+            final List<WebElement> navigationBarLinks = navigationBarLinksParent.findElements(NavigationBar.LINKS);
+
+            assertThat(navigationBarLinks)
+                .as("Expected the navigation bar to have 6 links for URL: %s", frontendLink.url())
+                .hasSize(NavigationBar.EXPECTED_NUMBER_OF_LINKS);
+
+            for (int i = 0; i < NavigationBar.EXPECTED_NUMBER_OF_LINKS; i++) {
+                final WebElement navigationBarLink = navigationBarLinks.get(i);
+                assertThat(navigationBarLink.findElement(Tag.A).getText())
+                    .isEqualTo(NavigationBar.EXPECTED_TAB_NAME_BY_INDEX.get(i));
             }
         });
+    }
+
+    private static Stream<Arguments> browserAndFrontendLinkProvider() {
+        final Stream.Builder<Arguments> argumentBuilder = Stream.builder();
+        for (final BrowserType browserType : BrowserType.getAllValues()) {
+            for (final FrontendLink frontendLink : FrontendLink.getAllValues()) {
+                argumentBuilder.add(Arguments.of(browserType, frontendLink));
+            }
+        }
+        return argumentBuilder.build();
     }
 }
