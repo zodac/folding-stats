@@ -47,7 +47,7 @@ class TeamTest {
 
     @Test
     void testCreate_noId() {
-        final Team team = Team.createWithoutId("teamName", "teamDescription", VALID_FORUM_LINK);
+        final Team team = Team.create(Team.EMPTY_TEAM_ID, "teamName", "teamDescription", VALID_FORUM_LINK);
 
         assertThat(team.id())
             .isEqualTo(Team.EMPTY_TEAM_ID);

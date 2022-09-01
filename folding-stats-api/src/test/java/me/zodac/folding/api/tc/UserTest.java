@@ -81,7 +81,8 @@ class UserTest {
     @Test
     void testCreate_noId() {
         final User user =
-            User.createWithoutId("user", "user", DUMMY_PASSKEY, Category.AMD_GPU, "", VALID_LIVE_STATS_LINK, createHardware(), createTeam(),
+            User.create(User.EMPTY_USER_ID, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, "", VALID_LIVE_STATS_LINK, createHardware(),
+                createTeam(),
                 Role.CAPTAIN);
 
         assertThat(user.id())

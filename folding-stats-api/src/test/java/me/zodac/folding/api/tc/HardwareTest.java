@@ -45,7 +45,7 @@ class HardwareTest {
 
     @Test
     void testCreate_noId() {
-        final Hardware hardware = Hardware.createWithoutId("hardware", "hardware", HardwareMake.AMD, HardwareType.GPU, 1.0D, 1L);
+        final Hardware hardware = Hardware.create(Hardware.EMPTY_HARDWARE_ID, "hardware", "hardware", HardwareMake.AMD, HardwareType.GPU, 1.0D, 1L);
 
         assertThat(hardware.id())
             .isEqualTo(Hardware.EMPTY_HARDWARE_ID);

@@ -91,29 +91,6 @@ public record Hardware(int id,
      * Creates a {@link Hardware}.
      *
      * <p>
-     * Since we do not know the ID until the DB has persisted the {@link Hardware}, the {@link #EMPTY_HARDWARE_ID} will be used instead.
-     *
-     * @param hardwareName the LARS DB name
-     * @param displayName  the display name for the {@code Team Competition}
-     * @param hardwareMake the {@link HardwareMake} of the {@link Hardware}
-     * @param hardwareType the {@link HardwareType} of the {@link Hardware}
-     * @param multiplier   the calculated multiplier
-     * @param averagePpd   the average PPD of the {@link Hardware}
-     * @return the created {@link Hardware}
-     */
-    public static Hardware createWithoutId(final String hardwareName,
-                                           final String displayName,
-                                           final HardwareMake hardwareMake,
-                                           final HardwareType hardwareType,
-                                           final double multiplier,
-                                           final long averagePpd) {
-        return create(EMPTY_HARDWARE_ID, hardwareName, displayName, hardwareMake, hardwareType, multiplier, averagePpd);
-    }
-
-    /**
-     * Creates a {@link Hardware}.
-     *
-     * <p>
      * We assume the provided {@link HardwareRequest}'s {@link HardwareMake} and {@link HardwareType} have already been validated.
      *
      * <p>
@@ -123,7 +100,8 @@ public record Hardware(int id,
      * @return the created {@link Hardware}
      */
     public static Hardware createWithoutId(final HardwareRequest hardwareRequest) {
-        return createWithoutId(
+        return create(
+            EMPTY_HARDWARE_ID,
             hardwareRequest.getHardwareName(),
             hardwareRequest.getDisplayName(),
             HardwareMake.get(hardwareRequest.getHardwareMake()),

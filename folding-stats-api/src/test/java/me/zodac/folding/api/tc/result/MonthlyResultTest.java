@@ -77,7 +77,8 @@ class MonthlyResultTest {
         teamLeaderboardEntries.add(
             TeamLeaderboardEntry.create(
                 TeamSummary.createWithDefaultRank(
-                    Team.createWithoutId(
+                    Team.create(
+                        Team.EMPTY_TEAM_ID,
                         "Team",
                         "",
                         ""
@@ -85,14 +86,16 @@ class MonthlyResultTest {
                     "captain",
                     List.of(
                         UserSummary.createWithDefaultRank(
-                            User.createWithoutId(
+                            User.create(
+                                User.EMPTY_USER_ID,
                                 "foldingUserName",
                                 "displayName",
                                 "passkey",
                                 Category.AMD_GPU,
                                 "",
                                 "",
-                                Hardware.createWithoutId(
+                                Hardware.create(
+                                    Hardware.EMPTY_HARDWARE_ID,
                                     "hardwareName",
                                     "displayName",
                                     HardwareMake.AMD,
@@ -100,7 +103,8 @@ class MonthlyResultTest {
                                     1.0D,
                                     1L
                                 ),
-                                Team.createWithoutId(
+                                Team.create(
+                                    Team.EMPTY_TEAM_ID,
                                     "Team",
                                     "",
                                     ""

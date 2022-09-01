@@ -115,10 +115,10 @@ class HardwareSplitterTest {
     }
 
     private static Hardware createHardwareWithMultiplier(final String hardwareName, final double multiplier) {
-        return Hardware.createWithoutId(hardwareName, "", HardwareMake.AMD, HardwareType.GPU, multiplier, 1L);
+        return Hardware.create(Hardware.EMPTY_HARDWARE_ID, hardwareName, "", HardwareMake.AMD, HardwareType.GPU, multiplier, 1L);
     }
 
     private static Hardware createHardwareWithAveragePpd(final String hardwareName, final long averagePpd) {
-        return Hardware.createWithoutId(hardwareName, "", HardwareMake.AMD, HardwareType.GPU, 1.00D, averagePpd);
+        return Hardware.create(Hardware.EMPTY_HARDWARE_ID, hardwareName, "", HardwareMake.AMD, HardwareType.GPU, 1.00D, averagePpd);
     }
 }

@@ -38,8 +38,8 @@ class HardwareNameComparatorTest {
 
     @Test
     void whenCompareLarsGpus_givenFirstGpuHasEarlierHardwareName_thenMinusOneIsReturned() {
-        final Hardware first = Hardware.createWithoutId("abc", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
-        final Hardware second = Hardware.createWithoutId("cba", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
+        final Hardware first = Hardware.create(Hardware.EMPTY_HARDWARE_ID, "abc", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
+        final Hardware second = Hardware.create(Hardware.EMPTY_HARDWARE_ID, "cba", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
 
         final HardwareNameComparator comparator = HardwareNameComparator.create();
         assertThat(comparator.compare(first, second))
@@ -48,8 +48,8 @@ class HardwareNameComparatorTest {
 
     @Test
     void whenCompareLarsGpus_givenSecondGpuHasLaterHardwareName_thenOneIsReturned() {
-        final Hardware first = Hardware.createWithoutId("cba", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
-        final Hardware second = Hardware.createWithoutId("abc", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
+        final Hardware first = Hardware.create(Hardware.EMPTY_HARDWARE_ID, "cba", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
+        final Hardware second = Hardware.create(Hardware.EMPTY_HARDWARE_ID, "abc", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
 
         final HardwareNameComparator comparator = HardwareNameComparator.create();
         assertThat(comparator.compare(first, second))
@@ -58,8 +58,8 @@ class HardwareNameComparatorTest {
 
     @Test
     void whenCompareLarsGpus_givenBothGpusHaveSameHardwareName_thenZeroIsReturned() {
-        final Hardware first = Hardware.createWithoutId("abc", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
-        final Hardware second = Hardware.createWithoutId("abc", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
+        final Hardware first = Hardware.create(Hardware.EMPTY_HARDWARE_ID, "abc", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
+        final Hardware second = Hardware.create(Hardware.EMPTY_HARDWARE_ID, "abc", "displayName", HardwareMake.AMD, HardwareType.GPU, 1.00D, 0L);
 
         final HardwareNameComparator comparator = HardwareNameComparator.create();
         assertThat(comparator.compare(first, second))

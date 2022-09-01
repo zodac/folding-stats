@@ -69,26 +69,11 @@ public record Team(int id, String teamName, String teamDescription, String forum
      * <p>
      * Since we do not know the ID until the DB has persisted the {@link Team}, the {@link #EMPTY_TEAM_ID} will be used instead.
      *
-     * @param teamName        the name of the team
-     * @param teamDescription an optional description for the team
-     * @param forumLink       a link to the {@link Team} thread on the forum
-     * @return the created {@link Team}
-     */
-    public static Team createWithoutId(final String teamName, final String teamDescription, final String forumLink) {
-        return create(EMPTY_TEAM_ID, teamName, teamDescription, forumLink);
-    }
-
-    /**
-     * Creates a {@link Team}.
-     *
-     * <p>
-     * Since we do not know the ID until the DB has persisted the {@link Team}, the {@link #EMPTY_TEAM_ID} will be used instead.
-     *
      * @param teamRequest the input {@link TeamRequest} from the REST endpoint
      * @return the created {@link Team}
      */
     public static Team createWithoutId(final TeamRequest teamRequest) {
-        return createWithoutId(teamRequest.getTeamName(), teamRequest.getTeamDescription(), teamRequest.getForumLink());
+        return create(EMPTY_TEAM_ID, teamRequest.getTeamName(), teamRequest.getTeamDescription(), teamRequest.getForumLink());
     }
 
     /**

@@ -109,7 +109,8 @@ public final class HttpLarsRetriever implements LarsRetriever {
     }
 
     private static Hardware toHardware(final LarsGpu larsGpu) {
-        return Hardware.createWithoutId(
+        return Hardware.create(
+            Hardware.EMPTY_HARDWARE_ID,
             larsGpu.getDetailedName(),
             larsGpu.getName(),
             HardwareMake.get(larsGpu.getMake()),

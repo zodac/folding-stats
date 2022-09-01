@@ -570,7 +570,7 @@ class PostgresDbManagerTest {
     }
 
     private static Hardware generateHardware() {
-        return Hardware.createWithoutId(nextHardwareName(), "hardware", HardwareMake.NVIDIA, HardwareType.GPU, 1.00D, 1L);
+        return Hardware.create(Hardware.EMPTY_HARDWARE_ID, nextHardwareName(), "hardware", HardwareMake.NVIDIA, HardwareType.GPU, 1.00D, 1L);
     }
 
     private static Hardware createHardware() {
@@ -580,7 +580,7 @@ class PostgresDbManagerTest {
     private static User generateUser() {
         final Hardware hardware = createHardware();
         final Team team = createTeam();
-        return User.createWithoutId(nextUserName(), "user", "passkey", Category.NVIDIA_GPU, "", "", hardware, team, Role.CAPTAIN);
+        return User.create(User.EMPTY_USER_ID, nextUserName(), "user", "passkey", Category.NVIDIA_GPU, "", "", hardware, team, Role.CAPTAIN);
     }
 
     private static User createUser() {
@@ -588,7 +588,7 @@ class PostgresDbManagerTest {
     }
 
     private static Team generateTeam() {
-        return Team.createWithoutId(nextTeamName(), "team", "");
+        return Team.create(Team.EMPTY_TEAM_ID, nextTeamName(), "team", "");
     }
 
     private static Team createTeam() {

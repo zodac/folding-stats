@@ -83,7 +83,6 @@ public record User(int id,
      * @return the created {@link User}
      * @throws IllegalArgumentException thrown if {@code hardware} or {@code team} is null
      */
-    // TODO: Make createCaptain(), createTeamMember()
     public static User create(final int userId,
                               final String foldingUserName,
                               final String displayName,
@@ -111,36 +110,6 @@ public record User(int id,
      * Creates a {@link User}.
      *
      * <p>
-     * Since we do not know the ID until the DB has persisted the {@link User}, the {@link #EMPTY_USER_ID} will be used instead.
-     *
-     * @param foldingUserName the Folding@Home username
-     * @param displayName     the display name for the {@code Team Competition}
-     * @param passkey         the Folding@Home passkey for this user
-     * @param category        the {@link Category} the user is eligible for when added to a {@link Team}
-     * @param profileLink     a URL linking to the {@link User}'s profile on their forum
-     * @param liveStatsLink   a URL linking to the live Folding@Home stats (HFM, for example) for the {@link User}
-     * @param hardware        the {@link Hardware} that this {@link User} is Folding on
-     * @param team            the {@link Team} that the {@link User} is Folding for
-     * @param role            the {@link User}'s role in their {@link Team}
-     * @return the created {@link User}
-     * @throws IllegalArgumentException thrown if {@code hardware} or {@code team} is null
-     */
-    public static User createWithoutId(final String foldingUserName,
-                                       final String displayName,
-                                       final String passkey,
-                                       final Category category,
-                                       final String profileLink,
-                                       final String liveStatsLink,
-                                       final Hardware hardware,
-                                       final Team team,
-                                       final Role role) {
-        return create(EMPTY_USER_ID, foldingUserName, displayName, passkey, category, profileLink, liveStatsLink, hardware, team, role);
-    }
-
-    /**
-     * Creates a {@link User}.
-     *
-     * <p>
      * We assume the provided {@link UserRequest}'s {@link Category} has already been validated.
      *
      * <p>
@@ -153,7 +122,8 @@ public record User(int id,
      * @throws IllegalArgumentException thrown if {@code hardware} or {@code team} is null
      */
     public static User createWithoutId(final UserRequest userRequest, final Hardware hardware, final Team team) {
-        return createWithoutId(
+        return create(
+            EMPTY_USER_ID,
             userRequest.getFoldingUserName(),
             userRequest.getDisplayName(),
             userRequest.getPasskey(),
