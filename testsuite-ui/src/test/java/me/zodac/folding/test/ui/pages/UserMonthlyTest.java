@@ -24,6 +24,7 @@
 
 package me.zodac.folding.test.ui.pages;
 
+import static me.zodac.folding.test.ui.util.Logger.log;
 import static me.zodac.folding.test.ui.util.Logger.logWithBlankLine;
 import static me.zodac.folding.test.ui.util.TestExecutor.executeWithDriver;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,7 +51,7 @@ class UserMonthlyTest {
     @ParameterizedTest
     @EnumSource(BrowserType.class)
     void loadAdminPage(final BrowserType browserType) throws MalformedURLException {
-        logWithBlankLine("Loading '%s' browser at '%s'", browserType.displayName(), FRONTEND_LINK.url());
+        log("Loading '%s' browser at '%s'", browserType.displayName(), FRONTEND_LINK.url());
 
         executeWithDriver(browserType, driver -> {
             driver.navigate().to(FRONTEND_LINK.url());
