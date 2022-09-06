@@ -31,10 +31,10 @@ import org.openqa.selenium.By;
  */
 public final class Tag {
 
+    public static final String A_VALUE = "a";
+    public static final By A = By.tagName(A_VALUE);
+
     private Tag() {
 
     }
-
-    public static final String A_VALUE = "a";
-    public static final By A = By.tagName(A_VALUE);
 }

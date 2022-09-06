@@ -25,7 +25,7 @@
 
 package me.zodac.folding.test.ui;
 
-import static me.zodac.folding.test.ui.util.Logger.logWithBlankLine;
+import static me.zodac.folding.test.ui.util.Logger.log;
 import static me.zodac.folding.test.ui.util.TestExecutor.executeWithDriver;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,7 +61,7 @@ class PageLoadTest {
     @ParameterizedTest
     @MethodSource("browserAndFrontendLinkProvider")
     void loadAllPages(final BrowserType browserType, final FrontendLink frontendLink) throws MalformedURLException {
-        logWithBlankLine("Loading '%s' browser at '%s'", browserType.displayName(), frontendLink.url());
+        log("Loading '%s' browser at '%s'", browserType.displayName(), frontendLink.url());
 
         executeWithDriver(browserType, driver -> {
             driver.navigate().to(frontendLink.url());

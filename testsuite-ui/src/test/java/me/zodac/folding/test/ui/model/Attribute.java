@@ -29,9 +29,9 @@ package me.zodac.folding.test.ui.model;
  */
 public final class Attribute {
 
+    public static final String CLASS = "class";
+
     private Attribute() {
 
     }
-
-    public static final String CLASS = "class";
 }

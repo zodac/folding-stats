@@ -32,10 +32,6 @@ import org.openqa.selenium.By;
  */
 public final class NavigationBar {
 
-    private NavigationBar() {
-
-    }
-
     // Expected values
     public static final String EXPECTED_NAVIGATION_BAR_TITLE = "Extreme Team Folding";
     public static final String EXPECTED_ACTIVE_LINK_CLASS = "active";
@@ -44,7 +40,6 @@ public final class NavigationBar {
     // Elements
     public static final String NAVIGATION_BAR_ID_VALUE = "navbar";
     public static final By NAVIGATION_BAR = By.id(NAVIGATION_BAR_ID_VALUE);
-
 
     public static final String TITLE_ID_VALUE = "navbar-title";
     public static final By TITLE = By.id(TITLE_ID_VALUE);
@@ -63,4 +58,8 @@ public final class NavigationBar {
         4, "System",
         5, "API"
     );
+
+    private NavigationBar() {
+
+    }
 }

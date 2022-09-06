@@ -48,14 +48,32 @@ public final class TestExecutor {
     public static void executeWithDriver(final BrowserType browserType, final Consumer<? super RemoteWebDriver> test)
         throws MalformedURLException {
 
-        final RemoteWebDriver driver = browserType.getDriver();
+        final RemoteWebDriver driver = browserType.remoteWebDriver();
         try {
             test.accept(driver);
+        } finally {
+            closeDriver(driver);
+        }
+    }
+
+    private static void closeDriver(final RemoteWebDriver driver) {
+        // Close all tabs except the first
+        final String originalTab = driver.getWindowHandle();
+        for (final String tab : driver.getWindowHandles()) {
+            if (!tab.equals(originalTab)) {
+                driver.switchTo().window(tab);
+                driver.close();
+            }
+        }
+        driver.switchTo().window(originalTab);
+
+        // Ensure session data is not re-used
+        driver.manage().deleteAllCookies();
+
+        try {
             Thread.sleep(TimeUnit.SECONDS.toMillis(1L));
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-        } finally {
-            driver.quit();
         }
     }
 }

@@ -24,8 +24,6 @@
 
 package me.zodac.folding.test.ui.util;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -41,49 +39,27 @@ public enum BrowserType {
     /**
      * {@code Google Chrome} web browser.
      */
-    CHROME("Google Chrome") {
-        @Override
-        public RemoteWebDriver getDriver() throws MalformedURLException {
-            final String port = System.getProperty("chromePort", "4444");
-            final URL url = new URL(String.format(WEB_DRIVER_URL_FORMAT, TEST_IP_ADDRESS, port));
-            return new RemoteWebDriver(url, new ChromeOptions());
-        }
-    },
+    CHROME("Google Chrome", RemoteWebDriverFactory.create("chromePort", "4444", new ChromeOptions())),
 
     /**
      * {@code Microsoft Edge} web browser.
      */
-    EDGE("Microsoft Edge") {
-        @Override
-        public RemoteWebDriver getDriver() throws MalformedURLException {
-            final String port = System.getProperty("edgePort", "4445");
-            final URL url = new URL(String.format(WEB_DRIVER_URL_FORMAT, TEST_IP_ADDRESS, port));
-            return new RemoteWebDriver(url, new EdgeOptions());
-        }
-    },
+    EDGE("Microsoft Edge", RemoteWebDriverFactory.create("edgePort", "4445", new EdgeOptions())),
 
     /**
      * {@code Mozilla Firefox} web browser.
      */
-    FIREFOX("Mozilla Firefox") {
-        @Override
-        public RemoteWebDriver getDriver() throws MalformedURLException {
-            final String port = System.getProperty("firefoxPort", "4446");
-            final URL url = new URL(String.format(WEB_DRIVER_URL_FORMAT, TEST_IP_ADDRESS, port));
-            return new RemoteWebDriver(url, new FirefoxOptions());
-        }
-    };
-
-    private static final String TEST_IP_ADDRESS = System.getProperty("testIpAddress", "127.0.0.1");
-    private static final String WEB_DRIVER_URL_FORMAT = "http://%s:%s/wd/hub";
+    FIREFOX("Mozilla Firefox", RemoteWebDriverFactory.create("firefoxPort", "4446", new FirefoxOptions()));
 
     private static final Collection<BrowserType> ALL_VALUES = Stream.of(values())
         .toList();
 
     private final String displayName;
+    private final RemoteWebDriver remoteWebDriver;
 
-    BrowserType(final String displayName) {
+    BrowserType(final String displayName, final RemoteWebDriver remoteWebDriver) {
         this.displayName = displayName;
+        this.remoteWebDriver = remoteWebDriver;
     }
 
     /**
@@ -109,10 +85,11 @@ public enum BrowserType {
     }
 
     /**
-     * Abstract method to be implemented by {@link BrowserType} values, to return a {@link RemoteWebDriver} for UI testing.
+     * Returns a {@link RemoteWebDriver} for UI testing.
      *
      * @return the {@link RemoteWebDriver}
-     * @throws MalformedURLException thrown if the {@link URL} is invalid
      */
-    public abstract RemoteWebDriver getDriver() throws MalformedURLException;
+    public RemoteWebDriver remoteWebDriver() {
+        return remoteWebDriver;
+    }
 }
