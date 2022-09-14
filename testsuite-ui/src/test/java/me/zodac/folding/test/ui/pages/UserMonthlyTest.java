@@ -25,7 +25,6 @@
 package me.zodac.folding.test.ui.pages;
 
 import static me.zodac.folding.test.ui.util.Logger.log;
-import static me.zodac.folding.test.ui.util.Logger.logWithBlankLine;
 import static me.zodac.folding.test.ui.util.TestExecutor.executeWithDriver;
 import static org.assertj.core.api.Assertions.assertThat;
 

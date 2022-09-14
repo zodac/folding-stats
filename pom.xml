@@ -213,7 +213,11 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter</artifactId>
                 <version>${spring-boot.version}</version>
-                <exclusions>
+		<exclusions>
+                    <exclusion>
+                        <groupId>org.yaml</groupId>
+                        <artifactId>snakeyaml</artifactId>
+                    </exclusion>
                     <exclusion>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-logging</artifactId>
@@ -447,7 +451,7 @@
                 <!-- Linters -->
 
                 <!-- Manual execution: -->
-                <!-- mvn dependency-check:check -Dlint -->
+                <!-- mvn org.owasp:dependency-check-maven:check -Dlint -->
                 <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
