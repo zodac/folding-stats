@@ -52,7 +52,7 @@ COPY ./folding-stats-rest/pom.xml ./folding-stats-rest/pom.xml
 COPY ./folding-stats-rest/src/main ./folding-stats-rest/src/main
 
 RUN cd ./folding-stats-rest && \
-    mvn package -P docker && \
+    mvn verify -P docker && \
     mv ./target/folding-stats-rest*.jar /folding-stats.jar
 
 ARG JAVA_VERSION

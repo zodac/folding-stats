@@ -31,6 +31,11 @@ import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParame
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.Collection;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -107,6 +112,21 @@ public class HardwareEndpoint {
      * @param request         the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#created(Object, int)} containing the created {@link Hardware}
      */
+    @Operation(summary = "Create a hardware")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200",
+            description = "Hardware has been created",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Hardware.class)
+            )),
+        @ApiResponse(responseCode = "400", description = "The given hardware payload is invalid", content = @Content),
+        @ApiResponse(responseCode = "401", description = "System user cannot be logged in with provided credentials", content = @Content),
+        @ApiResponse(responseCode = "403", description = "System user does not have the correct role to perform this request", content = @Content),
+        @ApiResponse(responseCode = "409", description = "A hardware with the same 'hardwareName' already exists", content = @Content),
+        @ApiResponse(responseCode = "502", description = "An error occurred connecting to an external system", content = @Content),
+        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests", content = @Content),
+    })
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
