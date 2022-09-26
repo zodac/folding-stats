@@ -68,6 +68,10 @@ services:
       JDBC_CONNECTION_USER: "folding_user"
       JDBC_CONNECTION_PASSWORD: "shroot"
       JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"
+      # Swagger documentation
+      CONTACT_NAME: "zodac"
+      FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
+      ROOT_URL: "http://127.0.0.1:81/"
     links:
       - database_dev
     networks:

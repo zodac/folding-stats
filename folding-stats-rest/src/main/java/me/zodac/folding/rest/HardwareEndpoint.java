@@ -37,6 +37,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Collection;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -69,6 +70,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * REST endpoints for {@code Team Competition} {@link Hardware}s.
  */
+@Tag(name = "Hardware Endpoint", description = "CRUD functions for Hardware")
 @RestController
 @RequestMapping("/hardware")
 public class HardwareEndpoint {

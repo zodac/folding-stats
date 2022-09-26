@@ -162,5 +162,18 @@
                 <artifactId>spotbugs-maven-plugin</artifactId>
             </plugin>
         </plugins>
+
+        <resources>
+            <!-- Allow filtering for spring-boot properties so we can pass in maven variables -->
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>application.properties</include>
+                    <include>application-production.properties</include>
+                    <include>application-test.properties</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 </project>
