@@ -27,8 +27,8 @@ COPY ./docker/metrics/prometheus/config/web-config.yml /etc/prometheus/web-confi
 
 # Executing as separate RUN commands because combining them intermittently causes the 'htpasswd' command to fail
 RUN apt-get update && apt-get install -y apache2-utils
-RUN sed -i -e "s/%ADMIN_USERNAME%/${ADMIN_USERNAME}/g" /etc/prometheus/web-config.yml
-RUN sed -i -e "s/%ADMIN_PASSWORD%/$(htpasswd -bnBC 10 "" ${ADMIN_PASSWORD} | tr -d ':\n')/g" /etc/prometheus/web-config.yml
+RUN sed -i -e "s|%ADMIN_USERNAME%|${ADMIN_USERNAME}|g" /etc/prometheus/web-config.yml
+RUN sed -i -e "s|%ADMIN_PASSWORD%|$(htpasswd -bnBC 10 "" ${ADMIN_PASSWORD} | tr -d ':\n')|g" /etc/prometheus/web-config.yml
 RUN echo "" >> /etc/prometheus/web-config.yml
 
 ARG PROMETHEUS_VERSION

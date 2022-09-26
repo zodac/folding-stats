@@ -36,8 +36,8 @@ RUN grep -rl '%REST_ENDPOINT_URL%' . | xargs sed -i "s|%REST_ENDPOINT_URL%|${RES
 RUN minify --verbose --match=\.*.css$ --type=css --output /docker/apache/site/res/css/ /docker/apache/css/ && \
     minify --verbose --match=\.*.js$ --type=js --output /docker/apache/site/res/js/ /docker/apache/js/ && \
     minify --verbose --match=\.*.js$ --type=js --output /docker/apache/site/res/js/ /docker/apache/js/util && \
-    find /docker/apache/site/res/ -iname "*.css" | sed 's/....$//' | xargs -i mv {}.css {}.min.css && \
-    find /docker/apache/site/res/ -iname "*.js" | sed 's/...$//' | xargs -i mv {}.js {}.min.js
+    find /docker/apache/site/res/ -iname "*.css" | sed 's|....$||' | xargs -i mv {}.css {}.min.css && \
+    find /docker/apache/site/res/ -iname "*.js" | sed 's|...$||' | xargs -i mv {}.js {}.min.js
 
 FROM httpd:2.4-alpine
 
@@ -48,8 +48,16 @@ RUN apk update && apk upgrade && \
 
 # Apache configuration (SSL certs are provided through a volume mount)
 COPY ./docker/frontend/conf/httpd.conf /usr/local/apache2/conf/httpd.conf
-COPY ./docker/frontend/conf/httpd-ssl.conf /usr/local/apache2/conf/original/extra/httpd-ssl.conf
 COPY ./docker/frontend/conf/httpd-ssl.conf /usr/local/apache2/conf/extra/httpd-ssl.conf
+
+ARG ADMIN_EMAIL_ADDRESS
+ARG HTTPS_FRONTEND_PORT
+ARG ROOT_URL
+
+# Replace environment arguments in httpd config files
+RUN sed -i -e "s|%HTTPS_FRONTEND_PORT%|${HTTPS_FRONTEND_PORT}|g" /usr/local/apache2/conf/extra/httpd-ssl.conf && \
+    sed -i -e "s|%ROOT_URL%|${ROOT_URL}|g" /usr/local/apache2/conf/extra/httpd-ssl.conf && \
+    sed -i -e "s|%ADMIN_EMAIL_ADDRESS%|${ADMIN_EMAIL_ADDRESS}|g" /usr/local/apache2/conf/extra/httpd-ssl.conf
 
 WORKDIR /usr/local/apache2/htdocs/
 

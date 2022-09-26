@@ -10,7 +10,9 @@ services:
         # Docker image versions
         NODE_VERSION: "18.8"
         # Build arguments
+        ADMIN_EMAIL_ADDRESS: "${ADMIN_EMAIL_ADDRESS}"
         FORUM_LINK: "${FORUM_LINK}"
+        HTTPS_FRONTEND_PORT: "${HTTPS_FRONTEND_PORT}"
         REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"
         ROOT_URL: "${ROOT_URL}"
         TITLE: "${TITLE}"
