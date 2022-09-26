@@ -36,6 +36,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.Collection;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -112,7 +113,7 @@ public class HardwareEndpoint {
      * @param request         the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#created(Object, int)} containing the created {@link Hardware}
      */
-    @Operation(summary = "Create a hardware")
+    @Operation(summary = "Create a hardware", security = @SecurityRequirement(name = "basicAuthentication"))
     @ApiResponses({
         @ApiResponse(responseCode = "200",
             description = "Hardware has been created",

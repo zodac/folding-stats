@@ -26,6 +26,9 @@ package me.zodac.folding.rest.stub;
 
 import static me.zodac.folding.rest.api.util.RestUtilConstants.GSON;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +58,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @see <a href="https://folding.lar.systems/">LARS PPD DB</a>
  */
+@Hidden
 @SuppressWarnings("ClassOnlyUsedInOneModule")
 @ConditionalOnProperty(name = "stubbed.endpoints.enabled", havingValue = "true")
 @RestController

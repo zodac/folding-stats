@@ -24,6 +24,7 @@
 
 package me.zodac.folding.rest.stub;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.AccessLevel;
@@ -57,6 +58,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @see <a href="https://api2.foldingathome.org/#GET-/user/:name/stats">Real user stats API</a>
  */
+@Hidden
 @ConditionalOnProperty(name = "stubbed.endpoints.enabled", havingValue = "true")
 @RestController
 @RequestMapping("/user")

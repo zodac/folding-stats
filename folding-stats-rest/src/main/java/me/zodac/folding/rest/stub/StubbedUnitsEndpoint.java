@@ -24,6 +24,7 @@
 
 package me.zodac.folding.rest.stub;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,6 +59,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @see <a href="https://api2.foldingathome.org/#GET-/bonus">Real bonus API</a>
  */
+@Hidden
 @ConditionalOnProperty(name = "stubbed.endpoints.enabled", havingValue = "true")
 @RestController
 @RequestMapping("/bonus")

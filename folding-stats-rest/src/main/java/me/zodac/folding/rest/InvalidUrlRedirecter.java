@@ -24,6 +24,7 @@
 
 package me.zodac.folding.rest;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.rest.response.Responses;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * {@link RestController} used to handle invalid URL requests. Redirects to the URL defined in environment variable <b>REDIRECT_URL</b>.
  */
+@Hidden
 @RestController
 @RequestMapping("/error") // Must be on the RestController to override built-in Spring handler for '/error'
 public class InvalidUrlRedirecter {

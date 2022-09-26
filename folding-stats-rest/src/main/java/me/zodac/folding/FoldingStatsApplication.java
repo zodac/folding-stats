@@ -24,11 +24,19 @@
 
 package me.zodac.folding;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.info.License;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.servers.Server;
 import java.util.Collection;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
+import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.state.SystemStateManager;
@@ -53,6 +61,19 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * <p>
  * The {@code jooq} transitive dependency {@link R2dbcAutoConfiguration} must also be excluded.
  */
+@OpenAPIDefinition(
+    info = @Info(
+        title = "Extreme Team Folding API",
+        description = "REST API for the Extreme Team Folding competition",
+        contact = @Contact(name = "Extreme HW", url = "https://forums.extremehw.net/forum/125-extreme-team-folding/"),
+        license = @License(name = "MIT Licence", url = "https://github.com/zodac/folding-stats/blob/master/LICENSE/")
+    )
+)
+@SecurityScheme(
+    name = "basicAuthentication",
+    scheme = "basic",
+    type = SecuritySchemeType.HTTP
+)
 @EnableScheduling
 @SpringBootApplication(exclude = R2dbcAutoConfiguration.class)
 public class FoldingStatsApplication {
