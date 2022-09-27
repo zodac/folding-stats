@@ -71,7 +71,7 @@ services:
       # Swagger documentation
       CONTACT_NAME: "zodac"
       FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
-      ROOT_URL: "http://127.0.0.1:81/"
+      REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
     links:
       - database_dev
     networks:
@@ -112,44 +112,44 @@ services:
     ports:
       - "5433:5432"
 
-#  selenium_chrome:
-#    image: selenium/standalone-chrome:104.0
-#    container_name: selenium_chrome
-#    hostname: selenium_chrome
-#    depends_on:
-#      - frontend_dev
-#    links:
-#      - frontend_dev
-#    ports:
-#      - "4444:4444"
-#    networks:
-#      - development
-#
-#  selenium_edge:
-#    image: selenium/standalone-edge:104.0
-#    container_name: selenium_edge
-#    hostname: selenium_edge
-#    depends_on:
-#      - frontend_dev
-#    links:
-#      - frontend_dev
-#    ports:
-#      - "4445:4444"
-#    networks:
-#      - development
-#
-#  selenium_firefox:
-#    image: selenium/standalone-firefox:103.0
-#    container_name: selenium_firefox
-#    hostname: selenium_firefox
-#    depends_on:
-#      - frontend_dev
-#    links:
-#      - frontend_dev
-#    ports:
-#      - "4446:4444"
-#    networks:
-#      - development
+  selenium_chrome:
+    image: selenium/standalone-chrome:104.0
+    container_name: selenium_chrome
+    hostname: selenium_chrome
+    depends_on:
+      - frontend_dev
+    links:
+      - frontend_dev
+    ports:
+      - "4444:4444"
+    networks:
+      - development
+
+  selenium_edge:
+    image: selenium/standalone-edge:104.0
+    container_name: selenium_edge
+    hostname: selenium_edge
+    depends_on:
+      - frontend_dev
+    links:
+      - frontend_dev
+    ports:
+      - "4445:4444"
+    networks:
+      - development
+
+  selenium_firefox:
+    image: selenium/standalone-firefox:103.0
+    container_name: selenium_firefox
+    hostname: selenium_firefox
+    depends_on:
+      - frontend_dev
+    links:
+      - frontend_dev
+    ports:
+      - "4446:4444"
+    networks:
+      - development
 
 networks:
   development:

@@ -110,7 +110,7 @@ public class FoldingStatsApplication {
                                       @Value("${application.version}") final String applicationVersion) {
         final String contactName = EnvironmentVariableUtils.get("CONTACT_NAME");
         final String forumLink = EnvironmentVariableUtils.get("FORUM_LINK");
-        final String rootUrl = EnvironmentVariableUtils.get("ROOT_URL");
+        final String restEndpointUrl = EnvironmentVariableUtils.get("REST_ENDPOINT_URL");
 
         final Info projectInfo = new Info()
             .title(String.format("The '%s' REST API", applicationName))
@@ -120,9 +120,9 @@ public class FoldingStatsApplication {
             .version(applicationVersion);
 
         return GroupedOpenApi.builder()
-            .group(String.format("The '%s' REST API", applicationName))
+            .group("ProjectAPI")
             .addOpenApiCustomiser(openApi -> openApi.info(projectInfo))
-            .addOpenApiCustomiser(openApi -> openApi.servers(List.of(new Server().description("Main Website").url(rootUrl))))
+            .addOpenApiCustomiser(openApi -> openApi.servers(List.of(new Server().description("Main Website").url(restEndpointUrl))))
             .pathsToExclude("/health/*")
             .build();
     }

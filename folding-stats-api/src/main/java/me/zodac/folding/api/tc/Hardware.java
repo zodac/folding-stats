@@ -25,6 +25,12 @@
 package me.zodac.folding.api.tc;
 
 import java.util.Objects;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.experimental.Accessors;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 
@@ -38,29 +44,28 @@ import me.zodac.folding.rest.api.tc.request.HardwareRequest;
  *     Best PPD / PPD for given {@link Hardware} (to 2 decimal places)
  * </pre>
  *
- * @param id           the ID
- * @param hardwareName the LARS DB name
- * @param displayName  the display name for the {@code Team Competition}
- * @param hardwareMake the {@link HardwareMake} of the {@link Hardware}
- * @param hardwareType the {@link HardwareType} of the {@link Hardware}
- * @param multiplier   the calculated multiplier
- * @param averagePpd   the average PPD of the {@link Hardware}
  * @see <a href="https://https://folding.lar.systems/">LARS PPD database</a>
  */
-public record Hardware(int id,
-                       String hardwareName,
-                       String displayName,
-                       HardwareMake hardwareMake,
-                       HardwareType hardwareType,
-                       double multiplier,
-                       long averagePpd
-) implements ResponsePojo {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
+@Accessors(fluent = true)
+@ToString(doNotUseGetters = true, callSuper = true)
+@EqualsAndHashCode
+public final class Hardware implements ResponsePojo {
 
     /**
      * The default {@link Hardware} ID. Since the REST request would not know the ID until the DB has created the object,
      * we use this and update the ID later.
      */
     public static final int EMPTY_HARDWARE_ID = 0;
+
+    private final int id;
+    private final String hardwareName;
+    private final String displayName;
+    private final HardwareMake hardwareMake;
+    private final HardwareType hardwareType;
+    private final double multiplier;
+    private final long averagePpd;
 
     /**
      * Creates a {@link Hardware}.

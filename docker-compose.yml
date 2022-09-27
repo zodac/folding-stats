@@ -77,7 +77,7 @@ services:
       # Swagger documentation
       CONTACT_NAME: "${CONTACT_NAME}"
       FORUM_LINK: "${FORUM_LINK}"
-      ROOT_URL: "${ROOT_URL}"
+      REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"
     healthcheck:
       test: "curl --fail --silent -k https://localhost:8443/folding/actuator/health | grep UP || exit 1"
       interval: 30s
