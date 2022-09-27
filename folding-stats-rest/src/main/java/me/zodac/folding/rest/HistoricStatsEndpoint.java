@@ -91,7 +91,7 @@ public class HistoricStatsEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/users/{userId}/{year}/{month}/{day}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUserHistoricStatsHourly(@PathVariable("userId") final int userId,
+    public ResponseEntity<Collection<HistoricStats>> getUserHistoricStatsHourly(@PathVariable("userId") final int userId,
                                                         @PathVariable("year") final String year,
                                                         @PathVariable("month") final String month,
                                                         @PathVariable("day") final String day,
@@ -116,7 +116,7 @@ public class HistoricStatsEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/users/{userId}/{year}/{month}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUserHistoricStatsDaily(@PathVariable("userId") final int userId,
+    public ResponseEntity<Collection<HistoricStats>> getUserHistoricStatsDaily(@PathVariable("userId") final int userId,
                                                        @PathVariable("year") final String year,
                                                        @PathVariable("month") final String month,
                                                        final HttpServletRequest request) {
@@ -139,7 +139,7 @@ public class HistoricStatsEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/users/{userId}/{year}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUserHistoricStatsMonthly(@PathVariable("userId") final int userId,
+    public ResponseEntity<Collection<HistoricStats>> getUserHistoricStatsMonthly(@PathVariable("userId") final int userId,
                                                          @PathVariable("year") final String year,
                                                          final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received to show monthly TC user stats at '{}'", request::getRequestURI);
@@ -163,7 +163,7 @@ public class HistoricStatsEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/teams/{teamId}/{year}/{month}/{day}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTeamHistoricStatsHourly(@PathVariable("teamId") final int teamId,
+    public ResponseEntity<Collection<HistoricStats>> getTeamHistoricStatsHourly(@PathVariable("teamId") final int teamId,
                                                         @PathVariable("year") final String year,
                                                         @PathVariable("month") final String month,
                                                         @PathVariable("day") final String day,
@@ -198,7 +198,7 @@ public class HistoricStatsEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/teams/{teamId}/{year}/{month}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTeamHistoricStatsDaily(@PathVariable("teamId") final int teamId,
+    public ResponseEntity<Collection<HistoricStats>> getTeamHistoricStatsDaily(@PathVariable("teamId") final int teamId,
                                                        @PathVariable("year") final String year,
                                                        @PathVariable("month") final String month,
                                                        final HttpServletRequest request) {
@@ -231,7 +231,7 @@ public class HistoricStatsEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/teams/{teamId}/{year}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTeamHistoricStatsMonthly(@PathVariable("teamId") final int teamId,
+    public ResponseEntity<Collection<HistoricStats>> getTeamHistoricStatsMonthly(@PathVariable("teamId") final int teamId,
                                                          @PathVariable("year") final String year,
                                                          final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received to show monthly TC team stats at '{}'", request::getRequestURI);

@@ -24,7 +24,6 @@
 
 package me.zodac.folding.rest;
 
-import static me.zodac.folding.rest.response.Responses.notFound;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParameters;
 
@@ -54,6 +53,7 @@ import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.request.OffsetTcStatsRequest;
+import me.zodac.folding.rest.exception.NotFoundException;
 import me.zodac.folding.rest.util.ReadRequired;
 import me.zodac.folding.rest.util.WriteRequired;
 import me.zodac.folding.state.SystemStateManager;
@@ -124,12 +124,12 @@ public class TeamCompetitionStatsEndpoint {
     /**
      * {@link GetMapping} request to retrieve the {@code Team Competition} simple {@link CompetitionSummary}.
      *
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()} containing the {@link CompetitionSummary}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} containing the {@link CompetitionSummary}
      */
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/overall", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getCompetitionStats() {
+    public ResponseEntity<CompetitionSummary> getCompetitionStats() {
         AUDIT_LOGGER.debug("GET request received to show TC overall stats");
         visitCounter.increment();
         final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
@@ -139,12 +139,12 @@ public class TeamCompetitionStatsEndpoint {
     /**
      * {@link GetMapping} request to retrieve the {@code Team Competition} overall {@link AllTeamsSummary}.
      *
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()} containing the {@link AllTeamsSummary}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} containing the {@link AllTeamsSummary}
      */
     @ReadRequired
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTeamCompetitionStats() {
+    public ResponseEntity<AllTeamsSummary> getTeamCompetitionStats() {
         AUDIT_LOGGER.debug("GET request received to show TC stats");
         final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
         return ok(allTeamsSummary);
@@ -155,12 +155,12 @@ public class TeamCompetitionStatsEndpoint {
      *
      * @param userId  the ID of the {@link User} whose {@link UserSummary} is to be retrieved
      * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()} containing the {@link UserSummary}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} containing the {@link UserSummary}
      */
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTeamCompetitionStatsForUser(@PathVariable("userId") final int userId, final HttpServletRequest request) {
+    public ResponseEntity<UserSummary> getTeamCompetitionStatsForUser(@PathVariable("userId") final int userId, final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received to show TC stats for user received at '{}'", request::getRequestURI);
 
         final User user = foldingRepository.getUserWithoutPasskey(userId);
@@ -177,23 +177,23 @@ public class TeamCompetitionStatsEndpoint {
             }
         }
 
-        return notFound();
+        throw new NotFoundException(User.class, user.id());
     }
 
     /**
      * {@link PatchMapping} request to update an existing {@link UserSummary} with an {@link OffsetTcStatsRequest}.
      *
-     * @param userId        the ID of the {@link UserSummary} to be updated
+     * @param userId               the ID of the {@link UserSummary} to be updated
      * @param offsetTcStatsRequest the {@link OffsetTcStatsRequest} to be applied
-     * @param request       the {@link HttpServletRequest}
+     * @param request              the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#ok()}
      */
     @WriteRequired
     @RolesAllowed("admin")
     @PatchMapping(path = "/users/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateUserWithOffset(@PathVariable("userId") final int userId,
-                                                  @RequestBody final OffsetTcStatsRequest offsetTcStatsRequest,
-                                                  final HttpServletRequest request) {
+    public ResponseEntity<Void> updateUserWithOffset(@PathVariable("userId") final int userId,
+                                                     @RequestBody final OffsetTcStatsRequest offsetTcStatsRequest,
+                                                     final HttpServletRequest request) {
         AUDIT_LOGGER.info("PATCH request to offset user stats received at '{}' with request {}", request::getRequestURI, () -> offsetTcStatsRequest);
 
         final User user = foldingRepository.getUserWithPasskey(userId);
@@ -214,26 +214,26 @@ public class TeamCompetitionStatsEndpoint {
     /**
      * {@link GetMapping} request to retrieve the {@code Team Competition} {@link TeamLeaderboardEntry}s.
      *
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()} containing the {@link TeamLeaderboardEntry}s
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} containing the {@link TeamLeaderboardEntry}s
      */
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/leaderboard", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTeamLeaderboard() {
+    public ResponseEntity<Collection<TeamLeaderboardEntry>> getTeamLeaderboard() {
         AUDIT_LOGGER.debug("GET request received to show TC leaderboard");
-        final List<TeamLeaderboardEntry> teamSummaries = leaderboardStatsGenerator.generateTeamLeaderboards();
+        final Collection<TeamLeaderboardEntry> teamSummaries = leaderboardStatsGenerator.generateTeamLeaderboards();
         return ok(teamSummaries);
     }
 
     /**
      * {@link GetMapping} request to retrieve the {@code Team Competition} {@link UserCategoryLeaderboardEntry}s by {@link Category}.
      *
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()} containing the {@link UserCategoryLeaderboardEntry}s
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} containing the {@link UserCategoryLeaderboardEntry}s
      */
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/category", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getCategoryLeaderboard() {
+    public ResponseEntity<Map<Category, List<UserCategoryLeaderboardEntry>>> getCategoryLeaderboard() {
         AUDIT_LOGGER.debug("GET request received to show TC category leaderboard");
         final Map<Category, List<UserCategoryLeaderboardEntry>> categoryLeaderboard = leaderboardStatsGenerator.generateUserCategoryLeaderboards();
         return ok(categoryLeaderboard);
@@ -248,7 +248,7 @@ public class TeamCompetitionStatsEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(path = "/manual/update")
-    public ResponseEntity<?> updateStats(final HttpServletRequest request) {
+    public ResponseEntity<Void> updateStats(final HttpServletRequest request) {
         AUDIT_LOGGER.info("GET request received to manually update TC stats at '{}?{}", request::getRequestURI, () -> extractParameters(request));
         final Collection<User> users = foldingRepository.getAllUsersWithPasskeys();
         userStatsParser.parseTcStatsForUsers(users);
@@ -263,7 +263,7 @@ public class TeamCompetitionStatsEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(path = "/manual/reset")
-    public ResponseEntity<?> resetStats() {
+    public ResponseEntity<Void> resetStats() {
         AUDIT_LOGGER.info("GET request received to manually reset TC stats");
 
         SystemStateManager.next(SystemState.RESETTING_STATS);

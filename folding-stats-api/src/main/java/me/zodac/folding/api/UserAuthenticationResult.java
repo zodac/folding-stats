@@ -29,6 +29,10 @@ import java.util.Set;
 
 /**
  * POJO defining the authentication result for a system user/password, and the roles for that user if successful.
+ *
+ * @param userExists    does the request user exist
+ * @param passwordMatch does the request password match the persisted password
+ * @param userRoles     {@link Set} of the user roles
  */
 public record UserAuthenticationResult(boolean userExists, boolean passwordMatch, Set<String> userRoles) {
 

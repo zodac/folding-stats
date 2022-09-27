@@ -107,7 +107,7 @@ public class UserEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> create(@RequestBody final UserRequest userRequest, final HttpServletRequest request) {
+    public ResponseEntity<User> create(@RequestBody final UserRequest userRequest, final HttpServletRequest request) {
         AUDIT_LOGGER.info("POST request received to create user at '{}' with request: {}", request::getRequestURI, () -> userRequest);
 
         final User validatedUser = userValidator.create(userRequest);
@@ -128,7 +128,7 @@ public class UserEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAll(final HttpServletRequest request) {
+    public ResponseEntity<Collection<User>> getAll(final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received for all users without passkeys at '{}'", request::getRequestURI);
         final Collection<User> elements = foldingRepository.getAllUsersWithoutPasskeys();
         return cachedOk(elements);
@@ -143,7 +143,7 @@ public class UserEndpoint {
     @RolesAllowed("admin")
     @ReadRequired
     @GetMapping(path = "/all/passkey", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllWithPasskeys(final HttpServletRequest request) {
+    public ResponseEntity<Collection<User>> getAllWithPasskeys(final HttpServletRequest request) {
         AUDIT_LOGGER.info("GET request received for all users with passkeys at '{}'", request::getRequestURI);
         final Collection<User> elements = foldingRepository.getAllUsersWithPasskeys();
         return cachedOk(elements);
@@ -159,7 +159,7 @@ public class UserEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getById(@PathVariable("userId") final int userId, final HttpServletRequest request) {
+    public ResponseEntity<User> getById(@PathVariable("userId") final int userId, final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request for user received at '{}'", request::getRequestURI);
 
         final User element = foldingRepository.getUserWithoutPasskey(userId);
@@ -176,7 +176,7 @@ public class UserEndpoint {
     @ReadRequired
     @RolesAllowed("admin")
     @GetMapping(path = "/{userId}/passkey", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getByIdWithPasskey(@PathVariable("userId") final int userId, final HttpServletRequest request) {
+    public ResponseEntity<User> getByIdWithPasskey(@PathVariable("userId") final int userId, final HttpServletRequest request) {
         AUDIT_LOGGER.info("GET request for user with passkey received at '{}'", request::getRequestURI);
 
         final User element = foldingRepository.getUserWithPasskey(userId);
@@ -194,7 +194,7 @@ public class UserEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PutMapping(path = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateById(@PathVariable("userId") final int userId,
+    public ResponseEntity<User> updateById(@PathVariable("userId") final int userId,
                                         @RequestBody final UserRequest userRequest,
                                         final HttpServletRequest request) {
         AUDIT_LOGGER.info("PUT request for user received at '{}' with request {}", request::getRequestURI, () -> userRequest);
@@ -229,7 +229,7 @@ public class UserEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @DeleteMapping(path = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteById(@PathVariable("userId") final int userId, final HttpServletRequest request) {
+    public ResponseEntity<Void> deleteById(@PathVariable("userId") final int userId, final HttpServletRequest request) {
         AUDIT_LOGGER.info("DELETE request for user received at '{}'", request::getRequestURI);
 
         final User user = foldingRepository.getUserWithoutPasskey(userId);

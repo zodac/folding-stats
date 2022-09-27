@@ -32,6 +32,7 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -122,8 +123,8 @@ public class UserChangeEndpoint {
     @PermitAll
     @WriteRequired
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> create(@RequestBody final UserChangeRequest userChangeRequest,
-                                    final HttpServletRequest request) {
+    public ResponseEntity<UserChange> create(@RequestBody final UserChangeRequest userChangeRequest,
+                                             final HttpServletRequest request) {
         AUDIT_LOGGER.info("POST request for user change received at '{}' with request: {}", request::getRequestURI, () -> userChangeRequest);
 
         final UserChange validatedUserChange = userChangeValidator.validate(userChangeRequest);
@@ -143,14 +144,15 @@ public class UserChangeEndpoint {
      */
     @ReadRequired
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAll(@RequestParam(value = "state", required = false, defaultValue = ALL_STATES_OPTION) final String state,
-                                    @RequestParam(value = "numberOfMonths", required = false, defaultValue = "0") final long numberOfMonths,
-                                    final HttpServletRequest request) {
+    public ResponseEntity<Collection<UserChange>> getAll(
+        @RequestParam(value = "state", required = false, defaultValue = ALL_STATES_OPTION) final String state,
+        @RequestParam(value = "numberOfMonths", required = false, defaultValue = "0") final long numberOfMonths,
+        final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request for all user changes received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
 
         final Collection<UserChangeState> states = getStatesBasedOnInput(state);
         if (states.isEmpty()) {
-            return ok();
+            return ok(Collections.emptyList());
         }
 
         final Collection<UserChange> userChanges = foldingRepository.getAllUserChangesWithoutPasskeys(states, numberOfMonths);
@@ -179,16 +181,16 @@ public class UserChangeEndpoint {
     @RolesAllowed("admin")
     @ReadRequired
     @GetMapping(path = "/passkey", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAllWithPasskeys(@RequestParam(value = "state", required = false, defaultValue = ALL_STATES_OPTION) final String state,
-                                                @RequestParam(value = "numberOfMonths", required = false, defaultValue = "0")
-                                                final long numberOfMonths,
-                                                final HttpServletRequest request) {
+    public ResponseEntity<Collection<UserChange>> getAllWithPasskeys(
+        @RequestParam(value = "state", required = false, defaultValue = ALL_STATES_OPTION) final String state,
+        @RequestParam(value = "numberOfMonths", required = false, defaultValue = "0") final long numberOfMonths,
+        final HttpServletRequest request) {
         AUDIT_LOGGER.info("GET request for all user changes with passkey received at '{}?{}'", request::getRequestURI,
             () -> extractParameters(request));
 
         final Collection<UserChangeState> states = getStatesBasedOnInput(state);
         if (states.isEmpty()) {
-            return ok();
+            return ok(Collections.emptyList());
         }
 
         final Collection<UserChange> userChanges = foldingRepository.getAllUserChangesWithPasskeys(states, numberOfMonths);
@@ -205,7 +207,7 @@ public class UserChangeEndpoint {
     @RolesAllowed("admin")
     @ReadRequired
     @GetMapping(path = "/{userChangeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getById(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
+    public ResponseEntity<UserChange> getById(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
         AUDIT_LOGGER.info("GET request for user change received at '{}'", request::getRequestURI);
 
         final UserChange userChange = foldingRepository.getUserChange(userChangeId);
@@ -226,7 +228,7 @@ public class UserChangeEndpoint {
     @RolesAllowed("admin")
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/approve/immediate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> approveImmediately(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
+    public ResponseEntity<UserChange> approveImmediately(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
         AUDIT_LOGGER.info("PUT request to approve user change immediately received at '{}'", request::getRequestURI);
         userChangeImmediateApprovals.increment();
         return update(userChangeId, UserChangeState.APPROVED_NOW);
@@ -242,7 +244,7 @@ public class UserChangeEndpoint {
     @RolesAllowed("admin")
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/approve/next", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> approveNextMonth(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
+    public ResponseEntity<UserChange> approveNextMonth(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
         AUDIT_LOGGER.info("PUT request to approve user change next month received at '{}'", request::getRequestURI);
         userChangeNextMonthApprovals.increment();
         return update(userChangeId, UserChangeState.APPROVED_NEXT_MONTH);
@@ -258,13 +260,13 @@ public class UserChangeEndpoint {
     @RolesAllowed("admin")
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/reject", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> reject(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
+    public ResponseEntity<UserChange> reject(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
         AUDIT_LOGGER.info("PUT request to reject user change received at '{}'", request::getRequestURI);
         userChangeRejects.increment();
         return update(userChangeId, UserChangeState.REJECTED);
     }
 
-    private ResponseEntity<?> update(final int userChangeId, final UserChangeState newState) {
+    private ResponseEntity<UserChange> update(final int userChangeId, final UserChangeState newState) {
         AUDIT_LOGGER.debug("Updating UserChange ID {} to state {}", userChangeId, newState);
 
         final UserChange existingUserChange = foldingRepository.getUserChange(userChangeId);

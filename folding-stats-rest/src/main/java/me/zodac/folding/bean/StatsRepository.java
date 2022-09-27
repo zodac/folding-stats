@@ -94,11 +94,11 @@ public class StatsRepository {
      *
      * @param month the {@link Month} of the {@link MonthlyResult} to be retrieved
      * @param year  the {@link Year} of the {@link MonthlyResult} to be retrieved
-     * @return an {@link Optional} of the {@code Team Competition} {@link MonthlyResult}
+     * @return the {@code Team Competition} {@link MonthlyResult}, or {@link MonthlyResult#empty()} if none exists
      */
-
-    public Optional<MonthlyResult> getMonthlyResult(final Month month, final Year year) {
-        return storage.getMonthlyResult(month, year);
+    public MonthlyResult getMonthlyResult(final Month month, final Year year) {
+        return storage.getMonthlyResult(month, year)
+            .orElse(MonthlyResult.empty());
     }
 
     /**

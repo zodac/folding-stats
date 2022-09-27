@@ -52,7 +52,7 @@ import lombok.experimental.Accessors;
  *
  * @see <a href="https://folding.lar.systems/api/gpu_ppd/gpu_rank_list.json">LARS GPU PPD database API</a>
  */
-@Accessors(fluent = true)
+@Accessors(fluent = false) // Need #get*()
 @Getter
 @Setter
 @EqualsAndHashCode

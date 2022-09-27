@@ -24,7 +24,8 @@
 
 package me.zodac.folding.rest.stub;
 
-import static me.zodac.folding.rest.api.util.RestUtilConstants.GSON;
+import static me.zodac.folding.rest.response.Responses.created;
+import static me.zodac.folding.rest.response.Responses.ok;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.ArrayList;
@@ -68,24 +69,20 @@ public class StubbedLarsEndpoint {
     /**
      * {@link PostMapping} request that allows tests to provide a single {@link LarsGpu} to be added to the stubbed response.
      *
-     * @param larsGpuInput the {@link LarsGpu} to add, as a {@link String}
+     * @param larsGpu the {@link LarsGpu} to add
      * @return {@link HttpStatus#CREATED} {@link ResponseEntity}
      */
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LarsGpu> addGpu(@RequestBody final String larsGpuInput) {
-        final LarsGpu larsGpu = GSON.fromJson(larsGpuInput, LarsGpu.class);
-
+    public ResponseEntity<LarsGpu> addGpu(@RequestBody final LarsGpu larsGpu) {
         final Map<String, LarsGpu> existingLarsGpus = new HashMap<>();
-        for (final LarsGpu existingGpu : LARS_GPU_RESPONSE.rankedGpus()) {
+        for (final LarsGpu existingGpu : LARS_GPU_RESPONSE.getRankedGpus()) {
             existingLarsGpus.put(existingGpu.getDetailedName(), existingGpu);
         }
 
         existingLarsGpus.put(larsGpu.getDetailedName(), larsGpu);
 
-        LARS_GPU_RESPONSE.rankedGpus(existingLarsGpus.values());
-        return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(larsGpu);
+        LARS_GPU_RESPONSE.setRankedGpus(existingLarsGpus.values());
+        return created(larsGpu);
     }
 
     /**
@@ -96,37 +93,33 @@ public class StubbedLarsEndpoint {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping
     public ResponseEntity<Void> deleteGpus() {
-        LARS_GPU_RESPONSE.rankedGpus(new ArrayList<>());
-        return ResponseEntity
-            .ok()
-            .build();
+        LARS_GPU_RESPONSE.setRankedGpus(new ArrayList<>());
+        return ok();
     }
 
     /**
      * {@link GetMapping} request that returns the configured hardware in the same format as the LARS DB HTML output.
      *
      * <p>
-     * Used by production code, not by tests directly, though tests should populate the hardware using {@link #addGpu(String)}.
+     * Used by production code, not by tests directly, though tests should populate the hardware using {@link #addGpu(LarsGpu)}.
      *
-     * @return the HTML output
-     * @see StubbedLarsEndpoint#addGpu(String)
+     * @return the {@link LarsGpuResponse} response
+     * @see StubbedLarsEndpoint#addGpu(LarsGpu)
      */
-    @GetMapping(path = "/gpu_rank_list.json", produces = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<String> getGpus() {
-        return ResponseEntity
-            .ok()
-            .body(GSON.toJson(LARS_GPU_RESPONSE));
+    @GetMapping(path = "/gpu_rank_list.json", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LarsGpuResponse> getGpus() {
+        return ok(LARS_GPU_RESPONSE);
     }
 
     private static LarsGpuResponse createLarsResponse() {
         final LarsGpuResponse larsGpuResponse = new LarsGpuResponse();
-        larsGpuResponse.apiName("");
-        larsGpuResponse.apiDescription("");
-        larsGpuResponse.apiLicence("");
-        larsGpuResponse.creditLinkWebsite("");
-        larsGpuResponse.creditLinkChromeExtension("");
-        larsGpuResponse.dateOfLastUpdate("");
-        larsGpuResponse.rankedGpus(new ArrayList<>());
+        larsGpuResponse.setApiName("");
+        larsGpuResponse.setApiDescription("");
+        larsGpuResponse.setApiLicence("");
+        larsGpuResponse.setCreditLinkWebsite("");
+        larsGpuResponse.setCreditLinkChromeExtension("");
+        larsGpuResponse.setDateOfLastUpdate("");
+        larsGpuResponse.setRankedGpus(new ArrayList<>());
 
         return larsGpuResponse;
     }

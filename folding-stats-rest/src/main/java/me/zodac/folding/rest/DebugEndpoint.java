@@ -74,7 +74,7 @@ public class DebugEndpoint {
      */
     @RolesAllowed("admin")
     @PostMapping(path = "/lars", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> startLarsUpdate() {
+    public ResponseEntity<Void> startLarsUpdate() {
         AUDIT_LOGGER.info("GET request received to manually update hardware from LARS DB");
         larsHardwareUpdater.retrieveHardwareAndPersist();
         return ok();
@@ -88,7 +88,7 @@ public class DebugEndpoint {
      */
     @RolesAllowed("admin")
     @PostMapping(path = "/caches", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> printCaches() {
+    public ResponseEntity<Void> printCaches() {
         AUDIT_LOGGER.info("Printing cache contents");
         foldingRepository.printCacheContents();
         return ok();

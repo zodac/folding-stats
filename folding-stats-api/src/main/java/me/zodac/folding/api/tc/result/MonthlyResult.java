@@ -25,7 +25,6 @@
 package me.zodac.folding.api.tc.result;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
@@ -37,8 +36,6 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.Category;
-import me.zodac.folding.api.tc.Team;
-import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
@@ -62,9 +59,9 @@ public final class MonthlyResult {
     /**
      * Creates a {@link MonthlyResult}.
      *
-     * @param teamLeaderboard         the leaderboard for {@link Team}s
-     * @param userCategoryLeaderboard the leaderboard for {@link User} {@link Category}s
-     * @param utcTimestamp            the {@link ZoneOffset#UTC} {@link LocalDateTime} for the {@link MonthlyResult}
+     * @param teamLeaderboard         the leaderboard for {@link me.zodac.folding.api.tc.Team}s
+     * @param userCategoryLeaderboard the leaderboard for {@link me.zodac.folding.api.tc.User} {@link Category}s
+     * @param utcTimestamp            the {@link java.time.ZoneOffset#UTC} {@link LocalDateTime} for the {@link MonthlyResult}
      * @return the created {@link MonthlyResult}
      */
     public static MonthlyResult create(final List<TeamLeaderboardEntry> teamLeaderboard,
@@ -77,10 +74,10 @@ public final class MonthlyResult {
      * Creates a {@link MonthlyResult}.
      *
      * <p>
-     * Uses the current {@link ZoneOffset#UTC} {@link LocalDateTime} from {@link DateTimeUtils#currentUtcLocalDateTime()}.
+     * Uses the current {@link java.time.ZoneOffset#UTC} {@link LocalDateTime} from {@link DateTimeUtils#currentUtcLocalDateTime()}.
      *
-     * @param teamLeaderboard         the leaderboard for {@link Team}s
-     * @param userCategoryLeaderboard the leaderboard for {@link User} {@link Category}s
+     * @param teamLeaderboard         the leaderboard for {@link me.zodac.folding.api.tc.Team}s
+     * @param userCategoryLeaderboard the leaderboard for {@link me.zodac.folding.api.tc.User} {@link Category}s
      * @return the created {@link MonthlyResult}
      */
     public static MonthlyResult createWithCurrentDateTime(final List<TeamLeaderboardEntry> teamLeaderboard,
@@ -110,7 +107,7 @@ public final class MonthlyResult {
      * Takes an existing {@link MonthlyResult} and creates a new instance with an updated {@code userCategoryLeaderboard}.
      *
      * <p>
-     * Since it is possible there are no {@link User}s for a given {@link Category}, there will be no entry for that
+     * Since it is possible there are no {@link me.zodac.folding.api.tc.User}s for a given {@link Category}, there will be no entry for that
      * {@link Category} in the {@code userCategoryLeaderboard}. We will instead iterate though {@link Category#getAllValues()} and add an entry for
      * each missing {@link Category}, with a default value of {@link Collections#emptyList()}.
      *

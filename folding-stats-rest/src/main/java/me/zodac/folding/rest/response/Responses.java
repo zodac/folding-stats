@@ -24,8 +24,6 @@
 
 package me.zodac.folding.rest.response;
 
-import static me.zodac.folding.rest.api.util.RestUtilConstants.GSON;
-
 import java.net.URI;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
@@ -56,10 +54,9 @@ public final class Responses {
      * Generally used for cases where an HTTP request is sent to request something from the system, but no response body is required, such as a
      * <b>DELETE</b> request, for example.
      *
-     * @param <E> the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<E> ok() {
+    public static ResponseEntity<Void> ok() {
         return ResponseEntity
             .ok()
             .build();
@@ -75,10 +72,10 @@ public final class Responses {
      * @param <E>    the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<String> ok(final E entity) {
+    public static <E> ResponseEntity<E> ok(final E entity) {
         return ResponseEntity
             .ok()
-            .body(GSON.toJson(entity));
+            .body(entity);
     }
 
     /**
@@ -91,11 +88,11 @@ public final class Responses {
      * @param <E>      the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<String> ok(final Collection<E> entities) {
+    public static <E> ResponseEntity<Collection<E>> ok(final Collection<E> entities) {
         return ResponseEntity
             .ok()
             .header(RestHeader.TOTAL_COUNT.headerName(), String.valueOf(entities.size()))
-            .body(GSON.toJson(entities));
+            .body(entities);
     }
 
     /**
@@ -109,7 +106,7 @@ public final class Responses {
      * @param <E>      the response body type
      * @return the <b>200_OK</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<String> ok(final E entity, final int entityId) {
+    public static <E> ResponseEntity<E> ok(final E entity, final int entityId) {
         return responseWithLocation(entity, entityId, HttpStatus.OK);
     }
 
@@ -125,12 +122,12 @@ public final class Responses {
      * @return the <b>200_OK</b> {@link ResponseEntity}
      * @see DateTimeUtils#untilNextMonthUtc(TemporalUnit)
      */
-    public static <E> ResponseEntity<String> cachedOk(final E entity) {
+    public static <E> ResponseEntity<E> cachedOk(final E entity) {
         return ResponseEntity
             .ok()
             .cacheControl(CacheControl.maxAge(DATE_TIME_UTILS.untilNextMonthUtc(ChronoUnit.SECONDS), TimeUnit.SECONDS))
             .eTag(String.valueOf(entity.hashCode()))
-            .body(GSON.toJson(entity));
+            .body(entity);
     }
 
     /**
@@ -145,7 +142,7 @@ public final class Responses {
      * @return the <b>200_OK</b> {@link ResponseEntity}
      * @see DateTimeUtils#untilNextMonthUtc(TemporalUnit)
      */
-    public static <E> ResponseEntity<String> cachedOk(final Collection<E> entities) {
+    public static <E> ResponseEntity<Collection<E>> cachedOk(final Collection<E> entities) {
         return cachedOk(entities, DATE_TIME_UTILS.untilNextMonthUtc(ChronoUnit.SECONDS));
     }
 
@@ -161,13 +158,13 @@ public final class Responses {
      * @return the <b>200_OK</b> {@link ResponseEntity}
      * @see DateTimeUtils#untilNextMonthUtc(TemporalUnit)
      */
-    public static <E> ResponseEntity<String> cachedOk(final Collection<E> entities, final long cachePeriodInSeconds) {
+    public static <E> ResponseEntity<Collection<E>> cachedOk(final Collection<E> entities, final long cachePeriodInSeconds) {
         return ResponseEntity
             .ok()
             .header(RestHeader.TOTAL_COUNT.headerName(), String.valueOf(entities.size()))
             .cacheControl(CacheControl.maxAge(cachePeriodInSeconds, TimeUnit.SECONDS))
             .eTag(String.valueOf(entities.stream().mapToInt(Object::hashCode).sum()))
-            .body(GSON.toJson(entities));
+            .body(entities);
     }
 
     /**
@@ -177,15 +174,31 @@ public final class Responses {
      * Used for cases where a <b>POST</b> request with a supplied payload has created a resource.
      *
      * @param entity   the created resource
+     * @param <E>      the response body type
+     * @return the <b>201_CREATED</b> {@link ResponseEntity}
+     */
+    public static <E> ResponseEntity<E> created(final E entity) {
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(entity);
+    }
+
+    /**
+     * A <b>201_CREATED</b> {@link ResponseEntity}.
+     *
+     * <p>
+     * Used for cases where a <b>POST</b> request with a supplied payload has created a resource with an ID.
+     *
+     * @param entity   the created resource
      * @param entityId the ID of the created resource
      * @param <E>      the response body type
      * @return the <b>201_CREATED</b> {@link ResponseEntity}
      */
-    public static <E> ResponseEntity<String> created(final E entity, final int entityId) {
+    public static <E> ResponseEntity<E> created(final E entity, final int entityId) {
         return responseWithLocation(entity, entityId, HttpStatus.CREATED);
     }
 
-    private static <E> ResponseEntity<String> responseWithLocation(final E entity, final int entityId, final HttpStatus httpStatus) {
+    private static <E> ResponseEntity<E> responseWithLocation(final E entity, final int entityId, final HttpStatus httpStatus) {
         final URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
@@ -195,7 +208,7 @@ public final class Responses {
         return ResponseEntity
             .status(httpStatus)
             .location(location)
-            .body(GSON.toJson(entity));
+            .body(entity);
     }
 
     /**
@@ -207,25 +220,10 @@ public final class Responses {
      * @param redirectUrl the URL to redirect to
      * @return the <b>303_SEE_OTHER</b> {@link ResponseEntity}
      */
-    public static ResponseEntity<String> redirect(final String redirectUrl) {
+    public static ResponseEntity<Void> redirect(final String redirectUrl) {
         return ResponseEntity
             .status(HttpStatus.SEE_OTHER)
             .location(URI.create(redirectUrl))
-            .build();
-    }
-
-    /**
-     * A <b>404_NOT_FOUND</b> {@link ResponseEntity}.
-     *
-     * <p>
-     * Generally used for cases when an ID is supplied in a REST request, but no resource exists matching that ID.
-     *
-     * @param <E> the response body type
-     * @return the <b>404_NOT_FOUND</b> {@link ResponseEntity}
-     */
-    public static <E> ResponseEntity<E> notFound() {
-        return ResponseEntity
-            .notFound()
             .build();
     }
 }

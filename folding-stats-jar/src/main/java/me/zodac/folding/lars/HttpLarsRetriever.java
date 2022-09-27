@@ -93,7 +93,7 @@ public final class HttpLarsRetriever implements LarsRetriever {
 
         final LarsGpuResponse larsGpuResponse = GSON.fromJson(response.body(), LarsGpuResponse.class);
 
-        return larsGpuResponse.rankedGpus()
+        return larsGpuResponse.getRankedGpus()
             .stream()
             .filter(HttpLarsRetriever::isValidLarsGpu)
             .map(HttpLarsRetriever::toHardware)

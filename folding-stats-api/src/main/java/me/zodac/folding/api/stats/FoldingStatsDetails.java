@@ -28,6 +28,9 @@ import me.zodac.folding.api.tc.User;
 
 /**
  * Simple POJO encapsulating the username and passkey for a Folding@Home user.
+ *
+ * @param foldingUserName the Folding@Home username
+ * @param passkey         the passkey for the user
  */
 public record FoldingStatsDetails(String foldingUserName, String passkey) {
 

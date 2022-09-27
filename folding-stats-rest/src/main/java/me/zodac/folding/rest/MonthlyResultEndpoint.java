@@ -28,7 +28,6 @@ import static me.zodac.folding.rest.response.Responses.ok;
 
 import java.time.Month;
 import java.time.Year;
-import java.util.Optional;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
@@ -80,19 +79,19 @@ public class MonthlyResultEndpoint {
      * @param year    the {@link Year} of the {@link MonthlyResult}
      * @param month   the {@link Month} of the {@link MonthlyResult}
      * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()} with the {@link MonthlyResult}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} with the {@link MonthlyResult}
      */
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/result/{year}/{month}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getMonthlyResult(@PathVariable("year") final String year,
+    public ResponseEntity<MonthlyResult> getMonthlyResult(@PathVariable("year") final String year,
                                               @PathVariable("month") final String month,
                                               final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received to retrieve monthly TC result at '{}'", request::getRequestURI);
 
         final DateDetails date = DateDetails.of(year, month);
-        final Optional<MonthlyResult> monthlyResult = statsRepository.getMonthlyResult(date.month(), date.year());
-        return ok(monthlyResult.orElse(MonthlyResult.empty()));
+        final MonthlyResult monthlyResult = statsRepository.getMonthlyResult(date.month(), date.year());
+        return ok(monthlyResult);
     }
 
     /**
@@ -103,7 +102,7 @@ public class MonthlyResultEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(path = "/manual/save")
-    public ResponseEntity<?> saveMonthlyResult() {
+    public ResponseEntity<Void> saveMonthlyResult() {
         AUDIT_LOGGER.info("GET request received to manually store monthly TC result");
         userStatsStorer.storeMonthlyResult();
         return ok();

@@ -109,7 +109,7 @@ public class TeamEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> create(@RequestBody final TeamRequest teamRequest, final HttpServletRequest request) {
+    public ResponseEntity<Team> create(@RequestBody final TeamRequest teamRequest, final HttpServletRequest request) {
         AUDIT_LOGGER.info("POST request received to create team at '{}' with request: {}", request::getRequestURI, () -> teamRequest);
 
         final Team validatedTeam = teamValidator.create(teamRequest);
@@ -130,7 +130,7 @@ public class TeamEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAll(final HttpServletRequest request) {
+    public ResponseEntity<Collection<Team>> getAll(final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received for all teams at '{}'", request::getRequestURI);
         final Collection<Team> elements = foldingRepository.getAllTeams();
         return cachedOk(elements);
@@ -146,7 +146,7 @@ public class TeamEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/{teamId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getById(@PathVariable("teamId") final int teamId, final HttpServletRequest request) {
+    public ResponseEntity<Team> getById(@PathVariable("teamId") final int teamId, final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request for team received at '{}'", request::getRequestURI);
 
         final Team element = foldingRepository.getTeam(teamId);
@@ -163,7 +163,7 @@ public class TeamEndpoint {
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/fields", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getByTeamName(@RequestParam("teamName") final String teamName, final HttpServletRequest request) {
+    public ResponseEntity<Team> getByTeamName(@RequestParam("teamName") final String teamName, final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request for team received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
 
         final Team retrievedTeam = foldingRepository.getAllTeams()
@@ -186,7 +186,7 @@ public class TeamEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PutMapping(path = "/{teamId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> updateById(@PathVariable("teamId") final int teamId,
+    public ResponseEntity<Team> updateById(@PathVariable("teamId") final int teamId,
                                         @RequestBody final TeamRequest teamRequest,
                                         final HttpServletRequest request) {
         AUDIT_LOGGER.info("PUT request for team received at '{}' with request {}", request::getRequestURI, () -> teamRequest);
@@ -220,7 +220,7 @@ public class TeamEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @DeleteMapping(path = "/{teamId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteById(@PathVariable("teamId") final int teamId, final HttpServletRequest request) {
+    public ResponseEntity<Void> deleteById(@PathVariable("teamId") final int teamId, final HttpServletRequest request) {
         AUDIT_LOGGER.info("DELETE request for team received at '{}'", request::getRequestURI);
 
         final Team team = foldingRepository.getTeam(teamId);

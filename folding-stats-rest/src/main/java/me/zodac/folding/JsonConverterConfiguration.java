@@ -24,9 +24,11 @@
 
 package me.zodac.folding;
 
-import static me.zodac.folding.rest.api.util.RestUtilConstants.GSON;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import java.time.LocalDateTime;
 import java.util.List;
+import me.zodac.folding.rest.api.util.LocalDateTimeGsonTypeAdapter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
@@ -40,6 +42,15 @@ public class JsonConverterConfiguration implements WebMvcConfigurer {
 
     @Override
     public void extendMessageConverters(final List<HttpMessageConverter<?>> converters) {
-        converters.add(new GsonHttpMessageConverter(GSON));
+        converters.clear();
+
+        // We don't try and reuse the GSON instance available in RestUtilConstants
+        // This is because we do not want pretty-print enabled
+        final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(LocalDateTime.class, LocalDateTimeGsonTypeAdapter.getInstance())
+            .disableHtmlEscaping()
+            .create();
+
+        converters.add(new GsonHttpMessageConverter(gson));
     }
 }

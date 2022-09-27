@@ -89,7 +89,7 @@ public class LoginEndpoint {
      * {@link PostMapping} request to log in as an admin system user.
      *
      * @param loginCredentials the {@link LoginCredentials}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)}
+     * @return {@link me.zodac.folding.rest.response.Responses#ok()}
      * @throws InvalidLoginCredentialsException thrown if the input {@link LoginCredentials} are in an incorrect format
      * @throws UnauthorizedException            thrown if the user does not exist, or the password is incorrect
      * @throws ForbiddenException               thrown if the user and password is accepted, but it does not have the correct role
@@ -97,7 +97,7 @@ public class LoginEndpoint {
     @ReadRequired
     @PermitAll
     @PostMapping(path = "/admin", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> loginAsAdmin(@RequestBody final LoginCredentials loginCredentials) {
+    public ResponseEntity<Void> loginAsAdmin(@RequestBody final LoginCredentials loginCredentials) {
         AUDIT_LOGGER.info("Login request received");
         loginAttempts.increment();
 

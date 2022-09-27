@@ -37,6 +37,8 @@ import java.util.function.Supplier;
 
 /**
  * Convenience class with convenient date/time-based functions.
+ *
+ * @param timeSupplier {@link Supplier} defining how the time should be configured for the {@link DateTimeUtils}
  */
 public record DateTimeUtils(Supplier<OffsetDateTime> timeSupplier) {
 
@@ -59,6 +61,7 @@ public record DateTimeUtils(Supplier<OffsetDateTime> timeSupplier) {
      * <p>
      * Should not be used outside of tests unless absolutely necessary.
      *
+     * @param timeSupplier {@link Supplier} defining how the time should be configured for the {@link DateTimeUtils}
      * @return the created {@link DateTimeUtils}
      */
     static DateTimeUtils createWithSupplier(final Supplier<OffsetDateTime> timeSupplier) {
