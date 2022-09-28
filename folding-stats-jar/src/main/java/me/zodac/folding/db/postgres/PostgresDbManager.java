@@ -86,6 +86,7 @@ import org.jooq.impl.DSL;
  *
  * <p>
  * Uses <b>jOOQ</b> for code generation for the DB tables/schemas, rather than direct SQL queries. See existing methods for examples.
+ *
  * @param dataSource the {@link DataSource} for this instance
  */
 public record PostgresDbManager(DataSource dataSource) implements DbManager {

@@ -26,6 +26,7 @@ package me.zodac.folding.stats.http.request;
 
 /**
  * Simple wrapper to hold the URL for a points or units REST request.
+ *
  * @param url the URL
  */
 public record StatsRequestUrl(String url) {
