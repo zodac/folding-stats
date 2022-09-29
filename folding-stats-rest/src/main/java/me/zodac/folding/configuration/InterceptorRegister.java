@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding;
+package me.zodac.folding.configuration;
 
 import me.zodac.folding.rest.interceptor.SecurityInterceptor;
 import me.zodac.folding.rest.interceptor.StateInterceptor;

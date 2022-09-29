@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package me.zodac.folding;
+package me.zodac.folding.configuration;
 
 import static me.zodac.folding.rest.api.util.RestUtilConstants.GSON;
 
