@@ -44,24 +44,24 @@
         <hikariCP.version>5.0.1</hikariCP.version>
         <javaee-web-api.version>8.0.1</javaee-web-api.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
-        <jersey-server.version>3.1.0-M3</jersey-server.version>
-        <jooq.version>3.17.3</jooq.version>
+        <jersey-server.version>3.1.0-M8</jersey-server.version>
+        <jooq.version>3.17.4</jooq.version>
         <jsoup.version>1.15.3</jsoup.version>
-        <log4j.version>2.18.0</log4j.version>
+        <log4j.version>2.19.0</log4j.version>
         <lombok.version>1.18.24</lombok.version>
-        <micrometer.version>1.9.3</micrometer.version>
+        <micrometer.version>1.9.4</micrometer.version>
         <postgresql-driver.version>42.5.0</postgresql-driver.version>
         <resilience4j.version>1.7.1</resilience4j.version>
-        <spring-boot.version>2.7.3</spring-boot.version>
+        <spring-boot.version>2.7.4</spring-boot.version>
         <springdoc.version>1.6.11</springdoc.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.23.1</assertj-core.version>
         <embedded-postgres.version>2.0.1</embedded-postgres.version>
         <embedded-postgres-binaries-bom.version>14.5.0</embedded-postgres-binaries-bom.version>
-        <flyway-core>9.2.0</flyway-core>
-        <junit-jupiter.version>5.9.0</junit-jupiter.version>
-        <selenium.version>4.4.0</selenium.version>
+        <flyway-core>9.3.1</flyway-core>
+        <junit-jupiter.version>5.9.1</junit-jupiter.version>
+        <selenium.version>4.5.0</selenium.version>
 
         <!-- Plugin Versions -->
         <build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
@@ -71,28 +71,28 @@
         <maven-dependency-plugin.version>3.3.0</maven-dependency-plugin.version>
         <maven-failsafe-plugin.version>3.0.0-M7</maven-failsafe-plugin.version>
         <maven-install-plugin.version>3.0.1</maven-install-plugin.version>
-        <maven-jar-plugin.version>3.2.2</maven-jar-plugin.version>
+        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M7</maven-surefire-plugin.version>
-        <maven-war-plugin.version>3.3.2</maven-war-plugin.version>
-        <versions-maven-plugin.version>2.11.0</versions-maven-plugin.version>
+        <maven-war-plugin.version>3.3.2</maven-war-plugin.version> <!-- TODO: Needed? -->
+        <versions-maven-plugin.version>2.12.0</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>10.3.2</checkstyle.version>
+        <checkstyle.version>10.3.4</checkstyle.version>
         <errorprone.version>2.15.0</errorprone.version>
         <licenses.version>1</licenses.version>
-        <spotbugs.version>4.7.1</spotbugs.version>
-        <pitest-junit5-plugin.version>1.0.0</pitest-junit5-plugin.version>
-        <pmd.version>6.48.0</pmd.version>
+        <spotbugs.version>4.7.2</spotbugs.version>
+        <pitest-junit5-plugin.version>1.1.0</pitest-junit5-plugin.version>
+        <pmd.version>6.49.0</pmd.version>
 
         <!-- Linter Plugin Versions -->
-        <dependency-check-maven.version>7.1.2</dependency-check-maven.version>
+        <dependency-check-maven.version>7.2.1</dependency-check-maven.version>
         <license-maven-plugin.version>4.2.rc3</license-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.2.0</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
-        <maven-pmd-plugin.version>3.18.0</maven-pmd-plugin.version>
+        <maven-pmd-plugin.version>3.19.0</maven-pmd-plugin.version>
         <pitest-maven.version>1.9.5</pitest-maven.version>
-        <spotbugs-maven-plugin.version>4.7.1.1</spotbugs-maven-plugin.version>
+        <spotbugs-maven-plugin.version>4.7.2.0</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
