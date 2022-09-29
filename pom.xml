@@ -79,7 +79,7 @@
 
         <!-- Linter 3PP Versions -->
         <checkstyle.version>10.3.2</checkstyle.version>
-        <errorprone.version>2.11.0</errorprone.version>
+        <errorprone.version>2.15.0</errorprone.version>
         <licenses.version>1</licenses.version>
         <spotbugs.version>4.7.1</spotbugs.version>
         <pitest-junit5-plugin.version>1.0.0</pitest-junit5-plugin.version>

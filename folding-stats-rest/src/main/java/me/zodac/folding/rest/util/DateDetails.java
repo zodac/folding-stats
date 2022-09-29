@@ -38,6 +38,10 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * POJO containing a {@link Year}, {@link Month} and {@code day} to simply represent a date.
+ *
+ * @param year  the {@link Year}
+ * @param month the {@link Month}
+ * @param day   the {@code day}
  */
 public record DateDetails(Year year, Month month, int day) {
 

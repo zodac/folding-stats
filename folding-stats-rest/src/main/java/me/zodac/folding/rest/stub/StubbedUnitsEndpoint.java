@@ -30,14 +30,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -139,16 +131,7 @@ public class StubbedUnitsEndpoint {
         return Collections.emptyList();
     }
 
-    @NoArgsConstructor
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    @Accessors(fluent = false) // Need #get*()
-    @Getter
-    @Setter
-    @EqualsAndHashCode
-    @ToString(doNotUseGetters = true)
-    private static class UnitsResponse {
-
-        private int finished;
+    private record UnitsResponse(int finished) {
 
         static UnitsResponse create(final int finished) {
             return new UnitsResponse(finished);

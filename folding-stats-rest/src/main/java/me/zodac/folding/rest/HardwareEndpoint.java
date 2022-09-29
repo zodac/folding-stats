@@ -123,12 +123,12 @@ public class HardwareEndpoint {
                 mediaType = "application/json",
                 schema = @Schema(implementation = Hardware.class)
             )),
-        @ApiResponse(responseCode = "400", description = "The given hardware payload is invalid", content = @Content),
-        @ApiResponse(responseCode = "401", description = "System user cannot be logged in with provided credentials", content = @Content),
-        @ApiResponse(responseCode = "403", description = "System user does not have the correct role to perform this request", content = @Content),
-        @ApiResponse(responseCode = "409", description = "A hardware with the same 'hardwareName' already exists", content = @Content),
-        @ApiResponse(responseCode = "502", description = "An error occurred connecting to an external system", content = @Content),
-        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests", content = @Content),
+        @ApiResponse(responseCode = "400", description = "The given hardware payload is invalid"),
+        @ApiResponse(responseCode = "401", description = "System user cannot be logged in with provided credentials"),
+        @ApiResponse(responseCode = "403", description = "System user does not have the correct role to perform this request"),
+        @ApiResponse(responseCode = "409", description = "A hardware with the same 'hardwareName' already exists"),
+        @ApiResponse(responseCode = "502", description = "An error occurred connecting to an external system"),
+        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests"),
     })
     @WriteRequired
     @RolesAllowed("admin")

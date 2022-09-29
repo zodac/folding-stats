@@ -27,14 +27,6 @@ package me.zodac.folding.rest.stub;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -139,16 +131,7 @@ public class StubbedPointsEndpoint {
         return PointsResponse.empty();
     }
 
-    @NoArgsConstructor
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    @Accessors(fluent = false) // Need #get*()
-    @Getter
-    @Setter
-    @EqualsAndHashCode
-    @ToString(doNotUseGetters = true)
-    private static class PointsResponse {
-
-        private long earned;
+    private record PointsResponse(long earned) {
 
         static PointsResponse create(final long earned) {
             return new PointsResponse(earned);
