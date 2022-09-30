@@ -32,6 +32,9 @@ import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParame
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -70,9 +73,10 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * REST endpoints for {@code Team Competition} {@link Hardware}s.
  */
-@Tag(name = "Hardware Endpoint", description = "CRUD functions for Hardware")
+@Tag(name = "Hardware Endpoint", description = "REST endpoints to create, read, update and delete hardware on the system")
 @RestController
 @RequestMapping("/hardware")
+// TODO: Extract all entry logging to decorator?
 public class HardwareEndpoint {
 
     private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
@@ -117,13 +121,43 @@ public class HardwareEndpoint {
      */
     @Operation(summary = "Create a hardware", security = @SecurityRequirement(name = "basicAuthentication"))
     @ApiResponses({
-        @ApiResponse(responseCode = "200",
+        @ApiResponse(
+            responseCode = "200",
             description = "Hardware has been created",
+            headers = @Header(
+                name = "location",
+                description = "The URL to the created hardware"
+            ),
             content = @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = Hardware.class)
             )),
-        @ApiResponse(responseCode = "400", description = "The given hardware payload is invalid"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "The given hardware payload is invalid",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = """
+                    {
+                        "invalidObject": {
+                            "id": 1,
+                            "hardwareName": " ",
+                            "hardwareMake": "invalid",
+                            "hardwareType": "invalid",
+                            "multiplier": -1.00,
+                            "averagePpd": -1
+                        },
+                        "errors": [
+                            "Field 'hardwareName' must not be empty",
+                            "Field 'displayName' must not be empty",
+                            "Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]",
+                            "Field 'hardwareType' must be one of: [CPU, GPU]",
+                            "Field 'multiplier' must be 1.00 or higher",
+                            "Field 'averagePpd' must be 1 or higher"
+                        ]
+                    }"""
+                )
+            )),
         @ApiResponse(responseCode = "401", description = "System user cannot be logged in with provided credentials"),
         @ApiResponse(responseCode = "403", description = "System user does not have the correct role to perform this request"),
         @ApiResponse(responseCode = "409", description = "A hardware with the same 'hardwareName' already exists"),
@@ -133,7 +167,10 @@ public class HardwareEndpoint {
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Hardware> create(@RequestBody final HardwareRequest hardwareRequest, final HttpServletRequest request) {
+    public ResponseEntity<Hardware> create(
+        @RequestBody @Parameter(description = "The new hardware to be created") final HardwareRequest hardwareRequest,
+        final HttpServletRequest request
+    ) {
         AUDIT_LOGGER.info("POST request received to create hardware at '{}' with request: {}", request::getRequestURI, () -> hardwareRequest);
 
         final Hardware validatedHardware = hardwareValidator.create(hardwareRequest);
@@ -151,6 +188,21 @@ public class HardwareEndpoint {
      * @param request the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Collection, long)} containing the {@link Hardware}s
      */
+    @Operation(summary = "Retrieves all hardwares")
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "All hardwares",
+            headers = @Header(
+                name = "eTag",
+                description = "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+            ),
+            content = @Content(
+                mediaType = "application/json",
+                array = @ArraySchema(schema = @Schema(implementation = Hardware.class))
+            )),
+        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute read requests"),
+    })
     @ReadRequired
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -167,10 +219,41 @@ public class HardwareEndpoint {
      * @param request    the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object)} containing the {@link Hardware}
      */
+    @Operation(summary = "Retrieves a single hardware by its ID")
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "The requested hardware",
+            headers = @Header(
+                name = "eTag",
+                description = "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+            ),
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Hardware.class)
+            )),
+        @ApiResponse(
+            responseCode = "400",
+            description = "The provided ID is an invalid integer",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = """
+                    {
+                        "error": "The input is not a valid format: Failed to convert value of type 'java.lang.String' to required type 'int';
+                                  nested exception is java.lang.NumberFormatException: For input string: \\"a\\""
+                    }"""
+                )
+            )),
+        @ApiResponse(responseCode = "404", description = "No hardware exists with the given ID"),
+        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute read requests"),
+    })
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/{hardwareId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Hardware> getById(@PathVariable("hardwareId") final int hardwareId, final HttpServletRequest request) {
+    public ResponseEntity<Hardware> getById(
+        @PathVariable("hardwareId") @Parameter(description = "The ID of the hardware to be retrieved") final int hardwareId,
+        final HttpServletRequest request
+    ) {
         AUDIT_LOGGER.debug("GET request for hardware received at '{}'", request::getRequestURI);
 
         final Hardware element = foldingRepository.getHardware(hardwareId);
@@ -184,10 +267,29 @@ public class HardwareEndpoint {
      * @param request      the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object)} containing the {@link Hardware}
      */
+    @Operation(summary = "Retrieves a single hardware by its 'hardwareName'")
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "The requested hardware",
+            headers = @Header(
+                name = "eTag",
+                description = "An EntityTag which can be used to retrieve a cached version of the response in future requests"
+            ),
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Hardware.class)
+            )),
+        @ApiResponse(responseCode = "404", description = "No hardware exists with the given 'hardwareName'"),
+        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute read requests"),
+    })
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/fields", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Hardware> getByHardwareName(@RequestParam("hardwareName") final String hardwareName, final HttpServletRequest request) {
+    public ResponseEntity<Hardware> getByHardwareName(
+        @RequestParam("hardwareName") @Parameter(description = "The 'hardwareName' of the hardware to be retrieved") final String hardwareName,
+        final HttpServletRequest request
+    ) {
         AUDIT_LOGGER.debug("GET request for hardware received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
 
         final Hardware retrievedHardware = foldingRepository.getAllHardware()
@@ -207,12 +309,60 @@ public class HardwareEndpoint {
      * @param request         the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link Hardware}
      */
+    @Operation(summary = "Updates a single hardware", security = @SecurityRequirement(name = "basicAuthentication"))
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "The hardware has been updated",
+            headers = @Header(
+                name = "location",
+                description = "The URL to the updated hardware"
+            ),
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = Hardware.class)
+            )),
+        @ApiResponse(
+            responseCode = "400",
+            description = "The given hardware payload is invalid",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = """
+                    {
+                        "invalidObject": {
+                            "id": 1,
+                            "hardwareName": " ",
+                            "hardwareMake": "invalid",
+                            "hardwareType": "invalid",
+                            "multiplier": -1.00,
+                            "averagePpd": -1
+                        },
+                        "errors": [
+                            "Field 'hardwareName' must not be empty",
+                            "Field 'displayName' must not be empty",
+                            "Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]",
+                            "Field 'hardwareType' must be one of: [CPU, GPU]",
+                            "Field 'multiplier' must be 1.00 or higher",
+                            "Field 'averagePpd' must be 1 or higher"
+                        ]
+                    }"""
+                )
+            )),
+        @ApiResponse(responseCode = "401", description = "System user cannot be logged in with provided credentials"),
+        @ApiResponse(responseCode = "403", description = "System user does not have the correct role to perform this request"),
+        @ApiResponse(responseCode = "404", description = "No hardware exists with the given ID"),
+        @ApiResponse(responseCode = "409", description = "A hardware with the same 'hardwareName' already exists"),
+        @ApiResponse(responseCode = "502", description = "An error occurred connecting to an external system"),
+        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests"),
+    })
     @WriteRequired
     @RolesAllowed("admin")
     @PutMapping(path = "/{hardwareId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Hardware> updateById(@PathVariable("hardwareId") final int hardwareId,
-                                        @RequestBody final HardwareRequest hardwareRequest,
-                                        final HttpServletRequest request) {
+    public ResponseEntity<Hardware> updateById(
+        @PathVariable("hardwareId") @Parameter(description = "The ID of the hardware to be updated") final int hardwareId,
+        @RequestBody @Parameter(description = "The new hardware to be updated") final HardwareRequest hardwareRequest,
+        final HttpServletRequest request
+    ) {
         AUDIT_LOGGER.info("PUT request for hardware received at '{}' with request {}", request::getRequestURI, () -> hardwareRequest);
 
         final Hardware existingHardware = foldingRepository.getHardware(hardwareId);
@@ -241,10 +391,70 @@ public class HardwareEndpoint {
      * @param request    the {@link HttpServletRequest}
      * @return {@link me.zodac.folding.rest.response.Responses#ok()}
      */
+    @Operation(summary = "Deletes a single hardware", security = @SecurityRequirement(name = "basicAuthentication"))
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            description = "The hardware has been deleted"
+        ),
+        @ApiResponse(responseCode = "401", description = "System user cannot be logged in with provided credentials"),
+        @ApiResponse(responseCode = "403", description = "System user does not have the correct role to perform this request"),
+        @ApiResponse(responseCode = "404", description = "No hardware exists with the given ID"),
+        @ApiResponse(
+            responseCode = "409",
+            description = "The hardware is being referenced by a user and cannot be deleted",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = """
+                    {
+                        "invalidObject": {
+                            "id": 1,
+                            "hardwareName": "Hardware1",
+                            "displayName": "Hardware1",
+                            "hardwareMake": "NVIDIA",
+                            "hardwareType": "GPU",
+                            "multiplier": 16.38,
+                            "averagePpd": 1
+                        },
+                        "conflictingObject": {
+                            "id": 1,
+                            "foldingUserName": "User1",
+                            "displayName": "User1",
+                            "passkey": "fc7d6837************************",
+                            "category": "WILDCARD",
+                            "hardware": {
+                                "id": 1,
+                                "hardwareName": "Hardware1",
+                                "displayName": "Hardware1",
+                                "hardwareMake": "NVIDIA",
+                                "hardwareType": "GPU",
+                                "multiplier": 16.38,
+                                "averagePpd": 1
+                            },
+                            "team": {
+                                "id": 1,
+                                "teamName": "Team1",
+                                "teamDescription": "Desc"
+                            },
+                            "role": "CAPTAIN"
+                        },
+                        "validationResult": "FAILURE_DUE_TO_CONFLICT",
+                        "errors": [
+                            "Payload conflicts with an existing object"
+                        ]
+                    }"""
+                )
+            )),
+        @ApiResponse(responseCode = "502", description = "An error occurred connecting to an external system"),
+        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests"),
+    })
     @WriteRequired
     @RolesAllowed("admin")
     @DeleteMapping(path = "/{hardwareId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> deleteById(@PathVariable("hardwareId") final int hardwareId, final HttpServletRequest request) {
+    public ResponseEntity<Void> deleteById(
+        @PathVariable("hardwareId") @Parameter(description = "The ID of the hardware to be deleted") final int hardwareId,
+        final HttpServletRequest request
+    ) {
         AUDIT_LOGGER.info("DELETE request for hardware received at '{}'", request::getRequestURI);
 
         final Hardware hardware = foldingRepository.getHardware(hardwareId);

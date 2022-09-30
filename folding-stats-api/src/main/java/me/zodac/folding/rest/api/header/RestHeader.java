@@ -27,6 +27,7 @@ package me.zodac.folding.rest.api.header;
 /**
  * Set of REST headers and their name.
  */
+// TODO: Needed in this module?
 public enum RestHeader {
 
     /**
@@ -47,7 +48,7 @@ public enum RestHeader {
     /**
      * The {@code ETag} header.
      */
-    ETAG("ETag"),
+    ETAG("eTag"),
 
     /**
      * The {@code If-None-Match} header.
