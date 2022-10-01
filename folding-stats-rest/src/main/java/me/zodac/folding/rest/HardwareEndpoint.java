@@ -73,7 +73,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * REST endpoints for {@code Team Competition} {@link Hardware}s.
  */
-@Tag(name = "Hardware Endpoint", description = "REST endpoints to create, read, update and delete hardware on the system")
+@Tag(name = "Hardware Endpoints", description = "REST endpoints to create, read, update and delete hardware on the system")
 @RestController
 @RequestMapping("/hardware")
 // TODO: Extract all entry logging to decorator?
@@ -395,8 +395,7 @@ public class HardwareEndpoint {
     @ApiResponses({
         @ApiResponse(
             responseCode = "200",
-            description = "The hardware has been deleted"
-        ),
+            description = "The hardware has been deleted"),
         @ApiResponse(responseCode = "401", description = "System user cannot be logged in with provided credentials"),
         @ApiResponse(responseCode = "403", description = "System user does not have the correct role to perform this request"),
         @ApiResponse(responseCode = "404", description = "No hardware exists with the given ID"),

@@ -28,6 +28,13 @@ import static me.zodac.folding.rest.response.Responses.ok;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Map;
 import javax.annotation.security.PermitAll;
 import me.zodac.folding.api.UserAuthenticationResult;
@@ -52,6 +59,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * REST endpoints to log in as a system user.
  */
+@Tag(name = "Login Endpoints", description = "REST endpoints to login as a system user")
 @RestController
 @RequestMapping("/login")
 public class LoginEndpoint {
@@ -94,10 +102,30 @@ public class LoginEndpoint {
      * @throws UnauthorizedException            thrown if the user does not exist, or the password is incorrect
      * @throws ForbiddenException               thrown if the user and password is accepted, but it does not have the correct role
      */
+    @Operation(summary = "Accepts user credentials and verifies whether they have admin access")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Credentials are valid and for an admin user"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "The given login payload is invalid",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(example = """
+                    {
+                        "encodedUserNameAndPassword": "dXNlcm5hbWU6cGFzc3dvcmQ="
+                    }"""
+                )
+            )),
+        @ApiResponse(responseCode = "401", description = "Provided credentials cannot be logged in"),
+        @ApiResponse(responseCode = "403", description = "Provided credentials is for a valid user, but not an admin"),
+        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests"),
+    })
     @ReadRequired
     @PermitAll
     @PostMapping(path = "/admin", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> loginAsAdmin(@RequestBody final LoginCredentials loginCredentials) {
+    public ResponseEntity<Void> loginAsAdmin(
+        @RequestBody @Parameter(description = "The login credentials to be checked") final LoginCredentials loginCredentials
+    ) {
         AUDIT_LOGGER.info("Login request received");
         loginAttempts.increment();
 

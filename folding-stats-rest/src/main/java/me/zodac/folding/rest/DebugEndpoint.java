@@ -26,6 +26,11 @@ package me.zodac.folding.rest;
 
 import static me.zodac.folding.rest.response.Responses.ok;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import javax.annotation.security.RolesAllowed;
 import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.api.FoldingRepository;
@@ -45,6 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>
  * <b>NOTE:</b> There are no client-libraries for these endpoints.
  */
+@Tag(name = "Debugging Endpoints", description = "REST endpoints for debugging functions")
 @RestController
 @RequestMapping("/debug")
 public class DebugEndpoint {
@@ -72,6 +78,12 @@ public class DebugEndpoint {
      * @return {@link me.zodac.folding.rest.response.Responses#ok()}
      * @see LarsHardwareUpdater
      */
+    @Operation(summary = "Manually trigger an update of hardware from LARS", security = @SecurityRequirement(name = "basicAuthentication"))
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "LARS update was successfully executed"),
+        @ApiResponse(responseCode = "401", description = "System user cannot be logged in with provided credentials"),
+        @ApiResponse(responseCode = "403", description = "System user does not have the correct role to perform this request"),
+    })
     @RolesAllowed("admin")
     @PostMapping(path = "/lars", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> startLarsUpdate() {
@@ -86,6 +98,12 @@ public class DebugEndpoint {
      * @return {@link me.zodac.folding.rest.response.Responses#ok()}
      * @see FoldingRepository#printCacheContents()
      */
+    @Operation(summary = "Print contents of caches to system log", security = @SecurityRequirement(name = "basicAuthentication"))
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Cache contents were successfully printed"),
+        @ApiResponse(responseCode = "401", description = "System user cannot be logged in with provided credentials"),
+        @ApiResponse(responseCode = "403", description = "System user does not have the correct role to perform this request"),
+    })
     @RolesAllowed("admin")
     @PostMapping(path = "/caches", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> printCaches() {
