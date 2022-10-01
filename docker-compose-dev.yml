@@ -112,6 +112,26 @@ services:
     ports:
       - "5433:5432"
 
+  test_frontend:
+    build:
+      context: .
+      dockerfile: docker/test-frontend/ui-app/Dockerfile
+      args:
+        # Docker image versions
+        NODE_VERSION: "18.8"
+    container_name: test_frontend
+    hostname: test_frontend
+    depends_on:
+      - backend_dev
+    links:
+      - backend_dev
+    networks:
+      - development
+    ports:
+      - "3000:3000"
+    volumes_from:
+      - backend_dev
+
   selenium_chrome:
     image: selenium/standalone-chrome:104.0
     container_name: selenium_chrome

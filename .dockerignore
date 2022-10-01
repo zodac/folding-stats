@@ -14,3 +14,8 @@ docker-compose.yml
 
 # git
 .git/
+
+# Frontend
+**/node_modules
+**/npm-debug.log
+build

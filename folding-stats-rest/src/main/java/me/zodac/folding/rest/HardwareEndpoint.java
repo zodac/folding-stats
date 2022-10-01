@@ -395,8 +395,7 @@ public class HardwareEndpoint {
     @ApiResponses({
         @ApiResponse(
             responseCode = "200",
-            description = "The hardware has been deleted"
-        ),
+            description = "The hardware has been deleted"),
         @ApiResponse(responseCode = "401", description = "System user cannot be logged in with provided credentials"),
         @ApiResponse(responseCode = "403", description = "System user does not have the correct role to perform this request"),
         @ApiResponse(responseCode = "404", description = "No hardware exists with the given ID"),
