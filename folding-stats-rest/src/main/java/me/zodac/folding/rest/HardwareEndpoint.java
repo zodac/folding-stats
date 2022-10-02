@@ -36,6 +36,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -126,11 +127,21 @@ public class HardwareEndpoint {
             description = "Hardware has been created",
             headers = @Header(
                 name = "location",
-                description = "The URL to the created hardware"
+                description = "The URL for the created hardware"
             ),
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(implementation = Hardware.class)
+                schema = @Schema(implementation = Hardware.class),
+                examples = @ExampleObject("""
+                    {
+                        "id": 1,
+                        "hardwareName": "Hardware1",
+                        "displayName": "Hardware1",
+                        "hardwareMake": "NVIDIA",
+                        "hardwareType": "GPU",
+                        "multiplier": 21.33,
+                        "averagePpd": 1
+                    }""")
             )),
         @ApiResponse(
             responseCode = "400",
@@ -199,7 +210,28 @@ public class HardwareEndpoint {
             ),
             content = @Content(
                 mediaType = "application/json",
-                array = @ArraySchema(schema = @Schema(implementation = Hardware.class))
+                array = @ArraySchema(schema = @Schema(implementation = Hardware.class)),
+                examples = @ExampleObject("""
+                    [
+                        {
+                            "id": 1,
+                            "hardwareName": "Hardware1",
+                            "displayName": "Hardware1",
+                            "hardwareMake": "NVIDIA",
+                            "hardwareType": "GPU",
+                            "multiplier": 21.33,
+                            "averagePpd": 1
+                        },
+                        {
+                            "id": 2,
+                            "hardwareName": "Hardware2",
+                            "displayName": "Hardware2",
+                            "hardwareMake": "AMD",
+                            "hardwareType": "GPU",
+                            "multiplier": 3.62,
+                            "averagePpd": 25
+                        }
+                    ]""")
             )),
         @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute read requests"),
     })
@@ -230,14 +262,25 @@ public class HardwareEndpoint {
             ),
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(implementation = Hardware.class)
+                schema = @Schema(implementation = Hardware.class),
+                examples = @ExampleObject("""
+                    {
+                        "id": 1,
+                        "hardwareName": "Hardware1",
+                        "displayName": "Hardware1",
+                        "hardwareMake": "NVIDIA",
+                        "hardwareType": "GPU",
+                        "multiplier": 21.33,
+                        "averagePpd": 1
+                    }"""
+                )
             )),
         @ApiResponse(
             responseCode = "400",
             description = "The provided ID is an invalid integer",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
+                examples = @ExampleObject("""
                     {
                         "error": "The input is not a valid format: Failed to convert value of type 'java.lang.String' to required type 'int';
                                   nested exception is java.lang.NumberFormatException: For input string: \\"a\\""
@@ -278,7 +321,18 @@ public class HardwareEndpoint {
             ),
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(implementation = Hardware.class)
+                schema = @Schema(implementation = Hardware.class),
+                examples = @ExampleObject("""
+                    {
+                        "id": 1,
+                        "hardwareName": "Hardware1",
+                        "displayName": "Hardware1",
+                        "hardwareMake": "NVIDIA",
+                        "hardwareType": "GPU",
+                        "multiplier": 21.33,
+                        "averagePpd": 1
+                    }"""
+                )
             )),
         @ApiResponse(responseCode = "404", description = "No hardware exists with the given 'hardwareName'"),
         @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute read requests"),
@@ -316,18 +370,30 @@ public class HardwareEndpoint {
             description = "The hardware has been updated",
             headers = @Header(
                 name = "location",
-                description = "The URL to the updated hardware"
+                description = "The URL for the updated hardware"
             ),
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(implementation = Hardware.class)
+                schema = @Schema(implementation = Hardware.class),
+                examples = @ExampleObject("""
+                    {
+                        "id": 1,
+                        "hardwareName": "Hardware1_Updated",
+                        "displayName": "Hardware1_Updated",
+                        "hardwareMake": "NVIDIA",
+                        "hardwareType": "GPU",
+                        "multiplier": 21.33,
+                        "averagePpd": 1
+                    }"""
+                )
             )),
         @ApiResponse(
             responseCode = "400",
             description = "The given hardware payload is invalid",
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(example = """
+                schema = @Schema(
+                    example = """
                     {
                         "invalidObject": {
                             "id": 1,

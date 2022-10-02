@@ -27,7 +27,6 @@ package me.zodac.folding.rest.api.header;
 /**
  * Set of REST headers and their name.
  */
-// TODO: Needed in this module?
 public enum RestHeader {
 
     /**

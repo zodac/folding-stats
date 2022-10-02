@@ -44,7 +44,7 @@ import lombok.experimental.Accessors;
 /**
  * POJO defining historic {@code Team Competition} stats (hourly, daily, monthly, etc.) for a {@link me.zodac.folding.api.tc.User}.
  */
-@NoArgsConstructor // [TODO] Needed? Same with Setter?
+@NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Accessors(fluent = true)
 @Getter
