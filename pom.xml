@@ -80,9 +80,9 @@
         <checkstyle.version>10.3.4</checkstyle.version>
         <errorprone.version>2.15.0</errorprone.version>
         <licenses.version>1</licenses.version>
-        <spotbugs.version>4.7.2</spotbugs.version>
         <pitest-junit5-plugin.version>1.1.0</pitest-junit5-plugin.version>
         <pmd.version>6.49.0</pmd.version>
+        <spotbugs.version>4.7.2</spotbugs.version>
 
         <!-- Linter Plugin Versions -->
         <dependency-check-maven.version>7.2.1</dependency-check-maven.version>
@@ -98,13 +98,13 @@
         <dependency-check-suppression-file>${project.parent.basedir}/ci/dependency-check-suppression.xml</dependency-check-suppression-file>
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
         <checkstyle-file>${project.parent.basedir}/ci/checkstyle.xml</checkstyle-file>
+        <pitest-test-strength-threshold>100</pitest-test-strength-threshold>
+        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
+        <pmd-ruleset>${project.parent.basedir}/ci/pmd-ruleset.xml</pmd-ruleset>
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
         <spotbugs-include-file>${project.parent.basedir}/ci/spotbugs-include-filter-file.xml</spotbugs-include-file>
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
         <spotbugs-exclude-file>${project.parent.basedir}/ci/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
-        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
-        <pmd-ruleset>${project.parent.basedir}/ci/pmd-ruleset.xml</pmd-ruleset>
-        <pitest-test-strength-threshold>100</pitest-test-strength-threshold>
 
         <!-- ProGuard 3PP Versions -->
         <proguard-base.version>7.2.2</proguard-base.version>
