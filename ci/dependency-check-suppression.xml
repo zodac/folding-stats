@@ -6,4 +6,14 @@
         <packageUrl regex="true">^pkg:maven/org\.springframework/spring.*$</packageUrl>
         <cve>CVE-2016-1000027</cve>
     </suppress>
+
+    <!-- TODO: Remove these when jackson-databind:2.14.0 is released -->
+    <suppress>
+        <notes><![CDATA[Ignored since fix is not yet available]]></notes>
+        <cve>CVE-2022-42003</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[Ignored since fix is not yet available]]></notes>
+        <cve>CVE-2022-42004</cve>
+    </suppress>
 </suppressions>

@@ -273,6 +273,13 @@
                 <artifactId>springdoc-openapi-ui</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
+<!--            &lt;!&ndash; Due to CVE-2022-42003/CVE-2022-42004 with jackson-databind:2.13.3 in spring-boot-starter-web &ndash;&gt;-->
+<!--            &lt;!&ndash; Remove this dependency when the above dependency is updated &ndash;&gt;-->
+<!--            <dependency>-->
+<!--                <groupId>com.fasterxml.jackson.core</groupId>-->
+<!--                <artifactId>jackson-databind</artifactId>-->
+<!--                <version>2.13.4</version>-->
+<!--            </dependency>-->
             <!-- [CVE-2022-38752] Removing snakeyaml from transitive dependency of springdoc-openapi-ui -->
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
