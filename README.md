@@ -459,4 +459,4 @@ with us over there.
 
 # License
 
-The source code is released under the [MIT License](http://www.opensource.org/licenses/MIT).
+The source code is released under the [BSD Zero Clause License](https://opensource.org/licenses/0BSD).
