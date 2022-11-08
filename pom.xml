@@ -19,18 +19,20 @@
     <properties>
         <!-- Project Properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java-release>18</java-release>
+        <java-release>19</java-release>
 
         <!-- License Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
         <license-file>${project.parent.basedir}/ci/license-template.txt</license-file>
+        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
+        <license-header-definition-file>${project.parent.basedir}/ci/license-header-definition.txt</license-header-definition-file>
 
         <!-- Lint Properties -->
-        <!-- All disabled by default, activated though profiles -->
+        <!-- All disabled by default, activated through profiles -->
         <skip-linters>true</skip-linters>
 
         <!-- Test Properties -->
-        <!-- All disabled by default, activated though profiles -->
+        <!-- All disabled by default, activated through profiles -->
         <skip-integration-tests>true</skip-integration-tests>
         <skip-performance-tests>true</skip-performance-tests>
         <skip-tests>true</skip-tests>
@@ -40,28 +42,28 @@
 
         <!-- 3PP Versions -->
         <caffeine.version>3.1.1</caffeine.version>
-        <gson.version>2.9.1</gson.version>
+        <gson.version>2.10</gson.version>
         <hikariCP.version>5.0.1</hikariCP.version>
         <javaee-web-api.version>8.0.1</javaee-web-api.version>
-        <jaxb-api.version>2.3.1</jaxb-api.version>
-        <jersey-server.version>3.1.0-M8</jersey-server.version>
-        <jooq.version>3.17.4</jooq.version>
+        <jaxb-api.version>2.4.0-b180830.0359</jaxb-api.version>
+        <jersey-server.version>3.1.0</jersey-server.version>
+        <jooq.version>3.17.5</jooq.version>
         <jsoup.version>1.15.3</jsoup.version>
         <log4j.version>2.19.0</log4j.version>
         <lombok.version>1.18.24</lombok.version>
-        <micrometer.version>1.9.4</micrometer.version>
+        <micrometer.version>1.10.0</micrometer.version>
         <postgresql-driver.version>42.5.0</postgresql-driver.version>
         <resilience4j.version>1.7.1</resilience4j.version>
-        <spring-boot.version>2.7.4</spring-boot.version>
-        <springdoc.version>1.6.11</springdoc.version>
+        <spring-boot.version>2.7.5</spring-boot.version>
+        <springdoc.version>1.6.12</springdoc.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.23.1</assertj-core.version>
         <embedded-postgres.version>2.0.1</embedded-postgres.version>
-        <embedded-postgres-binaries-bom.version>14.5.0</embedded-postgres-binaries-bom.version>
-        <flyway-core>9.3.1</flyway-core>
+        <embedded-postgres-binaries-bom.version>15.0.0</embedded-postgres-binaries-bom.version>
+        <flyway-core>9.7.0</flyway-core>
         <junit-jupiter.version>5.9.1</junit-jupiter.version>
-        <selenium.version>4.5.0</selenium.version>
+        <selenium.version>4.6.0</selenium.version>
 
         <!-- Plugin Versions -->
         <build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
@@ -74,24 +76,24 @@
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M7</maven-surefire-plugin.version>
-        <versions-maven-plugin.version>2.12.0</versions-maven-plugin.version>
+        <versions-maven-plugin.version>2.13.0</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>10.3.4</checkstyle.version>
-        <errorprone.version>2.15.0</errorprone.version>
+        <checkstyle.version>10.4</checkstyle.version>
+        <errorprone.version>2.16</errorprone.version>
         <licenses.version>1</licenses.version>
         <pitest-junit5-plugin.version>1.1.0</pitest-junit5-plugin.version>
-        <pmd.version>6.49.0</pmd.version>
-        <spotbugs.version>4.7.2</spotbugs.version>
+        <pmd.version>6.51.0</pmd.version>
+        <spotbugs.version>4.7.3</spotbugs.version>
 
         <!-- Linter Plugin Versions -->
-        <dependency-check-maven.version>7.2.1</dependency-check-maven.version>
+        <dependency-check-maven.version>7.3.0</dependency-check-maven.version>
         <license-maven-plugin.version>4.2.rc3</license-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.2.0</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.19.0</maven-pmd-plugin.version>
-        <pitest-maven.version>1.9.5</pitest-maven.version>
-        <spotbugs-maven-plugin.version>4.7.2.0</spotbugs-maven-plugin.version>
+        <pitest-maven.version>1.9.9</pitest-maven.version>
+        <spotbugs-maven-plugin.version>4.7.2.2</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
@@ -108,7 +110,7 @@
 
         <!-- ProGuard 3PP Versions -->
         <proguard-base.version>7.2.2</proguard-base.version>
-        <proguard-core.version>9.0.3</proguard-core.version>
+        <proguard-core.version>9.0.5</proguard-core.version>
 
         <!-- ProGuard Plugin Versions -->
         <proguard-maven-plugin.version>2.6.0</proguard-maven-plugin.version>
@@ -273,13 +275,6 @@
                 <artifactId>springdoc-openapi-ui</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
-<!--            &lt;!&ndash; Due to CVE-2022-42003/CVE-2022-42004 with jackson-databind:2.13.3 in spring-boot-starter-web &ndash;&gt;-->
-<!--            &lt;!&ndash; Remove this dependency when the above dependency is updated &ndash;&gt;-->
-<!--            <dependency>-->
-<!--                <groupId>com.fasterxml.jackson.core</groupId>-->
-<!--                <artifactId>jackson-databind</artifactId>-->
-<!--                <version>2.13.4</version>-->
-<!--            </dependency>-->
             <!-- [CVE-2022-38752] Removing snakeyaml from transitive dependency of springdoc-openapi-ui -->
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -525,25 +520,32 @@
 
                 <!-- Manual execution: -->
                 <!-- mvn license:check -Dlint -->
+                <!-- To fix missing/invalid licences, run the following in each module: mvn license:format -Dlint -Dyear="2022" -->
                 <plugin>
                     <groupId>com.mycila</groupId>
                     <artifactId>license-maven-plugin</artifactId>
                     <version>${license-maven-plugin.version}</version>
                     <configuration>
+                        <excludes>
+                            <exclude>**/gen/**</exclude>
+                        </excludes>
                         <header>${license-file}</header>
+                        <headerDefinitions>
+                            <headerDefinition>${license-header-definition-file}</headerDefinition>
+                        </headerDefinitions>
+                        <includes>
+                            <include>src/main/java/**</include>
+                            <include>src/test/java/**</include>
+                        </includes>
+                        <mapping>
+                            <java>JavaPackage</java>
+                        </mapping>
                         <properties>
                             <initial-year>2021</initial-year>
                             <!--suppress UnresolvedMavenProperty, defined by build-helper-maven-plugin -->
                             <year>${current-year}</year>
                             <website>zodac.me</website>
                         </properties>
-                        <includes>
-                            <include>src/main/java/**</include>
-                            <include>src/test/java/**</include>
-                        </includes>
-                        <excludes>
-                            <exclude>**/gen/**</exclude>
-                        </excludes>
                         <skip>${skip-linters}</skip>
                     </configuration>
                     <dependencies>

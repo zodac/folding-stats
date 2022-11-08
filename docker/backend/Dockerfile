@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y openssl && \
     cat folding-stats.pem | sed -n '/^-----BEGIN CERTIFICATE-----/,/^-----END CERTIFICATE-----/{p;/^-----END CERTIFICATE-----/q}' > folding-stats.crt && \
     cat folding-stats.pem | sed -n '/^-----BEGIN PRIVATE KEY-----/,/^-----END PRIVATE KEY-----/{p;/^-----END PRIVATE KEY-----/q}' > folding-stats.key
 
-FROM maven:${MAVEN_VERSION}-openjdk-${JAVA_VERSION} AS maven_builder
+FROM maven:${MAVEN_VERSION}-eclipse-temurin-${JAVA_VERSION} AS maven_builder
 
 # Build folding-stats
 RUN mkdir --parents /folding-stats-spring-boot

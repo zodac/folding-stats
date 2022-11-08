@@ -110,6 +110,9 @@
         <!-- Quite a few false positives -->
         <!-- Caught by SonarQube analysis -->
         <exclude name="BeanMembersShouldSerialize"/>
+
+        <!-- Helper classes can cause this to fail, not worth changing them -->
+        <exclude name="TestClassWithoutTestCases"/>
     </rule>
 
     <rule ref="category/java/multithreading.xml">
