@@ -21,7 +21,7 @@
         <property name="file" value="${checkstyle.config.path}/checkstyle-suppression.xml"/>
     </module>
 
-    <!-- Checks for whitespace                               -->
+    <!-- Checks for whitespace                            -->
     <!-- See http://checkstyle.org/config_whitespace.html -->
     <module name="FileTabCharacter">
         <property name="eachLine" value="true"/>
@@ -47,6 +47,7 @@
             <property name="scope" value="private"/>
             <property name="endOfSentenceFormat" value="([.:][ \t\n\r\f&lt;])|([.:]$)"/>
         </module>
+        <module name="UnusedImports"/>
 
         <!-- Google checks -->
         <module name="OuterTypeFilename"/>
