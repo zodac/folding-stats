@@ -9,9 +9,12 @@ scrape_configs:
       - targets: [ '127.0.0.1:9090' ]
     tls_config:
       insecure_skip_verify: true
+    basic_auth:
+      username: %ADMIN_USERNAME%
+      password: %ADMIN_PASSWORD%
 
   - job_name: 'spring-actuator'
-    metrics_path: '/folding/actuator/prometheus/'
+    metrics_path: '/folding/actuator/prometheus'
     scrape_interval: 60s
     scheme: https
     static_configs:

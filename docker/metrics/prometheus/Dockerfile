@@ -23,13 +23,15 @@ FROM debian:${DEBIAN_VERSION}-slim AS password_hasher
 
 ARG ADMIN_USERNAME
 ARG ADMIN_PASSWORD
+COPY ./docker/metrics/prometheus/config/prometheus.yml /etc/prometheus/prometheus.yml
 COPY ./docker/metrics/prometheus/config/web-config.yml /etc/prometheus/web-config.yml
 
-# Executing as separate RUN commands because combining them intermittently causes the 'htpasswd' command to fail
-RUN apt-get update && apt-get install -y apache2-utils
-RUN sed -i -e "s|%ADMIN_USERNAME%|${ADMIN_USERNAME}|g" /etc/prometheus/web-config.yml
-RUN sed -i -e "s|%ADMIN_PASSWORD%|$(htpasswd -bnBC 10 "" ${ADMIN_PASSWORD} | tr -d ':\n')|g" /etc/prometheus/web-config.yml
-RUN echo "" >> /etc/prometheus/web-config.yml
+RUN apt-get update && apt-get install -y apache2-utils \
+    sed -i -e "s|%ADMIN_USERNAME%|${ADMIN_USERNAME}|g" /etc/prometheus/prometheus.yml \
+    sed -i -e "s|%ADMIN_PASSWORD%|${ADMIN_PASSWORD}|g" /etc/prometheus/prometheus.yml \
+    sed -i -e "s|%ADMIN_USERNAME%|${ADMIN_USERNAME}|g" /etc/prometheus/web-config.yml \
+    sed -i -e "s|%ADMIN_PASSWORD%|$(htpasswd -bnBC 10 "" ${ADMIN_PASSWORD} | tr -d ':\n')|g" /etc/prometheus/web-config.yml \
+    echo "" >> /etc/prometheus/web-config.yml \
 
 ARG PROMETHEUS_VERSION
 FROM prom/prometheus:${PROMETHEUS_VERSION}
@@ -37,8 +39,8 @@ FROM prom/prometheus:${PROMETHEUS_VERSION}
 COPY --from=cert_builder /usr/local/certs/metrics/prometheus.crt /usr/local/certs/metrics/prometheus.crt
 COPY --from=cert_builder /usr/local/certs/metrics/prometheus.key /usr/local/certs/metrics/prometheus.key
 
-COPY ./docker/metrics/prometheus/config/prometheus.yml /etc/prometheus/prometheus.yml
 COPY --from=cert_builder /usr/local/certs/metrics/prometheus.key /usr/local/certs/metrics/prometheus.key
+COPY --from=password_hasher /etc/prometheus/prometheus.yml /etc/prometheus/prometheus.yml
 COPY --from=password_hasher /etc/prometheus/web-config.yml /etc/prometheus/web-config.yml
 
 # Make the non-root user the owner of certs directory
