@@ -19,13 +19,13 @@ package me.zodac.folding.rest;
 
 import static me.zodac.folding.rest.response.Responses.cachedOk;
 
+import jakarta.annotation.security.PermitAll;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.Month;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.security.PermitAll;
-import javax.servlet.http.HttpServletRequest;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.util.LoggerName;

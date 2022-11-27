@@ -12,7 +12,7 @@ services:
         FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
         HTTPS_FRONTEND_PORT: "80"
         REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
-        ROOT_URL: "http://127.0.0.1:81/"
+        ROOT_URL: "https://127.0.0.1:81"
         TITLE: "Extreme Team Folding"
         UPDATE_ENABLED: "false"
     container_name: frontend_dev
@@ -46,7 +46,7 @@ services:
       # External URL configuration
       LARS_URL_ROOT: "http://backend-dev:8081/folding"
       STATS_URL_ROOT: "http://backend-dev:8081/folding"
-      REDIRECT_URL: "http://127.0.0.1:81/"
+      REDIRECT_URL: "https://127.0.0.1:81"
       # Spring configuration
       DEPLOYMENT_TYPE: "test"
       MULTIPLE_LOG_FILES: "false"
@@ -87,7 +87,7 @@ services:
       dockerfile: docker/database/Dockerfile
       args:
         # Docker image versions
-        POSTGRES_VERSION: "15.0"
+        POSTGRES_VERSION: "15.1"
         # Build arguments
         ADMIN_USERNAME: "root"
         ADMIN_PASSWORD: "shroot"

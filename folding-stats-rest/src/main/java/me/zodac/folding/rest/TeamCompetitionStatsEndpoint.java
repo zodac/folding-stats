@@ -22,13 +22,13 @@ import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParame
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;

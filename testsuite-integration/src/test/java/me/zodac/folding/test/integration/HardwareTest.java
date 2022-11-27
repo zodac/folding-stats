@@ -308,7 +308,7 @@ class HardwareTest {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardwareToCreate)))
-            .uri(URI.create(TestConstants.FOLDING_URL + "/hardware/"))
+            .uri(URI.create(TestConstants.FOLDING_URL + "/hardware"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
@@ -429,7 +429,7 @@ class HardwareTest {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardwareToCreate)))
-            .uri(URI.create(TestConstants.FOLDING_URL + "/hardware/"))
+            .uri(URI.create(TestConstants.FOLDING_URL + "/hardware"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.TEXT.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();

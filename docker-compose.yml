@@ -101,7 +101,7 @@ services:
       dockerfile: docker/database/Dockerfile
       args:
         # Docker image versions
-        POSTGRES_VERSION: "15.0"
+        POSTGRES_VERSION: "15.1"
         # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"

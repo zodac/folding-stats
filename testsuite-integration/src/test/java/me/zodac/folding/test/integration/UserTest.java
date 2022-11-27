@@ -899,7 +899,7 @@ class UserTest {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(userToCreate)))
-            .uri(URI.create(TestConstants.FOLDING_URL + "/users/"))
+            .uri(URI.create(TestConstants.FOLDING_URL + "/users"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.TEXT.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();

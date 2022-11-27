@@ -20,7 +20,12 @@ package me.zodac.folding.rest;
 import static me.zodac.folding.rest.response.Responses.redirect;
 
 import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.servlet.http.HttpServletRequest;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
+import me.zodac.folding.api.util.LoggerName;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,17 +38,20 @@ import org.springframework.web.bind.annotation.RestController;
 @Hidden
 @RestController
 @RequestMapping("/error") // Must be on the RestController to override built-in Spring handler for '/error'
-public class InvalidUrlRedirecter {
+public class ErrorHandlerController implements ErrorController {
 
+    private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
     private static final String REDIRECT_URL = EnvironmentVariableUtils.getOrDefault("REDIRECT_URL", "https://etf.axihub.ca/");
 
     /**
      * {@link GetMapping} for the {@code /error} URL (any request with an invalid URL will be sent to this endpoint by Spring).
      *
+     * @param request the {@link HttpServletRequest}
      * @return {@link HttpStatus#SEE_OTHER} {@link ResponseEntity} with the <b>Location</b> header to the URL defined by <b>REDIRECT_URL</b>
      */
     @GetMapping
-    public ResponseEntity<Void> redirectOnError() {
+    public ResponseEntity<Void> redirectOnError(final HttpServletRequest request) {
+        AUDIT_LOGGER.debug("Invalid request found at '{}', redirecting to '{}", request::getRequestURI, () -> REDIRECT_URL);
         return redirect(REDIRECT_URL);
     }
 }

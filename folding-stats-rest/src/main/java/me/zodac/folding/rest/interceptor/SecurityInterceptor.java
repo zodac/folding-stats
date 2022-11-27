@@ -20,16 +20,16 @@ package me.zodac.folding.rest.interceptor;
 import static java.util.stream.Collectors.toSet;
 import static me.zodac.folding.api.util.CollectionUtils.containsNoMatches;
 
+import jakarta.annotation.security.DenyAll;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.security.DenyAll;
-import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.util.EncodingUtils;
 import me.zodac.folding.api.util.LoggerName;
@@ -126,7 +126,7 @@ public final class SecurityInterceptor implements HandlerInterceptor {
 
     private void validateRequest(final HttpServletRequest request, final HandlerMethod handlerMethod) {
         final Method method = handlerMethod.getMethod();
-        SECURITY_LOGGER.debug("Access requested to: #{}()", method.getName());
+        SECURITY_LOGGER.debug("Security access requested to: #{}()", method.getName());
 
         if (method.isAnnotationPresent(DenyAll.class)) {
             SECURITY_LOGGER.warn("All access to '#{}()' at '{}' is denied", method.getName(), request.getRequestURI());

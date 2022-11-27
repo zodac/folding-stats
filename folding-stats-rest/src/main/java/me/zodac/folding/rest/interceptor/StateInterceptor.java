@@ -17,9 +17,9 @@
 
 package me.zodac.folding.rest.interceptor;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import me.zodac.folding.rest.exception.ServiceUnavailableException;
 import me.zodac.folding.rest.util.ReadRequired;
 import me.zodac.folding.rest.util.WriteRequired;
@@ -83,7 +83,7 @@ public class StateInterceptor implements HandlerInterceptor {
 
     private static void validateSystemState(final HandlerMethod handlerMethod) {
         final Method method = handlerMethod.getMethod();
-        LOGGER.trace("Access requested to: #{}()", method.getName());
+        LOGGER.trace("State access requested to: #{}()", method.getName());
 
         if (method.isAnnotationPresent(ReadRequired.class) && SystemStateManager.current().isReadBlocked()) {
             LOGGER.warn("System state {} does not allow read requests", SystemStateManager.current());

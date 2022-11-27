@@ -19,11 +19,11 @@ package me.zodac.folding.rest;
 
 import static me.zodac.folding.rest.response.Responses.ok;
 
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.Month;
 import java.time.Year;
-import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
 import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.StatsRepository;
@@ -78,8 +78,8 @@ public class MonthlyResultEndpoint {
     @PermitAll
     @GetMapping(path = "/result/{year}/{month}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MonthlyResult> getMonthlyResult(@PathVariable("year") final String year,
-                                              @PathVariable("month") final String month,
-                                              final HttpServletRequest request) {
+                                                          @PathVariable("month") final String month,
+                                                          final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received to retrieve monthly TC result at '{}'", request::getRequestURI);
 
         final DateDetails date = DateDetails.of(year, month);

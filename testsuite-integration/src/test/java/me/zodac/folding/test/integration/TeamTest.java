@@ -418,7 +418,7 @@ class TeamTest {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(teamToCreate)))
-            .uri(URI.create(FOLDING_URL + "/teams/"))
+            .uri(URI.create(FOLDING_URL + "/teams"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
@@ -594,7 +594,7 @@ class TeamTest {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(team)))
-            .uri(URI.create(FOLDING_URL + "/teams/"))
+            .uri(URI.create(FOLDING_URL + "/teams"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.TEXT.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(ADMIN_USER.userName(), ADMIN_USER.password()))
             .build();

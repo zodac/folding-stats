@@ -41,27 +41,26 @@
         <maven.test.skip>${skip-tests}</maven.test.skip>
 
         <!-- 3PP Versions -->
-        <caffeine.version>3.1.1</caffeine.version>
+        <caffeine.version>3.1.2</caffeine.version>
         <gson.version>2.10</gson.version>
         <hikariCP.version>5.0.1</hikariCP.version>
         <javaee-web-api.version>8.0.1</javaee-web-api.version>
-        <jaxb-api.version>2.4.0-b180830.0359</jaxb-api.version>
         <jersey-server.version>3.1.0</jersey-server.version>
         <jooq.version>3.17.5</jooq.version>
         <jsoup.version>1.15.3</jsoup.version>
         <log4j.version>2.19.0</log4j.version>
         <lombok.version>1.18.24</lombok.version>
-        <micrometer.version>1.10.0</micrometer.version>
+        <micrometer.version>1.10.2</micrometer.version>
         <postgresql-driver.version>42.5.1</postgresql-driver.version>
-        <resilience4j.version>1.7.1</resilience4j.version>
-        <spring-boot.version>2.7.5</spring-boot.version>
-        <springdoc.version>1.6.12</springdoc.version>
+        <resilience4j.version>2.0.0</resilience4j.version>
+        <spring-boot.version>3.0.0</spring-boot.version>
+        <springdoc.version>2.0.0</springdoc.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.23.1</assertj-core.version>
         <embedded-postgres.version>2.0.1</embedded-postgres.version>
-        <embedded-postgres-binaries-bom.version>15.0.0</embedded-postgres-binaries-bom.version>
-        <flyway-core>9.7.0</flyway-core>
+        <embedded-postgres-binaries-bom.version>15.1.0</embedded-postgres-binaries-bom.version>
+        <flyway-core>9.8.3</flyway-core>
         <junit-jupiter.version>5.9.1</junit-jupiter.version>
         <selenium.version>4.6.0</selenium.version>
 
@@ -72,7 +71,7 @@
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.3.0</maven-dependency-plugin.version>
         <maven-failsafe-plugin.version>3.0.0-M7</maven-failsafe-plugin.version>
-        <maven-install-plugin.version>3.0.1</maven-install-plugin.version>
+        <maven-install-plugin.version>3.1.0</maven-install-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M7</maven-surefire-plugin.version>
@@ -87,13 +86,13 @@
         <spotbugs.version>4.7.3</spotbugs.version>
 
         <!-- Linter Plugin Versions -->
-        <dependency-check-maven.version>7.3.0</dependency-check-maven.version>
+        <dependency-check-maven.version>7.3.2</dependency-check-maven.version>
         <license-maven-plugin.version>4.2.rc3</license-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.2.0</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.19.0</maven-pmd-plugin.version>
-        <pitest-maven.version>1.9.9</pitest-maven.version>
-        <spotbugs-maven-plugin.version>4.7.2.2</spotbugs-maven-plugin.version>
+        <pitest-maven.version>1.9.11</pitest-maven.version>
+        <spotbugs-maven-plugin.version>4.7.3.0</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
@@ -109,8 +108,8 @@
         <spotbugs-exclude-file>${project.parent.basedir}/ci/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
 
         <!-- ProGuard 3PP Versions -->
-        <proguard-base.version>7.2.2</proguard-base.version>
-        <proguard-core.version>9.0.5</proguard-core.version>
+        <proguard-base.version>7.3.0</proguard-base.version>
+        <proguard-core.version>9.0.6</proguard-core.version>
 
         <!-- ProGuard Plugin Versions -->
         <proguard-maven-plugin.version>2.6.0</proguard-maven-plugin.version>
@@ -163,11 +162,6 @@
                 <groupId>javax</groupId>
                 <artifactId>javaee-web-api</artifactId>
                 <version>${javaee-web-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
-                <version>${jaxb-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
@@ -272,20 +266,8 @@
             </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-ui</artifactId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc.version}</version>
-            </dependency>
-            <!-- [CVE-2022-38752] Removing snakeyaml from transitive dependency of springdoc-openapi-ui -->
-            <dependency>
-                <groupId>com.fasterxml.jackson.dataformat</groupId>
-                <artifactId>jackson-dataformat-yaml</artifactId>
-                <version>2.13.3</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.yaml</groupId>
-                        <artifactId>snakeyaml</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <!-- Test Dependencies -->
@@ -436,6 +418,8 @@
                             <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED</arg>
                             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
                             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
+                            <!-- Configuration for Spring Boot -->
+                            <arg>-parameters</arg>
                         </compilerArgs>
                         <fork>true</fork>
                     </configuration>

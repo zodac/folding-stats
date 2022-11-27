@@ -578,7 +578,7 @@ class UserChangeTest {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(userChangeRequest)))
-            .uri(URI.create(FOLDING_URL + "/changes/"))
+            .uri(URI.create(FOLDING_URL + "/changes"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.TEXT.contentTypeValue())
             .build();
 

@@ -35,7 +35,7 @@ import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springdoc.core.GroupedOpenApi;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -109,13 +109,13 @@ public class FoldingStatsApplication {
             .title(String.format("The '%s' REST API", applicationName))
             .description(String.format("REST API for the '%s' project", applicationName))
             .contact(new Contact().name(contactName).url(forumLink))
-            .license(new License().name("MIT License").url("https://github.com/zodac/folding-stats/blob/master/LICENSE/"))
+            .license(new License().name("0BSD License").url("https://github.com/zodac/folding-stats/blob/master/LICENSE/"))
             .version(applicationVersion);
 
         return GroupedOpenApi.builder()
             .group("ProjectAPI")
-            .addOpenApiCustomiser(openApi -> openApi.info(projectInfo))
-            .addOpenApiCustomiser(openApi -> openApi.servers(List.of(new Server().description("Main Website").url(restEndpointUrl))))
+            .addOpenApiCustomizer(openApi -> openApi.info(projectInfo))
+            .addOpenApiCustomizer(openApi -> openApi.servers(List.of(new Server().description("Main Website").url(restEndpointUrl))))
             .pathsToExclude("/health/*")
             .build();
     }

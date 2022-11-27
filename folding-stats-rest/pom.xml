@@ -75,12 +75,7 @@
         </dependency>
         <dependency>
             <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-ui</artifactId>
-        </dependency>
-        <!-- Required due to ClassNotFoundExceptions when generating Swagger output -->
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
 
         <!-- Test Dependencies -->
@@ -164,7 +159,7 @@
         </plugins>
 
         <resources>
-            <!-- Allow filtering for spring-boot properties so we can pass in maven variables -->
+            <!-- Allow filtering for spring-boot properties, so we can pass in maven variables -->
             <resource>
                 <filtering>true</filtering>
                 <directory>src/main/resources</directory>

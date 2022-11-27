@@ -41,6 +41,7 @@ import org.springframework.stereotype.Component;
  * Implementation of {@link DbManager} which essentially wraps the response from {@link DbManagerRetriever#get()}. Used so we can inject an instance
  * instead of creating an instance of {@link DbManager}.
  */
+// TODO: Inject this, genius
 @Component
 public class DbManagerImpl implements DbManager {
 

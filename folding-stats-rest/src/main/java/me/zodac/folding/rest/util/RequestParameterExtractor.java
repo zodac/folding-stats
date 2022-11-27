@@ -17,10 +17,10 @@
 
 package me.zodac.folding.rest.util;
 
+import jakarta.servlet.ServletRequest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
-import javax.servlet.ServletRequest;
 
 /**
  * Utility class to extract parameters from a REST request.
