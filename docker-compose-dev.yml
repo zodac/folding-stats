@@ -19,8 +19,6 @@ services:
     hostname: frontend_dev
     depends_on:
       - backend_dev
-    links:
-      - backend_dev
     networks:
       - development
     ports:
@@ -72,8 +70,6 @@ services:
       CONTACT_NAME: "zodac"
       FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
       REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
-    links:
-      - database_dev
     networks:
       - development
     ports:
@@ -118,8 +114,6 @@ services:
     hostname: selenium_chrome
     depends_on:
       - frontend_dev
-    links:
-      - frontend_dev
     ports:
       - "4444:4444"
     networks:
@@ -131,8 +125,6 @@ services:
     hostname: selenium_edge
     depends_on:
       - frontend_dev
-    links:
-      - frontend_dev
     ports:
       - "4445:4444"
     networks:
@@ -143,8 +135,6 @@ services:
     container_name: selenium_firefox
     hostname: selenium_firefox
     depends_on:
-      - frontend_dev
-    links:
       - frontend_dev
     ports:
       - "4446:4444"

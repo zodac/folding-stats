@@ -21,8 +21,6 @@ services:
     hostname: frontend
     depends_on:
       - backend
-    links:
-      - backend
     networks:
       - production
     ports:
@@ -84,8 +82,6 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
-    links:
-      - database
     networks:
       - production
     ports:

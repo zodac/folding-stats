@@ -15,61 +15,48 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package me.zodac.folding.db;
+package me.zodac.folding.configuration;
 
 import io.github.resilience4j.core.IntervalFunction;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import java.time.Duration;
-import java.util.EnumMap;
-import java.util.Map;
 import java.util.function.Supplier;
 import javax.sql.DataSource;
 import me.zodac.folding.api.db.DbManager;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
+import me.zodac.folding.db.DatabaseType;
 import me.zodac.folding.db.postgres.PostgresDataSource;
 import me.zodac.folding.db.postgres.PostgresDbManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
- * Utility class used to retrieve an instance of {@link DbManager} for the system.
+ * {@link Configuration} class allowing for the injection of {@link DbManager} instances.
  */
-// TODO: Get rid of this, inject the DbManager in folding-stats-rest instead
-// TODO: Also introduce TestContainers for testing
-public final class DbManagerRetriever {
+@Configuration
+public class DbManagerConfiguration {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final String DATABASE_VARIABLE_NAME = "DEPLOYED_DATABASE";
-    private static final Map<DatabaseType, DbManager> DB_MANAGER_BY_TYPE = new EnumMap<>(DatabaseType.class);
-
-    private DbManagerRetriever() {
-
-    }
 
     /**
-     * Returns a concrete implementation of {@link DbManager}, based on the value of the <b>DEPLOYED_DATABASE</b> environment variable.
+     * Returns an implementation of {@link DbManager} as a {@link Bean} for {@link org.springframework.beans.factory.annotation.Autowired} injection.
      *
-     * <p>
-     * Supported DBs are defined by {@link DatabaseType}.
-     *
-     * @return the {@link DbManager} instance
+     * @return the {@link DbManager} implementation
      */
-    public static DbManager get() {
+    @Bean
+    public DbManager getDbManager() {
         final String deployedDatabase = EnvironmentVariableUtils.get(DATABASE_VARIABLE_NAME);
         final DatabaseType databaseType = DatabaseType.get(deployedDatabase);
 
-        if (DB_MANAGER_BY_TYPE.containsKey(databaseType)) {
-            LOGGER.trace("Found existing {} of type '{}'", DbManager.class.getSimpleName(), databaseType);
-            return DB_MANAGER_BY_TYPE.get(databaseType);
-        }
-
         if (databaseType == DatabaseType.POSTGRESQL) {
+            LOGGER.info("Initialising {} of type '{}'", DbManager.class.getSimpleName(), DatabaseType.POSTGRESQL);
             final Supplier<PostgresDataSource> supplier = Retry.decorateSupplier(retry(), PostgresDataSource::create);
             final DataSource postgresDataSource = supplier.get();
-            final PostgresDbManager postgresDbManager = PostgresDbManager.create(postgresDataSource);
-            DB_MANAGER_BY_TYPE.put(DatabaseType.POSTGRESQL, postgresDbManager);
-            return postgresDbManager;
+            return PostgresDbManager.create(postgresDataSource);
         }
 
         throw new IllegalStateException(String.format("Unable to find database of type using variable '%s': %s",
