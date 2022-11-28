@@ -123,7 +123,6 @@ public class HardwareEndpoint {
                 description = "The URL for the created hardware"
             ),
             content = @Content(
-                mediaType = "application/json",
                 schema = @Schema(implementation = Hardware.class),
                 examples = @ExampleObject("""
                     {
@@ -140,7 +139,6 @@ public class HardwareEndpoint {
             responseCode = "400",
             description = "The given hardware payload is invalid",
             content = @Content(
-                mediaType = "application/json",
                 schema = @Schema(example = """
                     {
                         "invalidObject": {

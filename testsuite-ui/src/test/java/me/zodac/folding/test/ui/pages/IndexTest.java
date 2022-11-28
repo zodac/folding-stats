@@ -42,11 +42,13 @@ class IndexTest {
 
     @ParameterizedTest
     @EnumSource(BrowserType.class)
-    void loadAdminPage(final BrowserType browserType) throws MalformedURLException {
+    void loadIndexPage(final BrowserType browserType) throws MalformedURLException {
         log("Loading '%s' browser at '%s'", browserType.displayName(), FRONTEND_LINK.url());
 
         executeWithDriver(browserType, driver -> {
             driver.navigate().to(FRONTEND_LINK.url());
+
+            System.out.println(driver.getTitle());
 
             // Checking active navigation link, and other links are inactive
             final WebElement navigationBar = driver.findElement(NavigationBar.NAVIGATION_BAR);

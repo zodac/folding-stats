@@ -27,10 +27,13 @@ import java.util.List;
 import me.zodac.folding.FoldingStatsApplication;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import org.springdoc.core.models.GroupedOpenApi;
+import org.springdoc.core.properties.SpringDocConfigProperties;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.MediaType;
 
 /**
  * {@link Configuration} used to define the Swagger OpenApi documentation for the {@code folding-stats} project.
@@ -71,5 +74,24 @@ public class SwaggerConfiguration {
             .addOpenApiCustomizer(openApi -> openApi.servers(List.of(new Server().description("Main Website").url(restEndpointUrl))))
             .pathsToExclude("/health/*")
             .build();
+    }
+
+    /**
+     * Sets the default configuration of Swagger documentation:
+     *
+     * <ul>
+     *     <li>The default 'Consumes' {@link MediaType} is {@link MediaType#APPLICATION_JSON_VALUE}</li>
+     *     <li>The default 'Produces' {@link MediaType} is {@link MediaType#APPLICATION_JSON_VALUE}</li>
+     * </ul>
+     *
+     * @param springDocConfigProperties the {@link SpringDocConfigProperties}
+     * @return the updated Swagger configuration
+     */
+    @Bean
+    public BeanFactoryPostProcessor setSwaggerDefaults(final SpringDocConfigProperties springDocConfigProperties) {
+        return beanFactory -> {
+            springDocConfigProperties.setDefaultConsumesMediaType(MediaType.APPLICATION_JSON_VALUE);
+            springDocConfigProperties.setDefaultProducesMediaType(MediaType.APPLICATION_JSON_VALUE);
+        };
     }
 }

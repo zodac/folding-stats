@@ -42,7 +42,7 @@ class RequestsTest {
 
     @ParameterizedTest
     @EnumSource(BrowserType.class)
-    void loadAdminPage(final BrowserType browserType) throws MalformedURLException {
+    void loadRequestsPage(final BrowserType browserType) throws MalformedURLException {
         log("Loading '%s' browser at '%s'", browserType.displayName(), FRONTEND_LINK.url());
 
         executeWithDriver(browserType, driver -> {

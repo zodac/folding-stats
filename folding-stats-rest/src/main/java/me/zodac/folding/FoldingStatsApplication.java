@@ -55,6 +55,6 @@ public class FoldingStatsApplication {
      */
     @Bean
     public CommandLineRunner startUp() {
-        return args -> LOGGER.info("Starting {}", getClass().getSimpleName());
+        return args -> LOGGER.info("Started {}", FoldingStatsApplication.class.getSimpleName());
     }
 }
