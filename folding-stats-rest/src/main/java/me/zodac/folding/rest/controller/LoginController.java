@@ -15,19 +15,12 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.controller;
 
 import static me.zodac.folding.rest.response.Responses.ok;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.PermitAll;
 import java.util.Map;
 import me.zodac.folding.api.UserAuthenticationResult;
@@ -35,6 +28,7 @@ import me.zodac.folding.api.util.EncodingUtils;
 import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.rest.api.LoginCredentials;
+import me.zodac.folding.rest.controller.api.LoginEndpoint;
 import me.zodac.folding.rest.exception.ForbiddenException;
 import me.zodac.folding.rest.exception.InvalidLoginCredentialsException;
 import me.zodac.folding.rest.exception.UnauthorizedException;
@@ -50,12 +44,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST endpoints to log in as a system user.
+ * Implementation of {@link LoginEndpoint} REST endpoints.
  */
-@Tag(name = "Login Endpoints", description = "REST endpoints to login as a system user")
 @RestController
 @RequestMapping("/login")
-public class LoginEndpoint {
+public class LoginController implements LoginEndpoint {
 
     private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
 
@@ -72,7 +65,7 @@ public class LoginEndpoint {
      * @param foldingRepository the {@link FoldingRepository}
      * @param registry          the Prometheus {@link MeterRegistry}
      */
-    public LoginEndpoint(final FoldingRepository foldingRepository, final MeterRegistry registry) {
+    public LoginController(final FoldingRepository foldingRepository, final MeterRegistry registry) {
         this.foldingRepository = foldingRepository;
 
         loginAttempts = Counter.builder("login_attempts_counter")
@@ -86,39 +79,11 @@ public class LoginEndpoint {
             .register(registry);
     }
 
-    /**
-     * {@link PostMapping} request to log in as an admin system user.
-     *
-     * @param loginCredentials the {@link LoginCredentials}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()}
-     * @throws InvalidLoginCredentialsException thrown if the input {@link LoginCredentials} are in an incorrect format
-     * @throws UnauthorizedException            thrown if the user does not exist, or the password is incorrect
-     * @throws ForbiddenException               thrown if the user and password is accepted, but it does not have the correct role
-     */
-    @Operation(summary = "Accepts user credentials and verifies whether they have admin access")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Credentials are valid and for an admin user"),
-        @ApiResponse(
-            responseCode = "400",
-            description = "The given login payload is invalid",
-            content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(example = """
-                    {
-                        "encodedUserNameAndPassword": "dXNlcm5hbWU6cGFzc3dvcmQ="
-                    }"""
-                )
-            )),
-        @ApiResponse(responseCode = "401", description = "Provided credentials cannot be logged in"),
-        @ApiResponse(responseCode = "403", description = "Provided credentials is for a valid user, but not an admin"),
-        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests"),
-    })
+    @Override
     @ReadRequired
     @PermitAll
     @PostMapping(path = "/admin", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> loginAsAdmin(
-        @RequestBody @Parameter(description = "The login credentials to be checked") final LoginCredentials loginCredentials
-    ) {
+    public ResponseEntity<Void> loginAsAdmin(@RequestBody final LoginCredentials loginCredentials) {
         AUDIT_LOGGER.info("Login request received");
         loginAttempts.increment();
 

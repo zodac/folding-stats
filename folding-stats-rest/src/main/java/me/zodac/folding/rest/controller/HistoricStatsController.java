@@ -15,14 +15,12 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.controller;
 
 import static me.zodac.folding.rest.response.Responses.cachedOk;
 
 import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.Month;
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +30,7 @@ import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
+import me.zodac.folding.rest.controller.api.HistoricStatsEndpoint;
 import me.zodac.folding.rest.util.DateDetails;
 import me.zodac.folding.rest.util.ReadRequired;
 import org.apache.logging.log4j.LogManager;
@@ -45,11 +44,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST endpoints for {@code Team Competition} {@link HistoricStats}.
+ * Implementation of {@link HistoricStatsEndpoint} REST endpoints.
  */
 @RestController
 @RequestMapping("/historic")
-public class HistoricStatsEndpoint {
+public class HistoricStatsController implements HistoricStatsEndpoint {
 
     private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
 
@@ -66,21 +65,12 @@ public class HistoricStatsEndpoint {
      * @param statsRepository   the {@link StatsRepository}
      */
     @Autowired
-    public HistoricStatsEndpoint(final FoldingRepository foldingRepository, final StatsRepository statsRepository) {
+    public HistoricStatsController(final FoldingRepository foldingRepository, final StatsRepository statsRepository) {
         this.foldingRepository = foldingRepository;
         this.statsRepository = statsRepository;
     }
 
-    /**
-     * {@link GetMapping} request to retrieve a {@link User}'s hourly {@link HistoricStats} for a single {@code day}.
-     *
-     * @param userId  the ID of the {@link User} whose {@link HistoricStats} are to be retrieved
-     * @param year    the {@link Year} of the {@link HistoricStats}
-     * @param month   the {@link Month} of the {@link HistoricStats}
-     * @param day     the {@code day} of the {@link HistoricStats}
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Collection, long)} containing the {@link User}'s hourly {@link HistoricStats}
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/users/{userId}/{year}/{month}/{day}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -97,15 +87,7 @@ public class HistoricStatsEndpoint {
         return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
     }
 
-    /**
-     * {@link GetMapping} request to retrieve a {@link User}'s daily {@link HistoricStats} for a single {@link Month}.
-     *
-     * @param userId  the ID of the {@link User} whose {@link HistoricStats} are to be retrieved
-     * @param year    the {@link Year} of the {@link HistoricStats}
-     * @param month   the {@link Month} of the {@link HistoricStats}
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Collection, long)} containing the {@link User}'s daily {@link HistoricStats}
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/users/{userId}/{year}/{month}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -121,14 +103,7 @@ public class HistoricStatsEndpoint {
         return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
     }
 
-    /**
-     * {@link GetMapping} request to retrieve a {@link User}'s monthly {@link HistoricStats} for a single {@link Year}.
-     *
-     * @param userId  the ID of the {@link User} whose {@link HistoricStats} are to be retrieved
-     * @param year    the {@link Year} of the {@link HistoricStats}
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Collection, long)} containing the {@link User}'s monthly {@link HistoricStats}
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/users/{userId}/{year}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -143,16 +118,7 @@ public class HistoricStatsEndpoint {
         return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
     }
 
-    /**
-     * {@link GetMapping} request to retrieve a {@link Team}'s hourly {@link HistoricStats} for a single {@code day}.
-     *
-     * @param teamId  the ID of the {@link Team} whose {@link HistoricStats} are to be retrieved
-     * @param year    the {@link Year} of the {@link HistoricStats}
-     * @param month   the {@link Month} of the {@link HistoricStats}
-     * @param day     the {@code day} of the {@link HistoricStats}
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Collection, long)} containing the {@link Team}'s hourly {@link HistoricStats}
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/teams/{teamId}/{year}/{month}/{day}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -179,15 +145,7 @@ public class HistoricStatsEndpoint {
         return cachedOk(combinedHistoricStats, CACHE_EXPIRATION_TIME);
     }
 
-    /**
-     * {@link GetMapping} request to retrieve a {@link Team}'s daily {@link HistoricStats} for a single {@link Month}.
-     *
-     * @param teamId  the ID of the {@link Team} whose {@link HistoricStats} are to be retrieved
-     * @param year    the {@link Year} of the {@link HistoricStats}
-     * @param month   the {@link Month} of the {@link HistoricStats}
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Collection, long)} containing the {@link Team}'s daily {@link HistoricStats}
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/teams/{teamId}/{year}/{month}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -213,14 +171,7 @@ public class HistoricStatsEndpoint {
         return cachedOk(combinedHistoricStats, CACHE_EXPIRATION_TIME);
     }
 
-    /**
-     * {@link GetMapping} request to retrieve a {@link Team}'s monthly {@link HistoricStats} for a single {@link Year}.
-     *
-     * @param teamId  the ID of the {@link Team} whose {@link HistoricStats} are to be retrieved
-     * @param year    the {@link Year} of the {@link HistoricStats}
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Collection, long)} containing the {@link Team}'s monthly {@link HistoricStats}
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/teams/{teamId}/{year}", produces = MediaType.APPLICATION_JSON_VALUE)

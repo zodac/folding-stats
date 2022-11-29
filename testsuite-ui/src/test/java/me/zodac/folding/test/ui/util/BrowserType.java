@@ -32,7 +32,17 @@ public enum BrowserType {
     /**
      * {@code Google Chrome} web browser.
      */
-    CHROME("Google Chrome", RemoteWebDriverFactory.create("chromePort", "4444", new ChromeOptions()));
+    CHROME("Google Chrome", RemoteWebDriverFactory.create("chromePort", "4444", new ChromeOptions())),
+
+    /**
+     * {@code Microsoft Edge} web browser.
+     */
+    EDGE("Microsoft Edge", RemoteWebDriverFactory.create("edgePort", "4445", new EdgeOptions())),
+
+    /**
+     * {@code Mozilla Firefox} web browser.
+     */
+    FIREFOX("Mozilla Firefox", RemoteWebDriverFactory.create("firefoxPort", "4446", new FirefoxOptions()));
 
     private static final Collection<BrowserType> ALL_VALUES = Stream.of(values())
         .toList();

@@ -48,8 +48,6 @@ class IndexTest {
         executeWithDriver(browserType, driver -> {
             driver.navigate().to(FRONTEND_LINK.url());
 
-            System.out.println(driver.getTitle());
-
             // Checking active navigation link, and other links are inactive
             final WebElement navigationBar = driver.findElement(NavigationBar.NAVIGATION_BAR);
             final WebElement navigationBarLinksParent = navigationBar.findElement(NavigationBar.LINKS_PARENT);

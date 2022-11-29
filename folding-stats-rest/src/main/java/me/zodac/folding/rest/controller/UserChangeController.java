@@ -15,7 +15,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.controller;
 
 import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.ok;
@@ -37,8 +37,8 @@ import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.user.UserChangeApplier;
 import me.zodac.folding.bean.tc.validation.UserChangeValidator;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
+import me.zodac.folding.rest.controller.api.UserChangeEndpoint;
 import me.zodac.folding.rest.exception.InvalidStateException;
-import me.zodac.folding.rest.response.Responses;
 import me.zodac.folding.rest.util.ReadRequired;
 import me.zodac.folding.rest.util.WriteRequired;
 import org.apache.logging.log4j.LogManager;
@@ -56,14 +56,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST endpoints for {@code Team Competition} {@link UserChange}s.
+ * Implementation of {@link UserChangeEndpoint} REST endpoints.
  */
 @RestController
 @RequestMapping("/changes")
-public class UserChangeEndpoint {
+public class UserChangeController implements UserChangeEndpoint {
 
     private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
-    private static final String ALL_STATES_OPTION = "*";
 
     private final FoldingRepository foldingRepository;
     private final UserChangeApplier userChangeApplier;
@@ -84,10 +83,10 @@ public class UserChangeEndpoint {
      * @param userChangeValidator the {@link UserChangeValidator}
      */
     @Autowired
-    public UserChangeEndpoint(final FoldingRepository foldingRepository,
-                              final MeterRegistry registry,
-                              final UserChangeApplier userChangeApplier,
-                              final UserChangeValidator userChangeValidator) {
+    public UserChangeController(final FoldingRepository foldingRepository,
+                                final MeterRegistry registry,
+                                final UserChangeApplier userChangeApplier,
+                                final UserChangeValidator userChangeValidator) {
         this.foldingRepository = foldingRepository;
         this.userChangeApplier = userChangeApplier;
         this.userChangeValidator = userChangeValidator;
@@ -106,13 +105,7 @@ public class UserChangeEndpoint {
             .register(registry);
     }
 
-    /**
-     * {@link PostMapping} request to create a {@link UserChange} based on the input request.
-     *
-     * @param userChangeRequest the {@link UserChangeRequest} to create a {@link UserChange}
-     * @param request           the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#created(Object, int)} containing the created {@link UserChange}
-     */
+    @Override
     @PermitAll
     @WriteRequired
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -127,18 +120,11 @@ public class UserChangeEndpoint {
         return created(createdUserChange, createdUserChange.id());
     }
 
-    /**
-     * {@link GetMapping} request to retrieve all {@link UserChange}s with one of the provides {@link UserChangeState}s.
-     *
-     * @param state          a comma-separated {@link String} of the {@link UserChangeState}s to look for
-     * @param numberOfMonths the number of months back from which to retrieve {@link UserChange}s (<b>0</b> means retrieve all)
-     * @param request        the {@link HttpServletRequest}
-     * @return {@link Responses#ok(Collection)} containing the {@link UserChange}s
-     */
+    @Override
     @ReadRequired
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<UserChange>> getAll(
-        @RequestParam(value = "state", required = false, defaultValue = ALL_STATES_OPTION) final String state,
+        @RequestParam(value = "state", required = false, defaultValue = UserChangeState.ALL_STATES) final String state,
         @RequestParam(value = "numberOfMonths", required = false, defaultValue = "0") final long numberOfMonths,
         final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request for all user changes received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
@@ -153,7 +139,7 @@ public class UserChangeEndpoint {
     }
 
     private static Collection<UserChangeState> getStatesBasedOnInput(final String state) {
-        if (ALL_STATES_OPTION.equals(state)) {
+        if (UserChangeState.ALL_STATES.equals(state)) {
             return UserChangeState.getAllValues();
         }
 
@@ -163,19 +149,12 @@ public class UserChangeEndpoint {
             .collect(Collectors.toSet());
     }
 
-    /**
-     * {@link GetMapping} request to retrieve all {@link UserChange}s.
-     *
-     * @param state          a comma-separated {@link String} of the {@link UserChangeState}s to look for
-     * @param numberOfMonths the number of months back from which to retrieve {@link UserChange}s (<b>0</b> means retrieve all)
-     * @param request        the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Collection)} containing the {@link UserChange}s
-     */
+    @Override
     @RolesAllowed("admin")
     @ReadRequired
     @GetMapping(path = "/passkey", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<UserChange>> getAllWithPasskeys(
-        @RequestParam(value = "state", required = false, defaultValue = ALL_STATES_OPTION) final String state,
+        @RequestParam(value = "state", required = false, defaultValue = UserChangeState.ALL_STATES) final String state,
         @RequestParam(value = "numberOfMonths", required = false, defaultValue = "0") final long numberOfMonths,
         final HttpServletRequest request) {
         AUDIT_LOGGER.info("GET request for all user changes with passkey received at '{}?{}'", request::getRequestURI,
@@ -190,13 +169,7 @@ public class UserChangeEndpoint {
         return ok(userChanges);
     }
 
-    /**
-     * {@link GetMapping} request to retrieve a {@link UserChange} by {@code userChangeId}.
-     *
-     * @param userChangeId the ID of the {@link UserChange} to be updated
-     * @param request      the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} containing the {@link UserChange}
-     */
+    @Override
     @RolesAllowed("admin")
     @ReadRequired
     @GetMapping(path = "/{userChangeId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -207,17 +180,7 @@ public class UserChangeEndpoint {
         return ok(userChange);
     }
 
-    /**
-     * {@link PutMapping} request to update a {@link UserChange} to {@link UserChangeState#APPROVED_NOW}.
-     *
-     * <p>
-     * Also applies the {@link UserChange} right away.
-     *
-     * @param userChangeId the ID of the {@link UserChange} to be updated
-     * @param request      the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link UserChange}
-     * @see UserChangeApplier#apply(UserChange)
-     */
+    @Override
     @RolesAllowed("admin")
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/approve/immediate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -227,13 +190,7 @@ public class UserChangeEndpoint {
         return update(userChangeId, UserChangeState.APPROVED_NOW);
     }
 
-    /**
-     * {@link PutMapping} request to update a {@link UserChange} to {@link UserChangeState#APPROVED_NEXT_MONTH}.
-     *
-     * @param userChangeId the ID of the {@link UserChange} to be updated
-     * @param request      the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link UserChange}
-     */
+    @Override
     @RolesAllowed("admin")
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/approve/next", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -243,13 +200,7 @@ public class UserChangeEndpoint {
         return update(userChangeId, UserChangeState.APPROVED_NEXT_MONTH);
     }
 
-    /**
-     * {@link PutMapping} request to update a {@link UserChange} to {@link UserChangeState#REJECTED}.
-     *
-     * @param userChangeId the ID of the {@link UserChange} to be updated
-     * @param request      the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link UserChange}
-     */
+    @Override
     @RolesAllowed("admin")
     @WriteRequired
     @PutMapping(path = "/{userChangeId}/reject", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

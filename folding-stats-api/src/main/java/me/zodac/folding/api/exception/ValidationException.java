@@ -47,7 +47,7 @@ public class ValidationException extends RuntimeException {
      * Constructor with failing {@link ResponsePojo} and a single error.
      *
      * @param invalidObject the {@link ResponsePojo} that failed validation
-     * @param message         the error
+     * @param message       the error
      */
     public ValidationException(final ResponsePojo invalidObject, final String message) {
         super(message);
@@ -58,7 +58,7 @@ public class ValidationException extends RuntimeException {
      * Constructor with failing {@link RequestPojo} and a single error.
      *
      * @param invalidObject the {@link RequestPojo} that failed validation
-     * @param message         the error
+     * @param message       the error
      */
     public ValidationException(final RequestPojo invalidObject, final String message) {
         super(message);
@@ -69,7 +69,7 @@ public class ValidationException extends RuntimeException {
      * Constructor with failing {@link RequestPojo}, a single error and the cause {@link Throwable}.
      *
      * @param invalidObject the {@link RequestPojo} that failed validation
-     * @param message         the error
+     * @param message       the error
      * @param cause         the cause {@link Throwable}
      */
     public ValidationException(final RequestPojo invalidObject, final String message, final Throwable cause) {

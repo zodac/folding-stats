@@ -15,7 +15,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.controller;
 
 import static me.zodac.folding.rest.response.Responses.cachedOk;
 import static me.zodac.folding.rest.response.Responses.created;
@@ -34,6 +34,7 @@ import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.validation.TeamValidator;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
+import me.zodac.folding.rest.controller.api.TeamEndpoint;
 import me.zodac.folding.rest.exception.NotFoundException;
 import me.zodac.folding.rest.util.ReadRequired;
 import me.zodac.folding.rest.util.WriteRequired;
@@ -54,11 +55,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST endpoints for {@code Team Competition} {@link Team}s.
+ * Implementation of {@link TeamEndpoint} REST endpoints.
  */
 @RestController
 @RequestMapping("/teams")
-public class TeamEndpoint {
+public class TeamController implements TeamEndpoint {
 
     private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
 
@@ -77,7 +78,7 @@ public class TeamEndpoint {
      * @param registry          the Prometheus {@link MeterRegistry}
      * @param teamValidator     the {@link TeamValidator}
      */
-    public TeamEndpoint(final FoldingRepository foldingRepository, final MeterRegistry registry, final TeamValidator teamValidator) {
+    public TeamController(final FoldingRepository foldingRepository, final MeterRegistry registry, final TeamValidator teamValidator) {
         this.foldingRepository = foldingRepository;
         this.teamValidator = teamValidator;
 
@@ -92,13 +93,7 @@ public class TeamEndpoint {
             .register(registry);
     }
 
-    /**
-     * {@link PostMapping} request to create a {@link Team} based on the input request.
-     *
-     * @param teamRequest the {@link TeamRequest} to create a {@link Team}
-     * @param request     the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#created(Object, int)} containing the created {@link Team}
-     */
+    @Override
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -114,12 +109,7 @@ public class TeamEndpoint {
         return created(elementWithId, elementWithId.id());
     }
 
-    /**
-     * {@link GetMapping} request to retrieve all {@link Team}s.
-     *
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Collection, long)} containing the {@link Team}s
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -129,13 +119,7 @@ public class TeamEndpoint {
         return cachedOk(elements);
     }
 
-    /**
-     * {@link GetMapping} request to retrieve a {@link Team} by {@code teamId}.
-     *
-     * @param teamId  the ID of the {@link Team} to retrieve
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object)} containing the {@link Team}
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/{teamId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -146,13 +130,7 @@ public class TeamEndpoint {
         return cachedOk(element);
     }
 
-    /**
-     * {@link GetMapping} request to retrieve a {@link Team} by {@code teamName}.
-     *
-     * @param teamName the {@code teamName} of the {@link Team} to retrieve
-     * @param request  the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object)} containing the {@link Team}
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/fields", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -168,14 +146,7 @@ public class TeamEndpoint {
         return cachedOk(retrievedTeam);
     }
 
-    /**
-     * {@link PutMapping} request to update an existing {@link Team} based on the input request.
-     *
-     * @param teamId      the ID of the {@link Team} to be updated
-     * @param teamRequest the {@link TeamRequest} to update a {@link Team}
-     * @param request     the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link Team}
-     */
+    @Override
     @WriteRequired
     @RolesAllowed("admin")
     @PutMapping(path = "/{teamId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -203,13 +174,7 @@ public class TeamEndpoint {
         return ok(updatedTeamWithId, updatedTeamWithId.id());
     }
 
-    /**
-     * {@link DeleteMapping} request to delete an existing {@link Team}.
-     *
-     * @param teamId  the ID of the {@link Team} to be deleted
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()}
-     */
+    @Override
     @WriteRequired
     @RolesAllowed("admin")
     @DeleteMapping(path = "/{teamId}", produces = MediaType.APPLICATION_JSON_VALUE)

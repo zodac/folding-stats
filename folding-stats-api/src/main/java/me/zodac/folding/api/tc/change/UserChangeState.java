@@ -61,6 +61,11 @@ public enum UserChangeState {
      */
     INVALID(true);
 
+    /**
+     * {@link String} denoting all {@link UserChangeState}s should be included.
+     */
+    public static final String ALL_STATES = "*";
+
     private static final Collection<UserChangeState> ALL_VALUES = List.of(values());
 
     private final boolean isFinalState;

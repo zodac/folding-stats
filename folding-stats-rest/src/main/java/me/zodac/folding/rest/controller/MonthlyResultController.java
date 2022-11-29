@@ -15,19 +15,18 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.controller;
 
 import static me.zodac.folding.rest.response.Responses.ok;
 
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.Month;
-import java.time.Year;
 import me.zodac.folding.api.tc.result.MonthlyResult;
 import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.bean.tc.user.UserStatsStorer;
+import me.zodac.folding.rest.controller.api.MonthlyResultEndpoint;
 import me.zodac.folding.rest.util.DateDetails;
 import me.zodac.folding.rest.util.ReadRequired;
 import me.zodac.folding.rest.util.WriteRequired;
@@ -43,11 +42,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST endpoints for {@code Team Competition} {@link MonthlyResult}s.
+ * Implementation of {@link MonthlyResultEndpoint} REST endpoints.
  */
 @RestController
 @RequestMapping("/results")
-public class MonthlyResultEndpoint {
+public class MonthlyResultController implements MonthlyResultEndpoint {
 
     private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
 
@@ -61,19 +60,12 @@ public class MonthlyResultEndpoint {
      * @param userStatsStorer the {@link UserStatsStorer}
      */
     @Autowired
-    public MonthlyResultEndpoint(final StatsRepository statsRepository, final UserStatsStorer userStatsStorer) {
+    public MonthlyResultController(final StatsRepository statsRepository, final UserStatsStorer userStatsStorer) {
         this.statsRepository = statsRepository;
         this.userStatsStorer = userStatsStorer;
     }
 
-    /**
-     * {@link GetMapping} request that retrieves a {@link MonthlyResult} for the given {@link Month}/{@link Year}.
-     *
-     * @param year    the {@link Year} of the {@link MonthlyResult}
-     * @param month   the {@link Month} of the {@link MonthlyResult}
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} with the {@link MonthlyResult}
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/result/{year}/{month}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -87,11 +79,7 @@ public class MonthlyResultEndpoint {
         return ok(monthlyResult);
     }
 
-    /**
-     * {@link PostMapping} request that performs a manual save of the current {@link MonthlyResult}.
-     *
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()}
-     */
+    @Override
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(path = "/manual/save")

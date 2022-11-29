@@ -15,7 +15,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.controller;
 
 import static me.zodac.folding.rest.response.Responses.cachedOk;
 import static me.zodac.folding.rest.response.Responses.created;
@@ -33,6 +33,7 @@ import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.validation.UserValidator;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
+import me.zodac.folding.rest.controller.api.UserEndpoint;
 import me.zodac.folding.rest.util.ReadRequired;
 import me.zodac.folding.rest.util.WriteRequired;
 import me.zodac.folding.state.SystemStateManager;
@@ -51,11 +52,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST endpoints for {@code Team Competition} {@link User}s.
+ * Implementation of {@link UserEndpoint} REST endpoints.
  */
 @RestController
 @RequestMapping("/users")
-public class UserEndpoint {
+public class UserController implements UserEndpoint {
 
     private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
 
@@ -75,7 +76,7 @@ public class UserEndpoint {
      * @param userValidator     the {@link UserValidator}
      */
     @Autowired
-    public UserEndpoint(final FoldingRepository foldingRepository, final MeterRegistry registry, final UserValidator userValidator) {
+    public UserController(final FoldingRepository foldingRepository, final MeterRegistry registry, final UserValidator userValidator) {
         this.foldingRepository = foldingRepository;
         this.userValidator = userValidator;
 
@@ -90,13 +91,7 @@ public class UserEndpoint {
             .register(registry);
     }
 
-    /**
-     * {@link PostMapping} request to create a {@link User} based on the input request.
-     *
-     * @param userRequest the {@link UserRequest} to create a {@link User}
-     * @param request     the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#created(Object, int)} containing the created {@link User}
-     */
+    @Override
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -112,12 +107,7 @@ public class UserEndpoint {
         return created(elementWithId, elementWithId.id());
     }
 
-    /**
-     * {@link GetMapping} request to retrieve all {@link User}s.
-     *
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Collection, long)} containing the {@link User}s
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -127,12 +117,7 @@ public class UserEndpoint {
         return cachedOk(elements);
     }
 
-    /**
-     * {@link GetMapping} request to retrieve all {@link User}s.
-     *
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Collection, long)} containing the {@link User}s
-     */
+    @Override
     @RolesAllowed("admin")
     @ReadRequired
     @GetMapping(path = "/all/passkey", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -142,13 +127,7 @@ public class UserEndpoint {
         return cachedOk(elements);
     }
 
-    /**
-     * {@link GetMapping} request to retrieve a {@link User} by {@code userId}.
-     *
-     * @param userId  the ID of the {@link User} to retrieve
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object)} containing the {@link User}
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -159,13 +138,7 @@ public class UserEndpoint {
         return cachedOk(element);
     }
 
-    /**
-     * {@link GetMapping} request to retrieve a {@link User} by {@code userId}, with the passkey exposed.
-     *
-     * @param userId  the ID of the {@link User} to retrieve
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#cachedOk(Object)} containing the {@link User}
-     */
+    @Override
     @ReadRequired
     @RolesAllowed("admin")
     @GetMapping(path = "/{userId}/passkey", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -176,14 +149,7 @@ public class UserEndpoint {
         return cachedOk(element);
     }
 
-    /**
-     * {@link PutMapping} request to update an existing {@link User} based on the input request.
-     *
-     * @param userId      the ID of the {@link User} to be updated
-     * @param userRequest the {@link UserRequest} to update a {@link User}
-     * @param request     the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object, int)} containing the updated {@link User}
-     */
+    @Override
     @WriteRequired
     @RolesAllowed("admin")
     @PutMapping(path = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -212,13 +178,7 @@ public class UserEndpoint {
         return ok(updatedUserWithId, updatedUserWithId.id());
     }
 
-    /**
-     * {@link DeleteMapping} request to delete an existing {@link User}.
-     *
-     * @param userId  the ID of the {@link User} to be deleted
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()}
-     */
+    @Override
     @WriteRequired
     @RolesAllowed("admin")
     @DeleteMapping(path = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)

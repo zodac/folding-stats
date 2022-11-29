@@ -21,13 +21,13 @@
         <!-- False positives with AssertJ using #as() to include an error message -->
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
         <!-- False positives when using 2D arrays -->
-        <exclude name="UseVarargs" />
+        <exclude name="UseVarargs"/>
     </rule>
     <!-- When using an indexed FOR loop, certain scenarios exist where I'd like to skip the increment -->
     <rule ref="category/java/bestpractices.xml/AvoidReassigningLoopVariables">
         <properties>
-            <property name="foreachReassign" value="deny" />
-            <property name="forReassign" value="skip" />
+            <property name="foreachReassign" value="deny"/>
+            <property name="forReassign" value="skip"/>
         </properties>
     </rule>
 
@@ -117,8 +117,7 @@
         <exclude name="AvoidFieldNameMatchingMethodName"/>
 
         <!-- Quite a few false positives -->
-        <!-- Caught by SonarQube analysis -->
-        <exclude name="BeanMembersShouldSerialize"/>
+        <exclude name="NonSerializableClass"/>
 
         <!-- Helper classes can cause this to fail, not worth changing them -->
         <exclude name="TestClassWithoutTestCases"/>

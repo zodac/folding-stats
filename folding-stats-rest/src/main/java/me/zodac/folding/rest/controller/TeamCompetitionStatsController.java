@@ -15,7 +15,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package me.zodac.folding.rest;
+package me.zodac.folding.rest.controller;
 
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParameters;
@@ -46,6 +46,7 @@ import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.request.OffsetTcStatsRequest;
+import me.zodac.folding.rest.controller.api.TeamCompetitionStatsEndpoint;
 import me.zodac.folding.rest.exception.NotFoundException;
 import me.zodac.folding.rest.util.ReadRequired;
 import me.zodac.folding.rest.util.WriteRequired;
@@ -64,11 +65,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST endpoint for {@code Team Competition} stats.
+ * Implementation of {@link TeamCompetitionStatsEndpoint} REST endpoints.
  */
 @RestController
 @RequestMapping("/stats")
-public class TeamCompetitionStatsEndpoint {
+public class TeamCompetitionStatsController implements TeamCompetitionStatsEndpoint {
 
     private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
 
@@ -93,12 +94,12 @@ public class TeamCompetitionStatsEndpoint {
      * @param userStatsResetter         the {@link UserStatsResetter}
      */
     @Autowired
-    public TeamCompetitionStatsEndpoint(final FoldingRepository foldingRepository,
-                                        final LeaderboardStatsGenerator leaderboardStatsGenerator,
-                                        final MeterRegistry registry,
-                                        final StatsRepository statsRepository,
-                                        final UserStatsParser userStatsParser,
-                                        final UserStatsResetter userStatsResetter) {
+    public TeamCompetitionStatsController(final FoldingRepository foldingRepository,
+                                          final LeaderboardStatsGenerator leaderboardStatsGenerator,
+                                          final MeterRegistry registry,
+                                          final StatsRepository statsRepository,
+                                          final UserStatsParser userStatsParser,
+                                          final UserStatsResetter userStatsResetter) {
         this.foldingRepository = foldingRepository;
         this.leaderboardStatsGenerator = leaderboardStatsGenerator;
         this.statsRepository = statsRepository;
@@ -114,11 +115,7 @@ public class TeamCompetitionStatsEndpoint {
             .register(registry);
     }
 
-    /**
-     * {@link GetMapping} request to retrieve the {@code Team Competition} simple {@link CompetitionSummary}.
-     *
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} containing the {@link CompetitionSummary}
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/overall", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -129,11 +126,7 @@ public class TeamCompetitionStatsEndpoint {
         return ok(allTeamsSummary.competitionSummary());
     }
 
-    /**
-     * {@link GetMapping} request to retrieve the {@code Team Competition} overall {@link AllTeamsSummary}.
-     *
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} containing the {@link AllTeamsSummary}
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -143,13 +136,7 @@ public class TeamCompetitionStatsEndpoint {
         return ok(allTeamsSummary);
     }
 
-    /**
-     * {@link GetMapping} request to retrieve the {@code Team Competition} {@link UserSummary} for the given {@link User}.
-     *
-     * @param userId  the ID of the {@link User} whose {@link UserSummary} is to be retrieved
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} containing the {@link UserSummary}
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -173,14 +160,7 @@ public class TeamCompetitionStatsEndpoint {
         throw new NotFoundException(User.class, user.id());
     }
 
-    /**
-     * {@link PatchMapping} request to update an existing {@link UserSummary} with an {@link OffsetTcStatsRequest}.
-     *
-     * @param userId               the ID of the {@link UserSummary} to be updated
-     * @param offsetTcStatsRequest the {@link OffsetTcStatsRequest} to be applied
-     * @param request              the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()}
-     */
+    @Override
     @WriteRequired
     @RolesAllowed("admin")
     @PatchMapping(path = "/users/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -204,11 +184,7 @@ public class TeamCompetitionStatsEndpoint {
         return ok();
     }
 
-    /**
-     * {@link GetMapping} request to retrieve the {@code Team Competition} {@link TeamLeaderboardEntry}s.
-     *
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} containing the {@link TeamLeaderboardEntry}s
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/leaderboard", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -218,11 +194,7 @@ public class TeamCompetitionStatsEndpoint {
         return ok(teamSummaries);
     }
 
-    /**
-     * {@link GetMapping} request to retrieve the {@code Team Competition} {@link UserCategoryLeaderboardEntry}s by {@link Category}.
-     *
-     * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} containing the {@link UserCategoryLeaderboardEntry}s
-     */
+    @Override
     @ReadRequired
     @PermitAll
     @GetMapping(path = "/category", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -232,12 +204,7 @@ public class TeamCompetitionStatsEndpoint {
         return ok(categoryLeaderboard);
     }
 
-    /**
-     * {@link PostMapping} request to manually update the {@code Team Competition} stats.
-     *
-     * @param request the {@link HttpServletRequest}
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()}
-     */
+    @Override
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(path = "/manual/update")
@@ -248,11 +215,7 @@ public class TeamCompetitionStatsEndpoint {
         return ok();
     }
 
-    /**
-     * {@link PostMapping} request to manually reset the {@code Team Competition} stats.
-     *
-     * @return {@link me.zodac.folding.rest.response.Responses#ok()}
-     */
+    @Override
     @WriteRequired
     @RolesAllowed("admin")
     @PostMapping(path = "/manual/reset")
