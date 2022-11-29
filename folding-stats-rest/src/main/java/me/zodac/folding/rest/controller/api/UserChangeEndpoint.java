@@ -17,6 +17,8 @@
 
 package me.zodac.folding.rest.controller.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import me.zodac.folding.api.tc.change.UserChange;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 /**
  * REST endpoints for {@code Team Competition} {@link UserChange}s.
  */
+@Tag(name = "UserChange Endpoints", description = "REST endpoints to create, read, approve and reject user change requests on the system")
 public interface UserChangeEndpoint {
 
     /**
@@ -44,6 +47,7 @@ public interface UserChangeEndpoint {
      * @param request           the {@link HttpServletRequest}
      * @return {@link Responses#created(Object, int)} containing the created {@link UserChange}
      */
+    @Operation(summary = "Create a new user change with the given properties")
     ResponseEntity<UserChange> create(@RequestBody UserChangeRequest userChangeRequest, HttpServletRequest request);
 
     /**

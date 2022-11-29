@@ -107,9 +107,25 @@ public interface HardwareEndpoint {
         @ApiResponse(responseCode = "502", description = "An error occurred connecting to an external system"),
         @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests"),
     })
-    ResponseEntity<Hardware> create(@RequestBody @Parameter(description = "The new hardware to be created") HardwareRequest hardwareRequest,
-                                    HttpServletRequest request
-    );
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        description = "The new hardware to be created",
+        required = true,
+        content = @Content(
+            schema = @Schema(implementation = HardwareRequest.class),
+            examples = @ExampleObject(
+                name = "An example request to create a hardware, with all required fields",
+                value = """
+                    {
+                      "hardwareName": "Hardware1",
+                      "displayName": "Hardware1",
+                      "hardwareMake": "NVIDIA",
+                      "hardwareType": "GPU",
+                      "multiplier": 21.33,
+                      "averagePpd": 1
+                    }"""
+            ))
+    )
+    ResponseEntity<Hardware> create(@RequestBody HardwareRequest hardwareRequest, HttpServletRequest request);
 
     /**
      * {@link GetMapping} request to retrieve all {@link Hardware}s.
@@ -267,11 +283,11 @@ public interface HardwareEndpoint {
                 examples = @ExampleObject("""
                     {
                         "id": 1,
-                        "hardwareName": "Hardware1_Updated",
-                        "displayName": "Hardware1_Updated",
+                        "hardwareName": "Hardware1",
+                        "displayName": "Hardware1 (Updated)",
                         "hardwareMake": "NVIDIA",
                         "hardwareType": "GPU",
-                        "multiplier": 21.33,
+                        "multiplier": 15.33,
                         "averagePpd": 1
                     }"""
                 )
@@ -310,8 +326,26 @@ public interface HardwareEndpoint {
         @ApiResponse(responseCode = "502", description = "An error occurred connecting to an external system"),
         @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests"),
     })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        description = "The new hardware to be updated",
+        required = true,
+        content = @Content(
+            schema = @Schema(implementation = HardwareRequest.class),
+            examples = @ExampleObject(
+                name = "An example request to update a hardware, with all required fields",
+                value = """
+                    {
+                      "hardwareName": "Hardware1",
+                      "displayName": "Hardware1 (Updated)",
+                      "hardwareMake": "NVIDIA",
+                      "hardwareType": "GPU",
+                      "multiplier": 15.33,
+                      "averagePpd": 1
+                    }"""
+            ))
+    )
     ResponseEntity<Hardware> updateById(@PathVariable("hardwareId") @Parameter(description = "The ID of the hardware to be updated") int hardwareId,
-                                        @RequestBody @Parameter(description = "The new hardware to be updated") HardwareRequest hardwareRequest,
+                                        @RequestBody HardwareRequest hardwareRequest,
                                         HttpServletRequest request
     );
 
