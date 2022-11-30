@@ -24,6 +24,8 @@ import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParame
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
