@@ -17,6 +17,7 @@
 
 package me.zodac.folding.rest.api.tc.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,9 +40,38 @@ import me.zodac.folding.api.RequestPojo;
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
+@Schema(name = "OffsetTcStatsRequest",
+    description = "An example request to offset the stats for a user (at least one of 'pointsOffset' or 'multipliedPointsOffset' must be non-zero)",
+    example = """
+        {
+          "pointsOffset": 150,
+          "multipliedPointsOffset": 1500,
+          "unitsOffset": 15
+        }"""
+)
 public class OffsetTcStatsRequest implements RequestPojo {
 
+    @Schema(
+        description = "The points offset (positive of negative) to be applied to a user's TC stats",
+        example = "150",
+        requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+        accessMode = Schema.AccessMode.WRITE_ONLY
+    )
     private long pointsOffset;
+
+    @Schema(
+        description = "The multiplied points offset (positive of negative) to be applied to a user's TC stats",
+        example = "1500",
+        requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+        accessMode = Schema.AccessMode.WRITE_ONLY
+    )
     private long multipliedPointsOffset;
+
+    @Schema(
+        description = "The units offset (positive of negative) to be applied to a user's TC stats",
+        example = "15",
+        requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+        accessMode = Schema.AccessMode.WRITE_ONLY
+    )
     private int unitsOffset;
 }

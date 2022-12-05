@@ -54,7 +54,6 @@ public interface LoginEndpoint {
             responseCode = "400",
             description = "The given login payload is invalid",
             content = @Content(
-                mediaType = "application/json",
                 schema = @Schema(example = """
                     {
                         "encodedUserNameAndPassword": "dXNlcm5hbWU6cGFzc3dvcmQ="

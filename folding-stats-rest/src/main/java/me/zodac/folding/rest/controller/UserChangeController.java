@@ -117,6 +117,8 @@ public class UserChangeController implements UserChangeEndpoint {
         final UserChange createdUserChange = foldingRepository.createUserChange(validatedUserChange);
 
         userChangeCreates.increment();
+
+        // TODO: When creating this change, does the response include user passkeys?
         return created(createdUserChange, createdUserChange.id());
     }
 

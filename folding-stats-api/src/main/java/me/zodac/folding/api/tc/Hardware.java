@@ -32,7 +32,7 @@ import me.zodac.folding.rest.api.tc.request.HardwareRequest;
  *
  * <p>
  * Each {@link Hardware} will have a multiplier which is calculated from the LARS PPD database, where the best piece of {@link Hardware} has a
- * multiplier of <b>1.0</b>, and each other piece of {@link Hardware}'s multiplier is:
+ * multiplier of <b>1.00</b>, and each other piece of {@link Hardware}'s multiplier is:
  * <pre>
  *     Best PPD / PPD for given {@link Hardware} (to 2 decimal places)
  * </pre>

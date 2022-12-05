@@ -20,6 +20,7 @@ package me.zodac.folding.rest.api.tc.request;
 import static me.zodac.folding.api.util.StringUtils.isBlank;
 import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -49,19 +50,97 @@ import me.zodac.folding.api.tc.HardwareMake;
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
+@Schema(name = "UserRequest",
+    description = "An example request to create a user, with all fields",
+    example = """
+        {
+          "foldingUserName": "User1",
+          "displayName": "FirstUser",
+          "passkey": "fc7d6837269d86784d8bfd0b386d6bca",
+          "category": "WILDCARD",
+          "profileLink": "https://forums.extremehw.net/",
+          "liveStatsLink": "https://etf.axihub.ca/",
+          "hardwareId": 1,
+          "teamId": 1,
+          "userIsCaptain": true
+        }"""
+)
 public class UserRequest implements RequestPojo {
 
     private static final Pattern FOLDING_USER_NAME_PATTERN = Pattern.compile("^[a-zA-Z\\d._-]*$");
     private static final Pattern PASSKEY_PATTERN = Pattern.compile("[a-zA-Z\\d]{32}");
 
+    @Schema(
+        description = "The Folding@Home userName that the user will use for stats from the Stanford stats website",
+        example = "User1",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private String foldingUserName;
+
+    @Schema(
+        description = "The user-friendly display name of the user",
+        example = "FirstUser",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private String displayName;
+
+    @Schema(
+        description = "The Folding@Home passkey of the user",
+        example = "fc7d6837269d86784d8bfd0b386d6bca",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.WRITE_ONLY
+    )
     private String passkey;
+
+    @Schema(
+        description = "The category the user will compete in (case-sensitive)",
+        example = "WILDCARD",
+        oneOf = Category.class,
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private String category;
+
+    @Schema(
+        description = "A link to the user's profile on the forum",
+        example = "https://forums.extremehw.net",
+        requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private String profileLink;
+
+    @Schema(
+        description = "A link to the live stats for the user",
+        example = "https://etf.axihub.ca",
+        requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private String liveStatsLink;
+
+    @Schema(
+        description = "The ID of the hardware that the user will use",
+        example = "4",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private int hardwareId;
+
+    @Schema(
+        description = "The ID of the team that the user will be on",
+        example = "17",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private int teamId;
+
+    @Schema(
+        description = "Whether the user is captain of their team",
+        example = "true",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private boolean userIsCaptain;
 
     /**

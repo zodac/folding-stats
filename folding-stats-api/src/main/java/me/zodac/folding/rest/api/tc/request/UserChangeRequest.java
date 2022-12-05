@@ -20,6 +20,7 @@ package me.zodac.folding.rest.api.tc.request;
 import static me.zodac.folding.api.util.StringUtils.isBlank;
 import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -47,17 +48,78 @@ import me.zodac.folding.api.exception.ValidationException;
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
+@Schema(name = "UserChangeRequest",
+    description = "An example request to create a user change request, with all fields",
+    example = """
+        {
+          "userId": 1,
+          "existingPasskey": "12345678912345678912345678912345",
+          "foldingUserName": "User1",
+          "passkey": "12345678912345678912345678912345",
+          "liveStatsLink": "https://www.google.com",
+          "hardwareId": 1,
+          "immediate": true
+        }"""
+)
 public class UserChangeRequest implements RequestPojo {
 
     private static final Pattern FOLDING_USER_NAME_PATTERN = Pattern.compile("^[a-zA-Z\\d._-]*$");
     private static final Pattern PASSKEY_PATTERN = Pattern.compile("[a-zA-Z\\d]{32}");
 
+    @Schema(
+        description = "The ID of the user for whom a change is being requested",
+        example = "1",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private int userId;
+
+    @Schema(
+        description = "The current passkey for the user",
+        example = "12345678912345678912345678912345",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.WRITE_ONLY
+    )
     private String existingPasskey;
+
+    @Schema(
+        description = "The foldingUserName that the user will use (leave as existing value if no change is required)",
+        example = "User1",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private String foldingUserName;
+
+    @Schema(
+        description = "The passkey that the user will use (leave as existing value if no change is required)",
+        example = "12345678912345678912345678912345",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.WRITE_ONLY
+    )
     private String passkey;
+
+    @Schema(
+        description = "A link to the live stats for the user  (leave as existing value if no change is required)",
+        example = "https://www.google.com",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private String liveStatsLink;
+
+    @Schema(
+        description = "The ID of the hardware that the user will use (leave as existing value if no change is required)",
+        example = "4",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private int hardwareId;
+
+    @Schema(
+        description = "Whether the change should be applied immediately, or for the next month's competition",
+        example = "true",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private boolean immediate;
 
     /**

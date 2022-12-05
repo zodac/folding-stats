@@ -17,6 +17,8 @@
 
 package me.zodac.folding;
 
+import me.zodac.folding.api.state.SystemState;
+import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.boot.CommandLineRunner;
@@ -49,12 +51,15 @@ public class FoldingStatsApplication {
     }
 
     /**
-     * {@link Bean} to print startup message to system log.
+     * {@link Bean} to set system to {@link SystemState#AVAILABLE} and print startup message to system log.
      *
      * @return the {@link CommandLineRunner} with the execution to be run
      */
     @Bean
     public CommandLineRunner startUp() {
-        return args -> LOGGER.info("Started {}", FoldingStatsApplication.class.getSimpleName());
+        return args -> {
+            SystemStateManager.next(SystemState.AVAILABLE);
+            LOGGER.info("System ready for requests");
+        };
     }
 }

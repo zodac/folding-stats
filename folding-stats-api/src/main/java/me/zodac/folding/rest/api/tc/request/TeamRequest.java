@@ -20,6 +20,7 @@ package me.zodac.folding.rest.api.tc.request;
 import static me.zodac.folding.api.util.StringUtils.isBlank;
 import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -46,10 +47,39 @@ import me.zodac.folding.api.exception.ValidationException;
 @Setter
 @EqualsAndHashCode
 @ToString(doNotUseGetters = true)
+@Schema(name = "TeamRequest",
+    description = "An example request to create a team, with all fields",
+    example = """
+        {
+          "teamName": "Team1",
+          "teamDescription": "The greatest team in the world!",
+          "forumLink": "https://forums.extremehw.net/forum/125-extreme-team-folding/"
+        }"""
+)
 public class TeamRequest implements RequestPojo {
 
+    @Schema(
+        description = "The unique name of the team",
+        example = "Team1",
+        requiredMode = Schema.RequiredMode.REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private String teamName;
+
+    @Schema(
+        description = "A description or motto for the team",
+        example = "The greatest team in the world!",
+        requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private String teamDescription;
+
+    @Schema(
+        description = "A link to the team on the forum",
+        example = "https://forums.extremehw.net/forum/125-extreme-team-folding/",
+        requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+        accessMode = Schema.AccessMode.READ_WRITE
+    )
     private String forumLink;
 
     /**

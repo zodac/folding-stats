@@ -60,19 +60,13 @@ public class InitialisationConfiguration {
      * <ol>
      *     <li>Initialise the {@link me.zodac.folding.api.tc.Hardware}, {@link User}, {@link me.zodac.folding.api.tc.Team},
      *     {@link OffsetTcStats} and initial {@link me.zodac.folding.api.tc.stats.UserStats} caches</li>
-     *     <li>Sets the {@link SystemState} to {@link SystemState#AVAILABLE} when complete</li>
      * </ol>
      *
      * @return the {@link CommandLineRunner} with the execution to be run
      */
     @Bean
     public CommandLineRunner initialisation() {
-        return args -> {
-            initCaches();
-
-            SystemStateManager.next(SystemState.AVAILABLE);
-            LOGGER.info("System ready for requests");
-        };
+        return args -> initCaches();
     }
 
     private void initCaches() {

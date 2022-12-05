@@ -99,11 +99,11 @@ public interface HardwareEndpoint {
                     }"""
                 )
             )),
-        @ApiResponse(responseCode = "401", description = "System user cannot be logged in with provided credentials"),
-        @ApiResponse(responseCode = "403", description = "System user does not have the correct role to perform this request"),
-        @ApiResponse(responseCode = "409", description = "A hardware with the same 'hardwareName' already exists"),
-        @ApiResponse(responseCode = "502", description = "An error occurred connecting to an external system"),
-        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests"),
+        @ApiResponse(responseCode = "401", description = "System user cannot be logged in with provided credentials", content = @Content),
+        @ApiResponse(responseCode = "403", description = "System user does not have the correct role to perform this request", content = @Content),
+        @ApiResponse(responseCode = "409", description = "A hardware with the same 'hardwareName' already exists", content = @Content),
+        @ApiResponse(responseCode = "502", description = "An error occurred connecting to an external system", content = @Content),
+        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests", content = @Content),
     })
     @RequestBody(
         description = "The new hardware to be created",
@@ -141,7 +141,6 @@ public interface HardwareEndpoint {
                 description = "An EntityTag which can be used to retrieve a cached version of the response in future requests"
             ),
             content = @Content(
-                mediaType = "application/json",
                 array = @ArraySchema(schema = @Schema(implementation = Hardware.class)),
                 examples = @ExampleObject("""
                     [
@@ -165,7 +164,7 @@ public interface HardwareEndpoint {
                         }
                     ]""")
             )),
-        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute read requests"),
+        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute read requests", content = @Content),
     })
     ResponseEntity<Collection<Hardware>> getAll(HttpServletRequest request);
 
@@ -186,7 +185,6 @@ public interface HardwareEndpoint {
                 description = "An EntityTag which can be used to retrieve a cached version of the response in future requests"
             ),
             content = @Content(
-                mediaType = "application/json",
                 schema = @Schema(implementation = Hardware.class),
                 examples = @ExampleObject("""
                     {
@@ -204,7 +202,6 @@ public interface HardwareEndpoint {
             responseCode = "400",
             description = "The provided ID is an invalid integer",
             content = @Content(
-                mediaType = "application/json",
                 examples = @ExampleObject("""
                     {
                         "error": "The input is not a valid format: Failed to convert value of type 'java.lang.String' to required type 'int';
@@ -212,8 +209,8 @@ public interface HardwareEndpoint {
                     }"""
                 )
             )),
-        @ApiResponse(responseCode = "404", description = "No hardware exists with the given ID"),
-        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute read requests"),
+        @ApiResponse(responseCode = "404", description = "No hardware exists with the given ID", content = @Content),
+        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute read requests", content = @Content),
     })
     @Parameter(name = "hardwareId", description = "The ID of the hardware to be retrieved")
     ResponseEntity<Hardware> getById(int hardwareId, HttpServletRequest request);
@@ -235,7 +232,6 @@ public interface HardwareEndpoint {
                 description = "An EntityTag which can be used to retrieve a cached version of the response in future requests"
             ),
             content = @Content(
-                mediaType = "application/json",
                 schema = @Schema(implementation = Hardware.class),
                 examples = @ExampleObject("""
                     {
@@ -249,8 +245,8 @@ public interface HardwareEndpoint {
                     }"""
                 )
             )),
-        @ApiResponse(responseCode = "404", description = "No hardware exists with the given 'hardwareName'"),
-        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute read requests"),
+        @ApiResponse(responseCode = "404", description = "No hardware exists with the given 'hardwareName'", content = @Content),
+        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute read requests", content = @Content),
     })
     @Parameter(name = "hardwareName", description = "The 'hardwareName' of the hardware to be retrieved")
     ResponseEntity<Hardware> getByHardwareName(String hardwareName, HttpServletRequest request);
@@ -273,7 +269,6 @@ public interface HardwareEndpoint {
                 description = "The URL for the updated hardware"
             ),
             content = @Content(
-                mediaType = "application/json",
                 schema = @Schema(implementation = Hardware.class),
                 examples = @ExampleObject("""
                     {
@@ -291,7 +286,6 @@ public interface HardwareEndpoint {
             responseCode = "400",
             description = "The given hardware payload is invalid",
             content = @Content(
-                mediaType = "application/json",
                 schema = @Schema(
                     example = """
                         {
@@ -314,12 +308,12 @@ public interface HardwareEndpoint {
                         }"""
                 )
             )),
-        @ApiResponse(responseCode = "401", description = "System user cannot be logged in with provided credentials"),
-        @ApiResponse(responseCode = "403", description = "System user does not have the correct role to perform this request"),
-        @ApiResponse(responseCode = "404", description = "No hardware exists with the given ID"),
-        @ApiResponse(responseCode = "409", description = "A hardware with the same 'hardwareName' already exists"),
-        @ApiResponse(responseCode = "502", description = "An error occurred connecting to an external system"),
-        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests"),
+        @ApiResponse(responseCode = "401", description = "System user cannot be logged in with provided credentials", content = @Content),
+        @ApiResponse(responseCode = "403", description = "System user does not have the correct role to perform this request", content = @Content),
+        @ApiResponse(responseCode = "404", description = "No hardware exists with the given ID", content = @Content),
+        @ApiResponse(responseCode = "409", description = "A hardware with the same 'hardwareName' already exists", content = @Content),
+        @ApiResponse(responseCode = "502", description = "An error occurred connecting to an external system", content = @Content),
+        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests", content = @Content),
     })
     @RequestBody(
         description = "The new hardware to be updated",
@@ -361,7 +355,6 @@ public interface HardwareEndpoint {
             responseCode = "409",
             description = "The hardware is being referenced by a user and cannot be deleted",
             content = @Content(
-                mediaType = "application/json",
                 schema = @Schema(example = """
                     {
                         "invalidObject": {
@@ -402,8 +395,8 @@ public interface HardwareEndpoint {
                     }"""
                 )
             )),
-        @ApiResponse(responseCode = "502", description = "An error occurred connecting to an external system"),
-        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests"),
+        @ApiResponse(responseCode = "502", description = "An error occurred connecting to an external system", content = @Content),
+        @ApiResponse(responseCode = "503", description = "The system is not in a valid state to execute write requests", content = @Content),
     })
     @Parameter(name = "hardwareId", description = "The ID of the hardware to be deleted")
     ResponseEntity<Void> deleteById(int hardwareId, HttpServletRequest request);

@@ -172,6 +172,8 @@ public class TeamCompetitionStatsController implements TeamCompetitionStatsEndpo
         final User user = foldingRepository.getUserWithPasskey(userId);
         final Hardware hardware = user.hardware();
         final OffsetTcStats offsetTcStats = OffsetTcStats.create(offsetTcStatsRequest);
+
+        // TODO: What happens if both points and multipliedPoints are empty?
         final OffsetTcStats offsetTcStatsToPersist = OffsetTcStats.updateWithHardwareMultiplier(offsetTcStats, hardware.multiplier());
 
         final OffsetTcStats createdOffsetStats = statsRepository.createOrUpdateOffsetStats(user, offsetTcStatsToPersist);
