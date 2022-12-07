@@ -86,7 +86,7 @@
         <spotbugs.version>4.7.3</spotbugs.version>
 
         <!-- Linter Plugin Versions -->
-        <dependency-check-maven.version>7.3.2</dependency-check-maven.version>
+        <dependency-check-maven.version>7.4.0</dependency-check-maven.version>
         <license-maven-plugin.version>4.2.rc3</license-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.2.0</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
@@ -215,12 +215,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter</artifactId>
                 <version>${spring-boot.version}</version>
-		<exclusions>
-                    <!-- [CVE-2022-38752] Removing snakeyaml -->
-                    <exclusion>
-                        <groupId>org.yaml</groupId>
-                        <artifactId>snakeyaml</artifactId>
-                    </exclusion>
+                <exclusions>
                     <!-- Remove built-in logging and use own -->
                     <exclusion>
                         <groupId>org.springframework.boot</groupId>

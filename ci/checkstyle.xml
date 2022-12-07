@@ -27,6 +27,10 @@
         <property name="eachLine" value="true"/>
     </module>
 
+    <module name="NewlineAtEndOfFile">
+        <property name="fileExtensions" value="java, xml"/>
+    </module>
+
     <module name="LineLength">
         <property name="fileExtensions" value="java, xml"/>
         <property name="max" value="150"/> <!-- Changed from 100 -->
