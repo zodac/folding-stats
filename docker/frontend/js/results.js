@@ -1,7 +1,8 @@
 const REST_ENDPOINT_URL="%REST_ENDPOINT_URL%"
 
+const FIRST_YEAR_WITH_RESULTS = 2021
 const NUMBER_OF_MONTHS = 12
-const NUMBER_OF_YEARS_TO_SHOW = 2
+const NUMBER_OF_YEARS_TO_SHOW = (new Date().getUTCFullYear() - FIRST_YEAR_WITH_RESULTS) + 1
 const YEAR_START = new Date().getUTCFullYear()
 
 var currentDate = new Date()
