@@ -1,7 +1,7 @@
 /*
  * BSD Zero Clause License
  *
- * Copyright (c) 2021-2022 zodac.me
+ * Copyright (c) 2021-2023 zodac.me
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted.
@@ -24,7 +24,7 @@ public final class TestConstants {
 
     // URL
     public static final String TEST_IP_ADDRESS = System.getProperty("testIpAddress", "127.0.0.1");
-    public static final String FOLDING_URL = String.format("http://%s:8081/folding", TEST_IP_ADDRESS);
+    public static final String FOLDING_URL = String.format("http://%s:8079/folding", TEST_IP_ADDRESS);
 
     // ID
     public static final int NON_EXISTING_ID = 9_999;

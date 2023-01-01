@@ -11,7 +11,7 @@ services:
         ADMIN_EMAIL_ADDRESS: "email@test.com"
         FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
         HTTPS_FRONTEND_PORT: "80"
-        REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
+        REST_ENDPOINT_URL: "http://127.0.0.1:8079/folding"
         ROOT_URL: "https://127.0.0.1:81"
         TITLE: "Extreme Team Folding"
         UPDATE_ENABLED: "false"
@@ -42,8 +42,8 @@ services:
     hostname: backend-dev # Using a dash as Java's URI builder will fail with an underscore
     environment:
       # External URL configuration
-      LARS_URL_ROOT: "http://backend-dev:8081/folding"
-      STATS_URL_ROOT: "http://backend-dev:8081/folding"
+      LARS_URL_ROOT: "http://backend-dev:8079/folding"
+      STATS_URL_ROOT: "http://backend-dev:8079/folding"
       REDIRECT_URL: "https://127.0.0.1:81"
       # Spring configuration
       DEPLOYMENT_TYPE: "test"
@@ -69,11 +69,11 @@ services:
       # Swagger documentation
       CONTACT_NAME: "zodac"
       FORUM_LINK: "https://forums.extremehw.net/forum/125-extreme-team-folding"
-      REST_ENDPOINT_URL: "http://127.0.0.1:8081/folding"
+      REST_ENDPOINT_URL: "http://127.0.0.1:8079/folding"
     networks:
       - development
     ports:
-      - "8081:8081"
+      - "8079:8079"
     volumes:
       - /usr/local/certs/stats/
 

@@ -292,12 +292,12 @@
             <property name="accessModifiers" value="public"/>
             <property name="allowMissingParamTags" value="true"/>
             <property name="allowMissingReturnTag" value="true"/>
-            <property name="allowedAnnotations" value="AfterAll, AfterEach, BeforeAll, BeforeEach, Override, Test"/>
+            <property name="allowedAnnotations" value="AfterAll, AfterEach, BeforeAll, BeforeEach, Disabled, Override, ParameterizedTest, Test"/>
             <property name="tokens" value="METHOD_DEF, CTOR_DEF, ANNOTATION_FIELD_DEF, COMPACT_CTOR_DEF"/>
         </module>
         <module name="MissingJavadocMethod">
             <property name="scope" value="package"/> <!-- Includes: public, protected, package -->
-            <property name="allowedAnnotations" value="AfterAll, AfterEach, BeforeAll, BeforeEach, Override, ParameterizedTest, Test"/>
+            <property name="allowedAnnotations" value="AfterAll, AfterEach, BeforeAll, BeforeEach, Disabled, Override, ParameterizedTest, Test"/>
             <property name="allowMissingPropertyJavadoc" value="true"/>
             <property name="tokens" value="METHOD_DEF, CTOR_DEF, ANNOTATION_FIELD_DEF, COMPACT_CTOR_DEF"/>
         </module>

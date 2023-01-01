@@ -31,7 +31,7 @@
             <collectionProp name="Arguments.arguments"/>
           </elementProp>
           <stringProp name="HTTPSampler.domain">127.0.0.1</stringProp>
-          <stringProp name="HTTPSampler.port">8081</stringProp>
+          <stringProp name="HTTPSampler.port">8079</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
           <stringProp name="HTTPSampler.path">/folding/hardware</stringProp>
@@ -84,7 +84,7 @@
             </collectionProp>
           </elementProp>
           <stringProp name="HTTPSampler.domain">127.0.0.1</stringProp>
-          <stringProp name="HTTPSampler.port">8081</stringProp>
+          <stringProp name="HTTPSampler.port">8079</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.contentEncoding"></stringProp>
           <stringProp name="HTTPSampler.path">/folding/hardware</stringProp>
@@ -110,7 +110,7 @@
         <AuthManager guiclass="AuthPanel" testclass="AuthManager" testname="HTTP Authorization Manager" enabled="false">
           <collectionProp name="AuthManager.auth_list">
             <elementProp name="" elementType="Authorization">
-              <stringProp name="Authorization.url">http://127.0.0.1:8081/folding</stringProp>
+              <stringProp name="Authorization.url">http://127.0.0.1:8079/folding</stringProp>
               <stringProp name="Authorization.username">root</stringProp>
               <stringProp name="Authorization.password">shroot</stringProp>
               <stringProp name="Authorization.domain"></stringProp>
