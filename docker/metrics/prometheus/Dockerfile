@@ -26,12 +26,12 @@ ARG ADMIN_PASSWORD
 COPY ./docker/metrics/prometheus/config/prometheus.yml /etc/prometheus/prometheus.yml
 COPY ./docker/metrics/prometheus/config/web-config.yml /etc/prometheus/web-config.yml
 
-RUN apt-get update && apt-get install -y apache2-utils \
-    sed -i -e "s|%ADMIN_USERNAME%|${ADMIN_USERNAME}|g" /etc/prometheus/prometheus.yml \
-    sed -i -e "s|%ADMIN_PASSWORD%|${ADMIN_PASSWORD}|g" /etc/prometheus/prometheus.yml \
-    sed -i -e "s|%ADMIN_USERNAME%|${ADMIN_USERNAME}|g" /etc/prometheus/web-config.yml \
-    sed -i -e "s|%ADMIN_PASSWORD%|$(htpasswd -bnBC 10 "" ${ADMIN_PASSWORD} | tr -d ':\n')|g" /etc/prometheus/web-config.yml \
-    echo "" >> /etc/prometheus/web-config.yml \
+RUN apt-get update && apt-get install -y apache2-utils && \
+    sed -i -e "s|%ADMIN_USERNAME%|${ADMIN_USERNAME}|g" /etc/prometheus/prometheus.yml && \
+    sed -i -e "s|%ADMIN_PASSWORD%|${ADMIN_PASSWORD}|g" /etc/prometheus/prometheus.yml && \
+    sed -i -e "s|%ADMIN_USERNAME%|${ADMIN_USERNAME}|g" /etc/prometheus/web-config.yml && \
+    sed -i -e "s|%ADMIN_PASSWORD%|$(htpasswd -bnBC 10 "" ${ADMIN_PASSWORD} | tr -d ':\n')|g" /etc/prometheus/web-config.yml && \
+    echo "" >> /etc/prometheus/web-config.yml
 
 ARG PROMETHEUS_VERSION
 FROM prom/prometheus:${PROMETHEUS_VERSION}
