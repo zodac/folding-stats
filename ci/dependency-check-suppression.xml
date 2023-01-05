@@ -5,4 +5,11 @@
         <notes><![CDATA[Ignored since fix is not yet available]]></notes>
         <cve>CVE-2022-1471</cve>
     </suppress>
+
+    <!-- TODO: Remove when https://github.com/jeremylong/DependencyCheck/issues/5213 is resolved -->
+    <suppress>
+        <notes><![CDATA[False Positive]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.latencyutils/LatencyUtils@.*$</packageUrl>
+        <cve>CVE-2021-4277</cve>
+    </suppress>
 </suppressions>

@@ -20,6 +20,7 @@ package me.zodac.folding.bean;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.exception.ExternalConnectionException;
@@ -181,7 +182,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
             final UserStats currentUserStats = foldingStatsRetriever.getTotalStats(createdUser);
             final UserStats initialStats = statsRepository.createInitialStats(currentUserStats);
             LOGGER.info("User '{}' (ID: {}) created with initial stats: {}", createdUser.displayName(), createdUser.id(), initialStats);
-            userStatsParser.parseTcStatsForUsers(Collections.singletonList(createdUser));
+            userStatsParser.parseTcStatsForUser(createdUser);
         } catch (final ExternalConnectionException e) {
             LOGGER.error("Error retrieving initial stats for user '{}' (ID: {})", createdUser.displayName(), createdUser.id(), e);
         }
@@ -441,7 +442,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     @Override
     public Collection<UserChange> getAllUserChangesForNextMonth() {
         try {
-            return storage.getAllUserChanges(Collections.singletonList(UserChangeState.APPROVED_NEXT_MONTH), 0L);
+            return storage.getAllUserChanges(List.of(UserChangeState.APPROVED_NEXT_MONTH), 0L);
         } catch (final Exception e) {
             LOGGER.warn("Error retrieving all user changes for next month", e);
             return Collections.emptyList();

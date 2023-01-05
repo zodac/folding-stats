@@ -19,6 +19,7 @@ package me.zodac.folding.bean.tc.user;
 
 import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
+import java.util.List;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
@@ -61,6 +62,15 @@ public class UserStatsParser {
         this.foldingStatsRetriever = foldingStatsRetriever;
         this.statsRepository = statsRepository;
         this.userTcStatsCalculator = userTcStatsCalculator;
+    }
+
+    /**
+     * Parses the latest TC stats for a single {@link User}.
+     *
+     * @param user the {@link User} whose TC stats are to be parsed
+     */
+    public void parseTcStatsForUser(final User user) {
+        parseTcStatsForUsers(List.of(user));
     }
 
     /**

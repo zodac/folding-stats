@@ -26,7 +26,6 @@ import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import me.zodac.folding.api.state.SystemState;
@@ -179,7 +178,7 @@ public class TeamCompetitionStatsController implements TeamCompetitionStatsEndpo
         final OffsetTcStats createdOffsetStats = statsRepository.createOrUpdateOffsetStats(user, offsetTcStatsToPersist);
 
         SystemStateManager.next(SystemState.UPDATING_STATS);
-        userStatsParser.parseTcStatsForUsers(Collections.singletonList(user));
+        userStatsParser.parseTcStatsForUser(user);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         AUDIT_LOGGER.info("Updated user with ID {} with points offset: {}", userId, createdOffsetStats);
         userStatsOffsets.increment();
@@ -225,7 +224,7 @@ public class TeamCompetitionStatsController implements TeamCompetitionStatsEndpo
         AUDIT_LOGGER.info("GET request received to manually reset TC stats");
 
         SystemStateManager.next(SystemState.RESETTING_STATS);
-        userStatsResetter.resetTeamCompetitionStats();
+        userStatsResetter.resetTeamCompetitionStats(true);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         return ok();
     }

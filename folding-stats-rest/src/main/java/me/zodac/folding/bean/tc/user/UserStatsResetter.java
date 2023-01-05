@@ -17,8 +17,10 @@
 
 package me.zodac.folding.bean.tc.user;
 
+import java.util.Collection;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.bean.StatsRepository;
+import me.zodac.folding.bean.api.FoldingRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,29 +34,46 @@ public class UserStatsResetter {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    private final FoldingRepository foldingRepository;
     private final StatsRepository statsRepository;
+    private final UserStatsParser userStatsParser;
 
     /**
      * {@link Autowired} constructor.
      *
-     * @param statsRepository the {@link StatsRepository}
+     * @param foldingRepository the {@link FoldingRepository}
+     * @param statsRepository   the {@link StatsRepository}
+     * @param userStatsParser   the {@link UserStatsParser}
      */
     @Autowired
-    public UserStatsResetter(final StatsRepository statsRepository) {
+    public UserStatsResetter(final FoldingRepository foldingRepository,
+                             final StatsRepository statsRepository,
+                             final UserStatsParser userStatsParser) {
+        this.foldingRepository = foldingRepository;
         this.statsRepository = statsRepository;
+        this.userStatsParser = userStatsParser;
     }
 
     /**
      * Resets the {@code Team Competition} stats for all {@link User}s.
      *
+     * <p>
+     * If the reset is for the start of a new month, we will also pull the latest stats for each {@link User}.
+     *
+     * @param isStartOfCompetition if the reset is for the start of a new month of the {@code Team Competition}
      * @see StatsRepository#resetAllTeamCompetitionUserStats()
+     * @see UserStatsParser#parseTcStatsForUsers(Iterable)
      */
-    public void resetTeamCompetitionStats() {
+    public void resetTeamCompetitionStats(final boolean isStartOfCompetition) {
         try {
-            // Not pulling the latest stats due to rate-limiting from Folding@Home API
-            // Technically means we could have some points drop in the two minutes between last update and reset,
-            // But I think we can live with that. :)
-            // userStatsParser.parseTcStatsForUsers(users);
+            final Collection<User> users = foldingRepository.getAllUsersWithPasskeys();
+
+            // Only pulling the latest stats if we are starting the competition for a new month.
+            // If it's the reset of the current month, we don't pull the latest stats due to rate-limiting from Folding@Home API.
+            // Technically means we could have some points drop in the two minutes between last update and reset, but I can live with that. :)
+            if (isStartOfCompetition) {
+                userStatsParser.parseTcStatsForUsers(users);
+            }
 
             LOGGER.info("Resetting Team Competition stats");
             statsRepository.resetAllTeamCompetitionUserStats();

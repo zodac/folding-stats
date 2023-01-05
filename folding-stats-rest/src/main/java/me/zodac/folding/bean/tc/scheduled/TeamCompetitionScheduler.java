@@ -98,7 +98,7 @@ public class TeamCompetitionScheduler {
     /**
      * Scheduled execution to prepare the {@code Team Competition} for the new month.
      *
-     * @see UserStatsResetter#resetTeamCompetitionStats()
+     * @see UserStatsResetter#resetTeamCompetitionStats(boolean)
      */
     @Scheduled(cron = "0 15 0 3 * *", zone = "UTC") // TC starts on the 3rd of the month
     public void startOfTeamCompetition() {
@@ -108,7 +108,7 @@ public class TeamCompetitionScheduler {
 
             SystemStateManager.next(SystemState.RESETTING_STATS);
             ParsingStateManager.next(ParsingState.DISABLED);
-            userStatsResetter.resetTeamCompetitionStats();
+            userStatsResetter.resetTeamCompetitionStats(true);
             SystemStateManager.next(SystemState.WRITE_EXECUTED);
         } catch (final Exception e) {
             LOGGER.error("Error with start of month schedule", e);
@@ -119,7 +119,7 @@ public class TeamCompetitionScheduler {
      * Scheduled execution to finalise the {@code Team Competition} at the end of a month.
      *
      * @see UserStatsStorer#storeMonthlyResult()
-     * @see UserStatsResetter#resetTeamCompetitionStats()
+     * @see UserStatsResetter#resetTeamCompetitionStats(boolean)
      * @see LarsHardwareUpdater#retrieveHardwareAndPersist()
      */
     @Scheduled(cron = "0 57 23 28-31 * *", zone = "UTC")
@@ -144,7 +144,7 @@ public class TeamCompetitionScheduler {
                 LOGGER.warn("Resetting TC stats for end of month");
                 ParsingStateManager.next(ParsingState.DISABLED);
                 SystemStateManager.next(SystemState.RESETTING_STATS);
-                userStatsResetter.resetTeamCompetitionStats();
+                userStatsResetter.resetTeamCompetitionStats(false);
                 SystemStateManager.next(SystemState.WRITE_EXECUTED);
             }
 
