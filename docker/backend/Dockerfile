@@ -1,3 +1,4 @@
+# syntax = docker/dockerfile:1.2
 ARG JAVA_VERSION
 ARG MAVEN_VERSION
 ARG DEBIAN_VERSION
@@ -9,7 +10,7 @@ WORKDIR /usr/local/certs/stats/
 
 # Generate PCKS12 keystore with self-signed certificate, and extract public crt and private key
 ARG KEYSTORE_PASSWORD
-RUN apt-get update && apt-get install -y openssl && \
+RUN apt-get update && apt-get install -yqq --no-install-recommends openssl && \
     keytool \
         -genkey \
         -alias folding-stats \
@@ -38,27 +39,27 @@ RUN /tmp/configure_custom_nexus.sh "${NEXUS_URL}"
 # Copy source code
 # Adding and building each module incrementally so we can retain some docker caches when building for tests
 COPY ./pom.xml ./pom.xml
-RUN mvn install -P docker
+RUN --mount=type=cache,target=/root/.m2 mvn install -P docker
 
 COPY ./folding-stats-api/pom.xml ./folding-stats-api/proguard-rules.cfg ./folding-stats-api/
 COPY ./folding-stats-api/src/main ./folding-stats-api/src/main
-RUN cd ./folding-stats-api && mvn install -P docker && cd ..
+RUN --mount=type=cache,target=/root/.m2 cd ./folding-stats-api && mvn install -P docker && cd ..
 
 COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/proguard-rules.cfg ./folding-stats-jar/
 COPY ./folding-stats-jar/src/main ./folding-stats-jar/src/main
-RUN cd ./folding-stats-jar && mvn install -P docker && cd ..
+RUN --mount=type=cache,target=/root/.m2 cd ./folding-stats-jar && mvn install -P docker && cd ..
 
 COPY ./folding-stats-rest/pom.xml ./folding-stats-rest/pom.xml
 COPY ./folding-stats-rest/src/main ./folding-stats-rest/src/main
 
-RUN cd ./folding-stats-rest && \
+RUN --mount=type=cache,target=/root/.m2 cd ./folding-stats-rest && \
     mvn verify -P docker && \
     mv ./target/folding-stats-rest*.jar /folding-stats.jar
 
 ARG JAVA_VERSION
 FROM openjdk:${JAVA_VERSION}-jdk-slim AS jdk_builder
 
-RUN apt-get update && apt-get install -y binutils
+RUN apt-get update && apt-get install -yqq --no-install-recommends binutils
 RUN jlink --compress=2 \
     --no-header-files \
     --no-man-pages \
@@ -80,8 +81,8 @@ ENV PATH "${PATH}:${JAVA_HOME}/bin"
 # Updating system packages, and installing:
 # - curl to run healthcheck
 # - nano to allow user to edit log4j2.xml (smaller than vi)
-RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y \
+RUN --mount=type=cache,target=/var/cache/apt apt-get update && apt-get upgrade -y && \
+    apt-get install -yqq --no-install-recommends \
       curl \
       nano \
     && \
