@@ -32,7 +32,7 @@
     "displayName": "User1",
     "passkey": "12345678912345678912345678912345",
     "category": "AMD_GPU",
-    "profileLink": "https://forums.extremehw.net/",
+    "profileLink": "https://extremehw.net/",
     "liveStatsLink": "https://www.my.old.link.com",
     "hardware": {
       "id": 1,
@@ -55,7 +55,7 @@
     "displayName": "User1",
     "passkey": "12345678912345678912345678912345",
     "category": "AMD_GPU",
-    "profileLink": "https://forums.extremehw.net/",
+    "profileLink": "https://extremehw.net/",
     "liveStatsLink": "https://www.google.com",
     "hardware": {
       "id": 1,

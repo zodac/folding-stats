@@ -452,7 +452,7 @@ Would you like to contribute? [Check here](./CONTRIBUTING.md) for details on how
 
 # Contact Us
 
-We are currently running the competition over at [ExtremeHW](https://forums.extremehw.net/forum/125-extreme-team-folding/), so you can get in touch
+We are currently running the competition over at [ExtremeHW](https://extremehw.net/forum/125-extreme-team-folding/), so you can get in touch
 with us over there.
 
 ---

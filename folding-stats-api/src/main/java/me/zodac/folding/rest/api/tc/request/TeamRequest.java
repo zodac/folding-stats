@@ -53,7 +53,7 @@ import me.zodac.folding.api.exception.ValidationException;
         {
           "teamName": "Team1",
           "teamDescription": "The greatest team in the world!",
-          "forumLink": "https://forums.extremehw.net/forum/125-extreme-team-folding/"
+          "forumLink": "https://extremehw.net/forum/125-extreme-team-folding/"
         }"""
 )
 public class TeamRequest implements RequestPojo {
@@ -76,7 +76,7 @@ public class TeamRequest implements RequestPojo {
 
     @Schema(
         description = "A link to the team on the forum",
-        example = "https://forums.extremehw.net/forum/125-extreme-team-folding/",
+        example = "https://extremehw.net/forum/125-extreme-team-folding/",
         requiredMode = Schema.RequiredMode.NOT_REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )

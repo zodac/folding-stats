@@ -58,7 +58,7 @@ import me.zodac.folding.api.tc.HardwareMake;
           "displayName": "FirstUser",
           "passkey": "fc7d6837269d86784d8bfd0b386d6bca",
           "category": "WILDCARD",
-          "profileLink": "https://forums.extremehw.net/",
+          "profileLink": "https://extremehw.net/",
           "liveStatsLink": "https://etf.axihub.ca/",
           "hardwareId": 1,
           "teamId": 1,
@@ -105,7 +105,7 @@ public class UserRequest implements RequestPojo {
 
     @Schema(
         description = "A link to the user's profile on the forum",
-        example = "https://forums.extremehw.net",
+        example = "https://extremehw.net",
         requiredMode = Schema.RequiredMode.NOT_REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
