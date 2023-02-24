@@ -27,6 +27,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import me.zodac.folding.api.ResponsePojo;
+import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 
 /**
@@ -67,9 +68,11 @@ public final class Team implements ResponsePojo {
      * @return the created {@link Team}
      */
     public static Team create(final int teamId, final String teamName, final String teamDescription, final String forumLink) {
+        final String unescapedTeamName = StringUtils.unescapeHtml(teamName);
         final String teamDescriptionOrNull = isBlank(teamDescription) ? null : teamDescription;
         final String forumLinkOrNull = isBlank(forumLink) ? null : forumLink;
-        return new Team(teamId, teamName, teamDescriptionOrNull, forumLinkOrNull);
+
+        return new Team(teamId, unescapedTeamName, teamDescriptionOrNull, forumLinkOrNull);
     }
 
     /**

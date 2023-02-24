@@ -106,9 +106,11 @@ public final class User implements ResponsePojo {
             throw new IllegalArgumentException("'team' must not be null");
         }
 
+        final String unescapedDisplayName = StringUtils.unescapeHtml(displayName);
         final String profileLinkOrNull = StringUtils.isBlank(profileLink) ? null : profileLink;
         final String liveStatsLinkOrNull = StringUtils.isBlank(liveStatsLink) ? null : liveStatsLink;
-        return new User(userId, foldingUserName, displayName, passkey, category, profileLinkOrNull, liveStatsLinkOrNull, hardware, team, role);
+        return new User(userId, foldingUserName, unescapedDisplayName, passkey, category, profileLinkOrNull, liveStatsLinkOrNull, hardware, team,
+            role);
     }
 
     /**

@@ -25,6 +25,7 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import me.zodac.folding.api.ResponsePojo;
+import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 
 /**
@@ -82,7 +83,8 @@ public final class Hardware implements ResponsePojo {
                                   final HardwareType hardwareType,
                                   final double multiplier,
                                   final long averagePpd) {
-        return new Hardware(id, hardwareName, displayName, hardwareMake, hardwareType, multiplier, averagePpd);
+        final String unescapedHardwareName = StringUtils.unescapeHtml(hardwareName);
+        return new Hardware(id, unescapedHardwareName, displayName, hardwareMake, hardwareType, multiplier, averagePpd);
     }
 
     /**
