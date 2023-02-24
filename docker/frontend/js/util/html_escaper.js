@@ -5,5 +5,4 @@ function escape(unsafe) {
          .replaceAll("<", "&lt;")
          .replaceAll(">", "&gt;")
          .replaceAll('"', "&quot;")
-         .replaceAll("'", "&apos;")
 }

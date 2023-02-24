@@ -17,8 +17,6 @@
 
 package me.zodac.folding.api.tc;
 
-import static me.zodac.folding.api.util.StringUtils.isBlank;
-
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -69,8 +67,8 @@ public final class Team implements ResponsePojo {
      */
     public static Team create(final int teamId, final String teamName, final String teamDescription, final String forumLink) {
         final String unescapedTeamName = StringUtils.unescapeHtml(teamName);
-        final String teamDescriptionOrNull = isBlank(teamDescription) ? null : teamDescription;
-        final String forumLinkOrNull = isBlank(forumLink) ? null : forumLink;
+        final String teamDescriptionOrNull = StringUtils.isBlank(teamDescription) ? null : teamDescription;
+        final String forumLinkOrNull = StringUtils.isBlank(forumLink) ? null : forumLink;
 
         return new Team(teamId, unescapedTeamName, teamDescriptionOrNull, forumLinkOrNull);
     }
