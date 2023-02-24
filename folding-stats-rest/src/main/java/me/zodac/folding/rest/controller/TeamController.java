@@ -31,6 +31,7 @@ import java.util.Collection;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.util.LoggerName;
+import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.validation.TeamValidator;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
@@ -136,12 +137,13 @@ public class TeamController implements TeamEndpoint {
     @GetMapping(path = "/fields", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Team> getByTeamName(@RequestParam("teamName") final String teamName, final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request for team received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
+        final String unescapedTeamName = StringUtils.unescapeHtml(teamName);
 
         final Team retrievedTeam = foldingRepository.getAllTeams()
             .stream()
-            .filter(team -> team.teamName().equalsIgnoreCase(teamName))
+            .filter(team -> team.teamName().equalsIgnoreCase(unescapedTeamName))
             .findAny()
-            .orElseThrow(() -> new NotFoundException(Team.class, teamName));
+            .orElseThrow(() -> new NotFoundException(Team.class, unescapedTeamName));
 
         return cachedOk(retrievedTeam);
     }
@@ -151,8 +153,8 @@ public class TeamController implements TeamEndpoint {
     @RolesAllowed("admin")
     @PutMapping(path = "/{teamId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Team> updateById(@PathVariable("teamId") final int teamId,
-                                        @RequestBody final TeamRequest teamRequest,
-                                        final HttpServletRequest request) {
+                                           @RequestBody final TeamRequest teamRequest,
+                                           final HttpServletRequest request) {
         AUDIT_LOGGER.info("PUT request for team received at '{}' with request {}", request::getRequestURI, () -> teamRequest);
 
         final Team existingTeam = foldingRepository.getTeam(teamId);

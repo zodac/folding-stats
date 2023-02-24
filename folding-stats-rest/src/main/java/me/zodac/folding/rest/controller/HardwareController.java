@@ -31,6 +31,7 @@ import java.util.Collection;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.util.LoggerName;
+import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.validation.HardwareValidator;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
@@ -138,12 +139,13 @@ public class HardwareController implements HardwareEndpoint {
     @GetMapping(path = "/fields", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Hardware> getByHardwareName(@RequestParam("hardwareName") final String hardwareName, final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request for hardware received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
+        final String unescapedHardwareName = StringUtils.unescapeHtml(hardwareName);
 
         final Hardware retrievedHardware = foldingRepository.getAllHardware()
             .stream()
-            .filter(hardware -> hardware.hardwareName().equalsIgnoreCase(hardwareName))
+            .filter(hardware -> hardware.hardwareName().equalsIgnoreCase(unescapedHardwareName))
             .findAny()
-            .orElseThrow(() -> new NotFoundException(Hardware.class, hardwareName));
+            .orElseThrow(() -> new NotFoundException(Hardware.class, unescapedHardwareName));
 
         return cachedOk(retrievedHardware);
     }

@@ -186,4 +186,25 @@ class StringUtilsTest {
         assertThat(result)
             .isFalse();
     }
+
+    @Test
+    void whenUnescapeHtml_givenEscapedHtml_thenUnescapedHtmlIsReturned() {
+        final String result = StringUtils.unescapeHtml("hello%20world");
+        assertThat(result)
+            .isEqualTo("hello world");
+    }
+
+    @Test
+    void whenUnescapeHtml_givenUnescapedHtml_thenInputIsReturned() {
+        final String result = StringUtils.unescapeHtml("hello world");
+        assertThat(result)
+            .isEqualTo(result);
+    }
+
+    @Test
+    void whenUnescapeHtml_givenNullInput_thenEmptyStringIsReturned() {
+        final String result = StringUtils.unescapeHtml(null);
+        assertThat(result)
+            .isEmpty();
+    }
 }

@@ -19,6 +19,8 @@ package me.zodac.folding.api.util;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Set;
 
@@ -102,5 +104,22 @@ public final class StringUtils {
      */
     public static boolean isEqualSafe(final String first, final String second) {
         return isBlank(first) ? isBlank(second) : first.equals(second);
+    }
+
+    /**
+     * Unescapes a HTML {@link String}.
+     *
+     * <p>
+     * For example, {@code hello%20world} becomes {@code hello world}.
+     *
+     * @param input the {@link String} to unescape
+     * @return the unescaped {@link String}, or a blank {@link String} if the input is {@code null}
+     */
+    public static String unescapeHtml(final String input) {
+        if (input == null) {
+            return "";
+        }
+
+        return URLDecoder.decode(input, StandardCharsets.UTF_8);
     }
 }
