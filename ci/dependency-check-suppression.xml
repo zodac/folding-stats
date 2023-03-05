@@ -1,14 +1,3 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-    <!-- TODO: Remove this when a fix for snakeyaml:1.33 is released -->
-    <suppress>
-        <notes><![CDATA[Awaiting Fix]]></notes>
-        <cve>CVE-2022-1471</cve>
-    </suppress>
-
-    <!-- TODO: Remove this when a fix for postgresql:42.5.3 is released -->
-    <suppress>
-        <notes><![CDATA[Awaiting Fix]]></notes>
-        <cve>CVE-2022-41862</cve>
-    </suppress>
 </suppressions>
