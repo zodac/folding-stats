@@ -63,7 +63,7 @@ function getUserHistoricStats(userId, userName, day, month, monthName, year) {
         tableHeaderRow = document.createElement("tr")
         headers.forEach(function (header, i) {
             tableHeader = document.createElement("th")
-            tableHeader.setAttribute("onclick", "sortTable("+i+", 'historic_table')")
+            tableHeader.setAttribute("onclick", "sortTable(" + i + ", 'historic_table')")
             tableHeader.setAttribute("scope", "col")
             tableHeader.innerHTML = header
 

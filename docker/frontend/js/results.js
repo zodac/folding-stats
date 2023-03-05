@@ -82,7 +82,7 @@ function loadTeamLeaderboard(jsonResponse) {
     leaderboardTableHeaderRow = document.createElement("tr")
     leaderboardHeaders.forEach(function (header, i) {
         leaderboardTableHeader = document.createElement("th")
-        leaderboardTableHeader.setAttribute("onclick", "sortTable("+i+", 'leaderboard')")
+        leaderboardTableHeader.setAttribute("onclick", "sortTable(" + i + ", 'leaderboard')")
         leaderboardTableHeader.setAttribute("scope", "col")
         leaderboardTableHeader.innerHTML = header
 
@@ -151,7 +151,7 @@ function loadCategoryLeaderboard(jsonResponse) {
         categoryTableHeaderRow = document.createElement("tr")
         categoryHeaders.forEach(function (header, i) {
             categoryTableHeader = document.createElement("th")
-            categoryTableHeader.setAttribute("onclick", "sortTable("+i+", '"+tableId+"')")
+            categoryTableHeader.setAttribute("onclick", "sortTable(" + i + ", '"+tableId+"')")
             categoryTableHeader.setAttribute("scope", "col")
             categoryTableHeader.innerHTML = header
 

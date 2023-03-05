@@ -209,7 +209,7 @@ function loadHardware() {
         hardwareTableHeaderRow = document.createElement("tr")
         hardwareHeaders.forEach(function (header, i) {
             hardwareTableHeader = document.createElement("th")
-            hardwareTableHeader.setAttribute("onclick", "sortTable("+i+", 'hardware')")
+            hardwareTableHeader.setAttribute("onclick", "sortTable(" + i + ", 'hardware')")
             hardwareTableHeader.setAttribute("scope", "col")
             hardwareTableHeader.innerHTML = header
 
@@ -304,7 +304,7 @@ function loadUsersAdmin() {
         usersTableHeaderRow = document.createElement("tr")
         usersHeaders.forEach(function (header, i) {
             usersTableHeader = document.createElement("th")
-            usersTableHeader.setAttribute("onclick", "sortTable("+i+", 'users')")
+            usersTableHeader.setAttribute("onclick", "sortTable(" + i + ", 'users')")
             usersTableHeader.setAttribute("scope", "col")
             usersTableHeader.innerHTML = header
 
@@ -404,7 +404,7 @@ function loadTeams() {
         teamsTableHeaderRow = document.createElement("tr")
         teamsHeaders.forEach(function (header, i) {
             teamsTableHeader = document.createElement("th")
-            teamsTableHeader.setAttribute("onclick", "sortTable("+i+", 'teams')")
+            teamsTableHeader.setAttribute("onclick", "sortTable(" + i + ", 'teams')")
             teamsTableHeader.setAttribute("scope", "col")
             teamsTableHeader.innerHTML = header
 
@@ -506,7 +506,7 @@ function loadUserChangesAdmin(states, id_prefix, title) {
         usersTableHeaderRow = document.createElement("tr")
         usersHeaders.forEach(function (header, i) {
             usersTableHeader = document.createElement("th")
-            usersTableHeader.setAttribute("onclick", "sortTable("+i+", '" + id_prefix + "_table')")
+            usersTableHeader.setAttribute("onclick", "sortTable(" + i + ", '" + id_prefix + "_table')")
             usersTableHeader.setAttribute("scope", "col")
             usersTableHeader.innerHTML = header
 
@@ -637,19 +637,19 @@ function loadUserChangesAdmin(states, id_prefix, title) {
                 } else if (usersProperty === "approve") {
                     approveNowButton = document.createElement("button")
                     approveNowButton.setAttribute("class", "btn btn-success")
-                    approveNowButton.setAttribute("onclick", "approveUserChangeNow(" + usersItem['id'] + ") return false")
+                    approveNowButton.setAttribute("onclick", "approveUserChangeNow(" + usersItem['id'] + "); return false")
                     approveNowButton.innerHTML = "Approve Now"
                     usersTableBodyCell.append(approveNowButton)
 
                     approveNextMonthButton = document.createElement("button")
                     approveNextMonthButton.setAttribute("class", "btn btn-success")
-                    approveNextMonthButton.setAttribute("onclick", "approveUserChangeNextMonth(" + usersItem['id'] + ") return false")
+                    approveNextMonthButton.setAttribute("onclick", "approveUserChangeNextMonth(" + usersItem['id'] + "); return false")
                     approveNextMonthButton.innerHTML = "Approve Next Month"
                     usersTableBodyCell.append(approveNextMonthButton)
 
                     rejectButton = document.createElement("button")
                     rejectButton.setAttribute("class", "btn btn-danger")
-                    rejectButton.setAttribute("onclick", "rejectUserChange(" + usersItem['id'] + ") return false")
+                    rejectButton.setAttribute("onclick", "rejectUserChange(" + usersItem['id'] + "); return false")
                     rejectButton.innerHTML = "Reject"
                     usersTableBodyCell.append(rejectButton)
                 }

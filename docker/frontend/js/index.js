@@ -50,7 +50,7 @@ function loadOverallStats() {
         overallTableHeaderRow = document.createElement("tr")
         overallTableHeaders.forEach(function (header, i) {
             overallTableHeader = document.createElement("th")
-            overallTableHeader.setAttribute("onclick", "sortTable("+i+", 'overall')")
+            overallTableHeader.setAttribute("onclick", "sortTable(" + i + ", 'overall')")
             overallTableHeader.setAttribute("scope", "col")
             overallTableHeader.innerHTML = header
 
@@ -109,7 +109,7 @@ function loadTeamLeaderboard() {
                 leaderboardTableHeader.setAttribute("style", "text-align:right")
             }
 
-            leaderboardTableHeader.setAttribute("onclick", "sortTable("+i+", 'leaderboard')")
+            leaderboardTableHeader.setAttribute("onclick", "sortTable(" + i + ", 'leaderboard')")
             leaderboardTableHeader.setAttribute("scope", "col")
             leaderboardTableHeader.innerHTML = header
 
@@ -200,7 +200,7 @@ function loadCategoryLeaderboard() {
             categoryTableHeaderRow = document.createElement("tr")
             categoryHeaders.forEach(function (header, i) {
                 categoryTableHeader = document.createElement("th")
-                categoryTableHeader.setAttribute("onclick", "sortTable("+i+", '"+tableId+"')")
+                categoryTableHeader.setAttribute("onclick", "sortTable(" + i + ", '"+tableId+"')")
                 categoryTableHeader.setAttribute("scope", "col")
                 categoryTableHeader.innerHTML = header
 
@@ -316,7 +316,7 @@ function loadTeamStats() {
             teamTableHeaderRow = document.createElement("tr")
             teamTableHeaders.forEach(function (header, i) {
                 teamTableHeaderCell = document.createElement("th")
-                teamTableHeaderCell.setAttribute("onclick", "sortTable("+i+", 'team_"+teamNumber+"')")
+                teamTableHeaderCell.setAttribute("onclick", "sortTable(" + i + ", 'team_"+teamNumber+"')")
                 teamTableHeaderCell.setAttribute("scope", "col")
                 teamTableHeaderCell.innerHTML = header
 

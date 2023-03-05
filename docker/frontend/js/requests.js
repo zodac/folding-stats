@@ -41,7 +41,7 @@ function loadUserChanges(states, id_prefix, title) {
         usersTableHeaderRow = document.createElement("tr")
         usersHeaders.forEach(function (header, i) {
             usersTableHeader = document.createElement("th")
-            usersTableHeader.setAttribute("onclick", "sortTable("+i+", '" + id_prefix + "_table')")
+            usersTableHeader.setAttribute("onclick", "sortTable(" + i + ", '" + id_prefix + "_table')")
             usersTableHeader.setAttribute("scope", "col")
             usersTableHeader.innerHTML = header
 
@@ -221,7 +221,7 @@ function loadHardware() {
         hardwareTableHeaderRow = document.createElement("tr")
         hardwareHeaders.forEach(function (header, i) {
             hardwareTableHeader = document.createElement("th")
-            hardwareTableHeader.setAttribute("onclick", "sortTable("+i+", 'hardware')")
+            hardwareTableHeader.setAttribute("onclick", "sortTable(" + i + ", 'hardware')")
             hardwareTableHeader.setAttribute("scope", "col")
             hardwareTableHeader.innerHTML = header
 
@@ -311,7 +311,7 @@ function loadUsers() {
         usersTableHeaderRow = document.createElement("tr")
         usersHeaders.forEach(function (header, i) {
             usersTableHeader = document.createElement("th")
-            usersTableHeader.setAttribute("onclick", "sortTable("+i+", 'users')")
+            usersTableHeader.setAttribute("onclick", "sortTable(" + i + ", 'users')")
             usersTableHeader.setAttribute("scope", "col")
             usersTableHeader.innerHTML = header
 
@@ -412,7 +412,7 @@ function loadTeams() {
         teamsTableHeaderRow = document.createElement("tr")
         teamsHeaders.forEach(function (header, i) {
             teamsTableHeader = document.createElement("th")
-            teamsTableHeader.setAttribute("onclick", "sortTable("+i+", 'teams')")
+            teamsTableHeader.setAttribute("onclick", "sortTable(" + i + ", 'teams')")
             teamsTableHeader.setAttribute("scope", "col")
             teamsTableHeader.innerHTML = header
 
