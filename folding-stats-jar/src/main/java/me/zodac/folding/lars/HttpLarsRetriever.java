@@ -84,6 +84,7 @@ public final class HttpLarsRetriever implements LarsRetriever {
                 String.format("Invalid response (status code: %s): %s", response.statusCode(), response.body()));
         }
 
+        LARS_LOGGER.debug("JSON response: {}", response.body());
         final LarsGpuResponse larsGpuResponse = GSON.fromJson(response.body(), LarsGpuResponse.class);
 
         return larsGpuResponse.getRankedGpus()
@@ -94,11 +95,17 @@ public final class HttpLarsRetriever implements LarsRetriever {
     }
 
     private static boolean isValidLarsGpu(final LarsGpu larsGpu) {
-        return StringUtils.isNotBlank(larsGpu.getDetailedName())
+        final boolean isValid = StringUtils.isNotBlank(larsGpu.getDetailedName())
             && StringUtils.isNotBlank(larsGpu.getName())
             && HardwareMake.get(larsGpu.getMake()) != HardwareMake.INVALID
             && larsGpu.getMultiplier() > 0.0D
             && larsGpu.getPpdAverageOverall() > 0L;
+
+        if (!isValid) {
+            LARS_LOGGER.warn("Invalid {}: {}", LarsGpu.class, larsGpu);
+        }
+
+        return isValid;
     }
 
     private static Hardware toHardware(final LarsGpu larsGpu) {

@@ -45,7 +45,7 @@ import me.zodac.folding.rest.api.tc.request.UserRequest;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Accessors(fluent = true)
-@ToString(doNotUseGetters = true, callSuper = true)
+@ToString(doNotUseGetters = true)
 @EqualsAndHashCode
 public final class User implements ResponsePojo {
 

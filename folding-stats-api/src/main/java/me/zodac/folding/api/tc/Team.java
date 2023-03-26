@@ -38,7 +38,7 @@ import me.zodac.folding.rest.api.tc.request.TeamRequest;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Accessors(fluent = true)
-@ToString(doNotUseGetters = true, callSuper = true)
+@ToString(doNotUseGetters = true)
 @EqualsAndHashCode
 public final class Team implements ResponsePojo {
 

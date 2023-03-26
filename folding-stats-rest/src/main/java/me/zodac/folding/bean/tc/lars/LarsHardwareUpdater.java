@@ -110,8 +110,12 @@ public class LarsHardwareUpdater {
         final Collection<Hardware> existing = foldingRepository.getAllHardware();
 
         for (final Hardware hardware : HardwareSplitter.toDelete(larsGpus, existing)) {
-            foldingRepository.deleteHardware(hardware);
-            LARS_LOGGER.info("Deleted GPU hardware '{}' (ID: {})", hardware.hardwareName(), hardware.id());
+            try {
+                foldingRepository.deleteHardware(hardware);
+                LARS_LOGGER.info("Deleted GPU hardware '{}' (ID: {})", hardware.hardwareName(), hardware.id());
+            } catch (final Exception e) {
+                LARS_LOGGER.warn("Unexpected error deleting GPU hardware {}", hardware, e);
+            }
         }
 
         for (final Map.Entry<Hardware, Hardware> entry : HardwareSplitter.toUpdate(larsGpus, existing).entrySet()) {
@@ -123,8 +127,12 @@ public class LarsHardwareUpdater {
         }
 
         for (final Hardware hardware : HardwareSplitter.toCreate(larsGpus, existing)) {
-            final Hardware createdHardware = foldingRepository.createHardware(hardware);
-            LARS_LOGGER.info("Created GPU hardware '{}' (ID: {})", createdHardware.hardwareName(), createdHardware.id());
+            try {
+                final Hardware createdHardware = foldingRepository.createHardware(hardware);
+                LARS_LOGGER.info("Created GPU hardware '{}' (ID: {})", createdHardware.hardwareName(), createdHardware.id());
+            } catch (final Exception e) {
+                LARS_LOGGER.warn("Unexpected error creating GPU hardware {}", hardware, e);
+            }
         }
     }
 

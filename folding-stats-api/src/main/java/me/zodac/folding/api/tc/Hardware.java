@@ -43,7 +43,7 @@ import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Accessors(fluent = true)
-@ToString(doNotUseGetters = true, callSuper = true)
+@ToString(doNotUseGetters = true)
 @EqualsAndHashCode
 public final class Hardware implements ResponsePojo {
 
