@@ -3,7 +3,7 @@ ARG JAVA_VERSION
 ARG MAVEN_VERSION
 ARG DEBIAN_VERSION
 
-FROM openjdk:${JAVA_VERSION}-jdk-slim AS cert_builder
+FROM eclipse-temurin:${JAVA_VERSION}-jdk AS cert_builder
 
 RUN mkdir --parents /usr/local/certs/stats/
 WORKDIR /usr/local/certs/stats/
@@ -57,7 +57,7 @@ RUN --mount=type=cache,target=/root/.m2 cd ./folding-stats-rest && \
     mv ./target/folding-stats-rest*.jar /folding-stats.jar
 
 ARG JAVA_VERSION
-FROM openjdk:${JAVA_VERSION}-jdk-slim AS jdk_builder
+FROM eclipse-temurin:${JAVA_VERSION}-jdk AS jdk_builder
 
 RUN apt-get update && apt-get install -yqq --no-install-recommends binutils
 RUN jlink --compress=2 \
@@ -65,8 +65,8 @@ RUN jlink --compress=2 \
     --no-man-pages \
     --strip-debug \
     --add-modules java.se,jdk.crypto.cryptoki,jdk.management,jdk.unsupported \
-    --output /opt/jdk && \
-    strip -p --strip-unneeded /opt/jdk/lib/server/libjvm.so
+    --output "/opt/jdk" && \
+    strip -p --strip-unneeded "/opt/jdk/lib/server/libjvm.so"
 
 FROM debian:${DEBIAN_VERSION}-slim AS spring_base
 
