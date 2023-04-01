@@ -102,7 +102,7 @@ public final class HttpLarsRetriever implements LarsRetriever {
             && larsGpu.getPpdAverageOverall() > 0L;
 
         if (!isValid) {
-            LARS_LOGGER.warn("Invalid {}: {}", LarsGpu.class, larsGpu);
+            LARS_LOGGER.warn("Invalid {}: {}", LarsGpu.class.getSimpleName(), larsGpu);
         }
 
         return isValid;

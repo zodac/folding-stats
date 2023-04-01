@@ -64,8 +64,7 @@ public class Storage {
 
     // POJO caches
     private final Cache<Integer, Hardware> hardwareCache = Caffeine.newBuilder()
-        .maximumSize(300L)
-        .expireAfterWrite(Duration.ofDays(30L))
+        .expireAfterWrite(Duration.ofDays(31L)) // Hardware cache has no max size, but expires after a month due to LARS DB update
         .build();
     private final Cache<Integer, Team> teamCache = Caffeine.newBuilder()
         .maximumSize(STANDARD_CACHE_SIZE)
