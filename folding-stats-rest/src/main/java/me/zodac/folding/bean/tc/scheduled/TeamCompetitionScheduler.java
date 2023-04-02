@@ -122,17 +122,9 @@ public class TeamCompetitionScheduler {
      * @see UserStatsResetter#resetTeamCompetitionStats(boolean)
      * @see LarsHardwareUpdater#retrieveHardwareAndPersist()
      */
-    @Scheduled(cron = "0 57 23 28-31 * *", zone = "UTC")
+    @Scheduled(cron = "0 57 23 L * *", zone = "UTC") // 'L' refers to the last day of the month
     public void endOfTeamCompetition() {
         try {
-            // Because we cannot set up a cron schedule with last day for each month, we use the range '28-31'.
-            // We then check if the current day in the month is the last day of the month.
-            // If not, we skip the reset.
-            if (!DATE_TIME_UTILS.isLastDayOfMonth()) {
-                LOGGER.warn("End of month reset triggered, but not actually end of the month, skipping");
-                return;
-            }
-
             LOGGER.trace("Method #endOfTeamCompetition() fired");
 
             if (IS_MONTHLY_RESULT_ENABLED) {

@@ -117,20 +117,6 @@ public record DateTimeUtils(Supplier<OffsetDateTime> timeSupplier) {
         );
     }
 
-    /**
-     * Checks if the current {@link OffsetDateTime} day in {@link ZoneOffset#UTC} is the last day of the month.
-     *
-     * @return {@code true} if the current day is the last day of the month.
-     */
-    public boolean isLastDayOfMonth() {
-        final int currentDayOfMonth = currentUtcDateTime().getDayOfMonth();
-        final int lastDayOfMonth = currentUtcDateTime().toLocalDate()
-            .with(TemporalAdjusters.lastDayOfMonth())
-            .getDayOfMonth();
-
-        return lastDayOfMonth == currentDayOfMonth;
-    }
-
     private OffsetDateTime currentUtcDateTime() {
         return timeSupplier.get();
     }
