@@ -20,7 +20,6 @@ package me.zodac.folding.bean.tc.scheduled;
 import me.zodac.folding.api.state.ParsingState;
 import me.zodac.folding.api.state.SystemState;
 import me.zodac.folding.api.tc.change.UserChange;
-import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.bean.tc.lars.LarsHardwareUpdater;
 import me.zodac.folding.bean.tc.user.UserChangeApplier;
@@ -66,7 +65,6 @@ import org.springframework.stereotype.Component;
 public class TeamCompetitionScheduler {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final DateTimeUtils DATE_TIME_UTILS = DateTimeUtils.create();
     private static final boolean IS_MONTHLY_RESET_ENABLED = EnvironmentVariableUtils.isEnabled("ENABLE_STATS_MONTHLY_RESET");
     private static final boolean IS_MONTHLY_RESULT_ENABLED = EnvironmentVariableUtils.isEnabled("ENABLE_MONTHLY_RESULT_STORAGE");
     private static final boolean IS_LARS_UPDATE_ENABLED = EnvironmentVariableUtils.isEnabled("ENABLE_LARS_HARDWARE_UPDATE");
