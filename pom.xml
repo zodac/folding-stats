@@ -41,58 +41,58 @@
         <maven.test.skip>${skip-tests}</maven.test.skip>
 
         <!-- 3PP Versions -->
-        <caffeine.version>3.1.5</caffeine.version>
+        <caffeine.version>3.1.6</caffeine.version>
         <gson.version>2.10.1</gson.version>
         <hikariCP.version>5.0.1</hikariCP.version>
-        <javaee-web-api.version>8.0.1</javaee-web-api.version>
+        <jakartaee-web-api.version>10.0.0</jakartaee-web-api.version>
         <jersey-server.version>3.1.1</jersey-server.version>
-        <jooq.version>3.18.1</jooq.version>
-        <jsoup.version>1.15.4</jsoup.version>
+        <jooq.version>3.18.4</jooq.version>
+        <jsoup.version>1.16.1</jsoup.version>
         <log4j.version>2.20.0</log4j.version>
         <lombok.version>1.18.26</lombok.version>
-        <micrometer.version>1.10.5</micrometer.version>
+        <micrometer.version>1.11.0</micrometer.version>
         <postgresql-driver.version>42.6.0</postgresql-driver.version>
         <resilience4j.version>2.0.2</resilience4j.version>
-        <spring-boot.version>3.0.5</spring-boot.version>
-        <springdoc.version>2.0.4</springdoc.version>
+        <spring-boot.version>3.0.6</spring-boot.version>
+        <springdoc.version>2.1.0</springdoc.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.24.2</assertj-core.version>
         <embedded-postgres.version>2.0.3</embedded-postgres.version>
         <embedded-postgres-binaries-bom.version>15.2.0</embedded-postgres-binaries-bom.version>
-        <flyway-core>9.16.1</flyway-core>
-        <junit-jupiter.version>5.9.2</junit-jupiter.version>
-        <selenium.version>4.8.2</selenium.version>
+        <flyway-core>9.17.0</flyway-core>
+        <junit-jupiter.version>5.9.3</junit-jupiter.version>
+        <selenium.version>4.9.1</selenium.version>
 
         <!-- Plugin Versions -->
-        <build-helper-maven-plugin.version>3.3.0</build-helper-maven-plugin.version>
+        <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
         <jmeter-maven-plugin.version>3.7.0</jmeter-maven-plugin.version>
         <maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
-        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.5.0</maven-dependency-plugin.version>
-        <maven-failsafe-plugin.version>3.0.0-M8</maven-failsafe-plugin.version>
-        <maven-install-plugin.version>3.1.0</maven-install-plugin.version>
+        <maven-failsafe-plugin.version>3.1.0</maven-failsafe-plugin.version>
+        <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
-        <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
-        <maven-surefire-plugin.version>3.0.0-M8</maven-surefire-plugin.version>
-        <versions-maven-plugin.version>2.14.2</versions-maven-plugin.version>
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <maven-surefire-plugin.version>3.1.0</maven-surefire-plugin.version>
+        <versions-maven-plugin.version>2.15.0</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>10.7.0</checkstyle.version>
-        <errorprone.version>2.18.0</errorprone.version>
+        <checkstyle.version>10.11.0</checkstyle.version>
+        <errorprone.version>2.19.1</errorprone.version>
         <licenses.version>1</licenses.version>
         <pitest-junit5-plugin.version>1.1.2</pitest-junit5-plugin.version>
-        <pmd.version>6.54.0</pmd.version>
+        <pmd.version>6.55.0</pmd.version>
         <spotbugs.version>4.7.3</spotbugs.version>
 
         <!-- Linter Plugin Versions -->
-        <dependency-check-maven.version>8.1.2</dependency-check-maven.version>
-        <license-maven-plugin.version>4.2.rc3</license-maven-plugin.version>
-        <maven-checkstyle-plugin.version>3.2.1</maven-checkstyle-plugin.version>
-        <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
+        <dependency-check-maven.version>8.2.1</dependency-check-maven.version>
+        <license-maven-plugin.version>4.2</license-maven-plugin.version>
+        <maven-checkstyle-plugin.version>3.2.2</maven-checkstyle-plugin.version>
+        <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.20.0</maven-pmd-plugin.version>
-        <pitest-maven.version>1.11.0</pitest-maven.version>
-        <spotbugs-maven-plugin.version>4.7.3.0</spotbugs-maven-plugin.version>
+        <pitest-maven.version>1.13.1</pitest-maven.version>
+        <spotbugs-maven-plugin.version>4.7.3.4</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
@@ -108,8 +108,8 @@
         <spotbugs-exclude-file>${project.parent.basedir}/ci/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
 
         <!-- ProGuard 3PP Versions -->
-        <proguard-base.version>7.3.1</proguard-base.version>
-        <proguard-core.version>9.0.7</proguard-core.version>
+        <proguard-base.version>7.3.2</proguard-base.version>
+        <proguard-core.version>9.0.8</proguard-core.version>
 
         <!-- ProGuard Plugin Versions -->
         <proguard-maven-plugin.version>2.6.0</proguard-maven-plugin.version>
@@ -159,9 +159,9 @@
                 <version>${hikariCP.version}</version>
             </dependency>
             <dependency>
-                <groupId>javax</groupId>
-                <artifactId>javaee-web-api</artifactId>
-                <version>${javaee-web-api.version}</version>
+                <groupId>jakarta.platform</groupId>
+                <artifactId>jakarta.jakartaee-web-api</artifactId>
+                <version>${jakartaee-web-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
@@ -272,17 +272,49 @@
                 <artifactId>snakeyaml</artifactId>
                 <version>2.0</version>
             </dependency>
-            <!-- [CVE-2023-20860] -->
+
+            <!-- [CVE-2023-20863] -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-aop</artifactId>
+                <version>6.0.8</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>6.0.8</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-expression</artifactId>
-                <version>6.0.7</version>
+                <version>6.0.8</version>
             </dependency>
-            <!-- [CVE-2023-20861] -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+                <version>6.0.8</version>
+            </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-webmvc</artifactId>
-                <version>6.0.7</version>
+                <version>6.0.8</version>
+            </dependency>
+
+            <!-- [CVE-2023-20873] -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot</artifactId>
+                <version>3.0.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-autoconfigure</artifactId>
+                <version>3.0.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-security</artifactId>
+                <version>3.0.6</version>
             </dependency>
 
             <!-- Test Dependencies -->
@@ -401,6 +433,7 @@
                     <version>${maven-compiler-plugin.version}</version>
                     <configuration>
                         <release>${java-release}</release>
+                        <showWarnings>false</showWarnings>
 
                         <!-- Configuration for errorprone compiler checks -->
                         <annotationProcessorPaths>
@@ -605,9 +638,7 @@
                     <version>${maven-javadoc-plugin.version}</version>
                     <configuration>
                         <doclint>all</doclint>
-                        <excludePackageNames>
-                            me.zodac.folding.db.postgres.gen:me.zodac.folding.db.postgres.gen.*
-                        </excludePackageNames>
+                        <excludePackageNames>me.zodac.folding.db.postgres.gen:me.zodac.folding.db.postgres.gen.*</excludePackageNames>
                         <!-- Would prefer this to be true, but annoying false positive with default constructors -->
                         <failOnWarnings>false</failOnWarnings>
                         <quiet>true</quiet>

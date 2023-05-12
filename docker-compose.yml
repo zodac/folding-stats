@@ -8,7 +8,7 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         # Docker image versions
-        NODE_VERSION: "19.0"
+        NODE_VERSION: "20.1"
         # Build arguments
         ADMIN_EMAIL_ADDRESS: "${ADMIN_EMAIL_ADDRESS}"
         FORUM_LINK: "${FORUM_LINK}"
@@ -35,9 +35,9 @@ services:
       dockerfile: docker/backend/Dockerfile
       args:
         # Docker image versions
-        DEBIAN_VERSION: "11.5"
-        JAVA_VERSION: "19"
-        MAVEN_VERSION: "3.8.6"
+        DEBIAN_VERSION: "11.7"
+        JAVA_VERSION: "20"
+        MAVEN_VERSION: "3.9.1"
         # Build arguments
         KEYSTORE_PASSWORD: "${KEYSTORE_PASSWORD}"
         NEXUS_URL: "${NEXUS_URL}"
@@ -97,7 +97,7 @@ services:
       dockerfile: docker/database/Dockerfile
       args:
         # Docker image versions
-        POSTGRES_VERSION: "15.1"
+        POSTGRES_VERSION: "15.3"
         # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
@@ -136,9 +136,9 @@ services:
       dockerfile: docker/metrics/prometheus/Dockerfile
       args:
         # Docker image versions
-        DEBIAN_VERSION: "11.5"
-        JAVA_VERSION: "19"
-        PROMETHEUS_VERSION: "v2.40.0"
+        DEBIAN_VERSION: "11.7"
+        JAVA_VERSION: "20"
+        PROMETHEUS_VERSION: "v2.43.1"
         # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"

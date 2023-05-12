@@ -4,7 +4,7 @@ ARG PROMETHEUS_VERSION
 ARG ADMIN_USERNAME
 ARG ADMIN_PASSWORD
 
-FROM openjdk:${JAVA_VERSION}-jdk-slim AS cert_builder
+FROM eclipse-temurin:${JAVA_VERSION}-jdk AS cert_builder
 
 RUN mkdir --parents /usr/local/certs/metrics
 WORKDIR /usr/local/certs/metrics
