@@ -17,8 +17,6 @@
 
 package me.zodac.folding.test.ui.util;
 
-import java.net.MalformedURLException;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -36,37 +34,14 @@ public final class TestExecutor {
      *
      * @param browserType the {@link BrowserType} to execute the test on, which creates the {@link RemoteWebDriver}
      * @param test        the test to be executed, using the {@link RemoteWebDriver}
-     * @throws MalformedURLException thrown if an error occurs creating the {@link RemoteWebDriver}
      */
-    public static void executeWithDriver(final BrowserType browserType, final Consumer<? super RemoteWebDriver> test)
-        throws MalformedURLException {
+    public static void executeWithDriver(final BrowserType browserType, final Consumer<? super RemoteWebDriver> test) {
 
-        final RemoteWebDriver driver = browserType.remoteWebDriver();
+        final RemoteWebDriver driver = RemoteWebDriverFactory.create(browserType);
         try {
             test.accept(driver);
         } finally {
-            closeDriver(driver);
-        }
-    }
-
-    private static void closeDriver(final RemoteWebDriver driver) {
-        // Close all tabs except the first
-        final String originalTab = driver.getWindowHandle();
-        for (final String tab : driver.getWindowHandles()) {
-            if (!tab.equals(originalTab)) {
-                driver.switchTo().window(tab);
-                driver.close();
-            }
-        }
-        driver.switchTo().window(originalTab);
-
-        // Ensure session data is not re-used
-        driver.manage().deleteAllCookies();
-
-        try {
-            Thread.sleep(TimeUnit.SECONDS.toMillis(1L));
-        } catch (final InterruptedException e) {
-            Thread.currentThread().interrupt();
+            driver.quit();
         }
     }
 }

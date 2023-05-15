@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
-import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.remote.AbstractDriverOptions;
 
 /**
  * Supported browsers to be tested.
@@ -32,27 +32,24 @@ public enum BrowserType {
     /**
      * {@code Google Chrome} web browser.
      */
-    CHROME("Google Chrome", RemoteWebDriverFactory.create("chromePort", "4444", new ChromeOptions())),
-
-    /**
-     * {@code Microsoft Edge} web browser.
-     */
-    EDGE("Microsoft Edge", RemoteWebDriverFactory.create("edgePort", "4445", new EdgeOptions())),
+    CHROME("Google Chrome", "4444", new ChromeOptions()),
 
     /**
      * {@code Mozilla Firefox} web browser.
      */
-    FIREFOX("Mozilla Firefox", RemoteWebDriverFactory.create("firefoxPort", "4446", new FirefoxOptions()));
+    FIREFOX("Mozilla Firefox", "4445", new FirefoxOptions());
 
     private static final Collection<BrowserType> ALL_VALUES = Stream.of(values())
         .toList();
 
     private final String displayName;
-    private final RemoteWebDriver remoteWebDriver;
+    private final String portNumber;
+    private final AbstractDriverOptions<?> options;
 
-    BrowserType(final String displayName, final RemoteWebDriver remoteWebDriver) {
+    BrowserType(final String displayName, final String portNumber, final AbstractDriverOptions<?> options) {
         this.displayName = displayName;
-        this.remoteWebDriver = remoteWebDriver;
+        this.portNumber = portNumber;
+        this.options = options;
     }
 
     /**
@@ -78,11 +75,20 @@ public enum BrowserType {
     }
 
     /**
-     * Returns a {@link RemoteWebDriver} for UI testing.
+     * The port number to connect to the selenium instance for the {@link BrowserType}.
      *
-     * @return the {@link RemoteWebDriver}
+     * @return the port number
      */
-    public RemoteWebDriver remoteWebDriver() {
-        return remoteWebDriver;
+    public String portNumber() {
+        return portNumber;
+    }
+
+    /**
+     * The browser {@link AbstractDriverOptions} for the {@link BrowserType}.
+     *
+     * @return the {@link AbstractDriverOptions}
+     */
+    public AbstractDriverOptions<?> options() {
+        return options;
     }
 }

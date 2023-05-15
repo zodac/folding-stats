@@ -19,7 +19,6 @@ package me.zodac.folding.test.ui.util;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.AbstractDriverOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
@@ -36,20 +35,20 @@ final class RemoteWebDriverFactory {
     }
 
     /**
-     * Creates an instance of {@link RemoteWebDriver}. Will use a blank instance of {@link ChromeOptions}.
+     * Creates an instance of {@link RemoteWebDriver}.
      *
-     * @param portPropertyName the name of the environment variable defining the selenium port
-     * @param defaultPortValue the default port number if no environment variable is set
-     * @param options          the default {@link AbstractDriverOptions}
+     * @param browserType the {@link BrowserType} for which to create the {@link RemoteWebDriver}
      * @return the constructed {@link RemoteWebDriver}
      */
-    static RemoteWebDriver create(final String portPropertyName, final String defaultPortValue, final AbstractDriverOptions<?> options) {
+    static RemoteWebDriver create(final BrowserType browserType) {
         try {
-            final String port = System.getProperty(portPropertyName, defaultPortValue);
-            final URL url = new URL(String.format(WEB_DRIVER_URL_FORMAT, TEST_IP_ADDRESS, port));
+            final AbstractDriverOptions<?> options = browserType.options();
+            options.setAcceptInsecureCerts(true); // Needed as we use a self-signed certificate in the dev environment
+
+            final URL url = new URL(String.format(WEB_DRIVER_URL_FORMAT, TEST_IP_ADDRESS, browserType.portNumber()));
             return new RemoteWebDriver(url, options);
         } catch (final MalformedURLException e) {
-            throw new AssertionError("Error initialising web driver", e);
+            throw new AssertionError(String.format("Error initialising web driver for %s", browserType), e);
         }
     }
 }
