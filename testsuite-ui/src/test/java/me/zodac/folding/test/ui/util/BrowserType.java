@@ -20,7 +20,6 @@ package me.zodac.folding.test.ui.util;
 import java.util.Collection;
 import java.util.stream.Stream;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.AbstractDriverOptions;
 
