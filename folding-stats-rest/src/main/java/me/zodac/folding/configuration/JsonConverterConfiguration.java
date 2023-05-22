@@ -24,24 +24,17 @@ import java.util.List;
 import me.zodac.folding.rest.api.util.LocalDateTimeGsonTypeAdapter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.GsonHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * {@link Configuration} class using a {@link GsonHttpMessageConverter} as the default JSON serialiser.
+ * {@link Configuration} class using a {@link GsonHttpMessageConverter} as an available JSON serialiser.
  */
 @Configuration
 public class JsonConverterConfiguration implements WebMvcConfigurer {
 
     @Override
     public void extendMessageConverters(final List<HttpMessageConverter<?>> converters) {
-        // Remove existing Jackson converer
-        converters.clear();
-
-        // Add StringHttpMessageConverter for Swagger endpoint
-        converters.add(new StringHttpMessageConverter());
-
         // We don't try and reuse the GSON instance available in RestUtilConstants
         // This is because we do not want pretty-print enabled
         final Gson gson = new GsonBuilder()
