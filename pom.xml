@@ -49,7 +49,7 @@
         <jooq.version>3.18.4</jooq.version>
         <jsoup.version>1.16.1</jsoup.version>
         <log4j.version>2.20.0</log4j.version>
-        <lombok.version>1.18.26</lombok.version>
+        <lombok.version>1.18.28</lombok.version>
         <micrometer.version>1.11.0</micrometer.version>
         <postgresql-driver.version>42.6.0</postgresql-driver.version>
         <resilience4j.version>2.0.2</resilience4j.version>
@@ -60,7 +60,7 @@
         <assertj-core.version>3.24.2</assertj-core.version>
         <embedded-postgres.version>2.0.4</embedded-postgres.version>
         <embedded-postgres-binaries-bom.version>15.3.0</embedded-postgres-binaries-bom.version>
-        <flyway-core>9.18.0</flyway-core>
+        <flyway-core>9.19.1</flyway-core>
         <junit-jupiter.version>5.10.0-M1</junit-jupiter.version>
         <selenium.version>4.9.1</selenium.version>
 
@@ -535,7 +535,7 @@
                     <artifactId>dependency-check-maven</artifactId>
                     <version>${dependency-check-maven.version}</version>
                     <configuration>
-                        <failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
+                        <failBuildOnCVSS>0</failBuildOnCVSS>
                         <skip>${skip-linters}</skip>
                         <suppressionFiles>
                             <suppressionFile>${dependency-check-suppression-file}</suppressionFile>
@@ -558,17 +558,21 @@
                     <artifactId>license-maven-plugin</artifactId>
                     <version>${license-maven-plugin.version}</version>
                     <configuration>
-                        <excludes>
-                            <exclude>**/gen/**</exclude>
-                        </excludes>
-                        <header>${license-file}</header>
-                        <headerDefinitions>
-                            <headerDefinition>${license-header-definition-file}</headerDefinition>
-                        </headerDefinitions>
-                        <includes>
-                            <include>src/main/java/**</include>
-                            <include>src/test/java/**</include>
-                        </includes>
+                        <licenseSets>
+                            <licenseSet>
+                                <excludes>
+                                    <exclude>**/gen/**</exclude>
+                                </excludes>
+                                <header>${license-file}</header>
+                                <headerDefinitions>
+                                    <headerDefinition>${license-header-definition-file}</headerDefinition>
+                                </headerDefinitions>
+                                <includes>
+                                    <include>src/main/java/**</include>
+                                    <include>src/test/java/**</include>
+                                </includes>
+                            </licenseSet>
+                        </licenseSets>
                         <mapping>
                             <java>JavaPackage</java>
                         </mapping>
