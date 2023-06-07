@@ -51,17 +51,17 @@
         <log4j.version>2.20.0</log4j.version>
         <lombok.version>1.18.28</lombok.version>
         <micrometer.version>1.11.0</micrometer.version>
-        <postgresql-driver.version>42.6.0</postgresql-driver.version>
+        <postgresql.version>42.6.0</postgresql.version>
         <resilience4j.version>2.0.2</resilience4j.version>
         <spring-boot.version>3.1.0</spring-boot.version>
-        <springdoc.version>2.1.0</springdoc.version>
+        <springdoc-openapi-starter.version>2.1.0</springdoc-openapi-starter.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.24.2</assertj-core.version>
         <embedded-postgres.version>2.0.4</embedded-postgres.version>
         <embedded-postgres-binaries-bom.version>15.3.0</embedded-postgres-binaries-bom.version>
         <flyway-core>9.19.1</flyway-core>
-        <junit-jupiter.version>5.10.0-M1</junit-jupiter.version>
+        <junit-bom.version>5.10.0-M1</junit-bom.version>
         <selenium.version>4.9.1</selenium.version>
 
         <!-- Plugin Versions -->
@@ -69,29 +69,29 @@
         <jmeter-maven-plugin.version>3.7.0</jmeter-maven-plugin.version>
         <maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <maven-dependency-plugin.version>3.5.0</maven-dependency-plugin.version>
-        <maven-failsafe-plugin.version>3.1.0</maven-failsafe-plugin.version>
+        <maven-dependency-plugin.version>3.6.0</maven-dependency-plugin.version>
+        <maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
         <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-        <maven-surefire-plugin.version>3.1.0</maven-surefire-plugin.version>
-        <versions-maven-plugin.version>2.15.0</versions-maven-plugin.version>
+        <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+        <versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>10.11.0</checkstyle.version>
-        <errorprone.version>2.19.1</errorprone.version>
+        <checkstyle.version>10.12.0</checkstyle.version>
+        <error_prone_core.version>2.19.1</error_prone_core.version>
         <licenses.version>1</licenses.version>
-        <pitest-junit5-plugin.version>1.1.2</pitest-junit5-plugin.version>
+        <pitest-junit5-plugin.version>1.2.0</pitest-junit5-plugin.version>
         <pmd.version>6.55.0</pmd.version>
         <spotbugs.version>4.7.3</spotbugs.version>
 
         <!-- Linter Plugin Versions -->
         <dependency-check-maven.version>8.2.1</dependency-check-maven.version>
         <license-maven-plugin.version>4.2</license-maven-plugin.version>
-        <maven-checkstyle-plugin.version>3.2.2</maven-checkstyle-plugin.version>
+        <maven-checkstyle-plugin.version>3.3.0</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
-        <maven-pmd-plugin.version>3.20.0</maven-pmd-plugin.version>
-        <pitest-maven.version>1.13.1</pitest-maven.version>
+        <maven-pmd-plugin.version>3.21.0</maven-pmd-plugin.version>
+        <pitest-maven.version>1.14.1</pitest-maven.version>
         <spotbugs-maven-plugin.version>4.7.3.4</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
@@ -192,7 +192,7 @@
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>${postgresql-driver.version}</version>
+                <version>${postgresql.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.github.resilience4j</groupId>
@@ -262,7 +262,7 @@
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-                <version>${springdoc.version}</version>
+                <version>${springdoc-openapi-starter.version}</version>
             </dependency>
 
             <!-- Dependency Overrides -->
@@ -352,7 +352,7 @@
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
-                <version>${junit-jupiter.version}</version>
+                <version>${junit-bom.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -440,7 +440,7 @@
                             <path>
                                 <groupId>com.google.errorprone</groupId>
                                 <artifactId>error_prone_core</artifactId>
-                                <version>${errorprone.version}</version>
+                                <version>${error_prone_core.version}</version>
                             </path>
 
                             <!-- The errorprone checks will fail unless Lombok is also added -->
