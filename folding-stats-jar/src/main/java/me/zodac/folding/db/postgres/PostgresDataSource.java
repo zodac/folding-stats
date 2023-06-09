@@ -19,7 +19,6 @@ package me.zodac.folding.db.postgres;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -37,23 +36,21 @@ public final class PostgresDataSource extends HikariDataSource {
     /**
      * Creates an instance of {@link PostgresDataSource}.
      *
-     * <p>
-     * Uses the following environment variables:
-     * <ul>
-     *     <li>JDBC_CONNECTION_URL</li>
-     *     <li>JDBC_CONNECTION_USER</li>
-     *     <li>JDBC_CONNECTION_PASSWORD</li>
-     *     <li>JDBC_CONNECTION_DRIVER</li>
-     * </ul>
-     *
+     * @param dataSourceUrl      the JDBC URL for the data source
+     * @param dataSourceDriver   the driver for the data source
+     * @param dataSourceUsername the username for the data source
+     * @param dataSourcePassword the password URL for the data source
      * @return the created {@link PostgresDataSource}
      */
-    public static PostgresDataSource create() {
+    public static PostgresDataSource create(final String dataSourceUrl,
+                                            final String dataSourceDriver,
+                                            final String dataSourceUsername,
+                                            final String dataSourcePassword) {
         final HikariConfig hikariConfig = new HikariConfig();
-        hikariConfig.setJdbcUrl(EnvironmentVariableUtils.get("JDBC_CONNECTION_URL"));
-        hikariConfig.setUsername(EnvironmentVariableUtils.get("JDBC_CONNECTION_USER"));
-        hikariConfig.setPassword(EnvironmentVariableUtils.get("JDBC_CONNECTION_PASSWORD"));
-        hikariConfig.setDriverClassName(EnvironmentVariableUtils.get("JDBC_CONNECTION_DRIVER"));
+        hikariConfig.setJdbcUrl(dataSourceUrl);
+        hikariConfig.setDriverClassName(dataSourceDriver);
+        hikariConfig.setUsername(dataSourceUsername);
+        hikariConfig.setPassword(dataSourcePassword);
         hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
         hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
         hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");

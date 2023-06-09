@@ -60,12 +60,12 @@ services:
       USERS_IN_AMD_GPU: "1"
       USERS_IN_NVIDIA_GPU: "1"
       USERS_IN_WILDCARD: "1"
-      # Database configuration
-      DEPLOYED_DATABASE: "postgresql"
-      JDBC_CONNECTION_URL: "jdbc:postgresql://database_dev:5432/folding_db"
-      JDBC_CONNECTION_USER: "folding_user"
-      JDBC_CONNECTION_PASSWORD: "shroot"
-      JDBC_CONNECTION_DRIVER: "org.postgresql.Driver"
+      # Spring configuration
+      spring.datasource.url: "jdbc:postgresql://database_dev:5432/folding_db"
+      spring.datasource.driver: "org.postgresql.Driver"
+      spring.datasource.username: "folding_user"
+      spring.datasource.password: "shroot"
+      spring.datasource.database.type: "postgresql"
       # Swagger documentation
       CONTACT_NAME: "zodac"
       FORUM_LINK: "https://extremehw.net/forum/125-extreme-team-folding"

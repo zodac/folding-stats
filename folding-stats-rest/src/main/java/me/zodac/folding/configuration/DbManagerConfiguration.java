@@ -24,12 +24,12 @@ import java.time.Duration;
 import java.util.function.Supplier;
 import javax.sql.DataSource;
 import me.zodac.folding.api.db.DbManager;
-import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.db.DatabaseType;
 import me.zodac.folding.db.postgres.PostgresDataSource;
 import me.zodac.folding.db.postgres.PostgresDbManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -45,22 +45,35 @@ public class DbManagerConfiguration {
     /**
      * Returns an implementation of {@link DbManager} as a {@link Bean} for {@link org.springframework.beans.factory.annotation.Autowired} injection.
      *
+     * @param dataSourceUrl          the JDBC URL for the data source
+     * @param dataSourceDriver       the driver for the data source
+     * @param dataSourceUsername     the username for the data source
+     * @param dataSourcePassword     the password URL for the data source
+     * @param dataSourceDatabaseType the type of database for the data source
      * @return the {@link DbManager} implementation
      */
     @Bean
-    public DbManager getDbManager() {
-        final String deployedDatabase = EnvironmentVariableUtils.get(DATABASE_VARIABLE_NAME);
-        final DatabaseType databaseType = DatabaseType.get(deployedDatabase);
+    public DbManager getDbManager(@Value("${spring.datasource.url}") final String dataSourceUrl,
+                                  @Value("${spring.datasource.driver}") final String dataSourceDriver,
+                                  @Value("${spring.datasource.username}") final String dataSourceUsername,
+                                  @Value("${spring.datasource.password}") final String dataSourcePassword,
+                                  @Value("${spring.datasource.database.type}") final String dataSourceDatabaseType) {
+        final DatabaseType databaseType = DatabaseType.get(dataSourceDatabaseType);
 
         if (databaseType == DatabaseType.POSTGRESQL) {
             LOGGER.info("Initialising {} of type '{}'", DbManager.class.getSimpleName(), DatabaseType.POSTGRESQL);
-            final Supplier<PostgresDataSource> supplier = Retry.decorateSupplier(retry(), PostgresDataSource::create);
+            final Supplier<PostgresDataSource> supplier = Retry.decorateSupplier(retry(), () -> PostgresDataSource.create(
+                dataSourceUrl,
+                dataSourceDriver,
+                dataSourceUsername,
+                dataSourcePassword
+            ));
             final DataSource postgresDataSource = supplier.get();
             return PostgresDbManager.create(postgresDataSource);
         }
 
         throw new IllegalStateException(String.format("Unable to find database of type using variable '%s': %s",
-            DATABASE_VARIABLE_NAME, deployedDatabase));
+            DATABASE_VARIABLE_NAME, dataSourceDatabaseType));
     }
 
     private static Retry retry() {
