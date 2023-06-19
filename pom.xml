@@ -50,7 +50,7 @@
         <jsoup.version>1.16.1</jsoup.version>
         <log4j.version>2.20.0</log4j.version>
         <lombok.version>1.18.28</lombok.version>
-        <micrometer.version>1.11.0</micrometer.version>
+        <micrometer.version>1.11.1</micrometer.version>
         <postgresql.version>42.6.0</postgresql.version>
         <resilience4j.version>2.0.2</resilience4j.version>
         <spring-boot.version>3.1.0</spring-boot.version>
@@ -60,9 +60,9 @@
         <assertj-core.version>3.24.2</assertj-core.version>
         <embedded-postgres.version>2.0.4</embedded-postgres.version>
         <embedded-postgres-binaries-bom.version>15.3.0</embedded-postgres-binaries-bom.version>
-        <flyway-core>9.19.1</flyway-core>
+        <flyway-core>9.19.4</flyway-core>
         <junit-bom.version>5.10.0-M1</junit-bom.version>
-        <selenium.version>4.9.1</selenium.version>
+        <selenium.version>4.10.0</selenium.version>
 
         <!-- Plugin Versions -->
         <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
@@ -86,7 +86,7 @@
         <spotbugs.version>4.7.3</spotbugs.version>
 
         <!-- Linter Plugin Versions -->
-        <dependency-check-maven.version>8.2.1</dependency-check-maven.version>
+        <dependency-check-maven.version>8.3.1</dependency-check-maven.version>
         <license-maven-plugin.version>4.2</license-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.3.0</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
@@ -109,7 +109,7 @@
 
         <!-- ProGuard 3PP Versions -->
         <proguard-base.version>7.3.2</proguard-base.version>
-        <proguard-core.version>9.0.8</proguard-core.version>
+        <proguard-core.version>9.0.9</proguard-core.version>
 
         <!-- ProGuard Plugin Versions -->
         <proguard-maven-plugin.version>2.6.0</proguard-maven-plugin.version>
