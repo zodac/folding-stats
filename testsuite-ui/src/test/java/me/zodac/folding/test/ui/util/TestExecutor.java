@@ -36,7 +36,6 @@ public final class TestExecutor {
      * @param test        the test to be executed, using the {@link RemoteWebDriver}
      */
     public static void executeWithDriver(final BrowserType browserType, final Consumer<? super RemoteWebDriver> test) {
-
         final RemoteWebDriver driver = RemoteWebDriverFactory.create(browserType);
         try {
             test.accept(driver);

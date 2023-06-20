@@ -101,10 +101,10 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
      *
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     * @see #getOverallStats(String)
+     * @see #getSummaryStats(String)
      */
-    public HttpResponse<String> getOverallStats() throws FoldingRestException {
-        return getOverallStats(null);
+    public HttpResponse<String> getSummaryStats() throws FoldingRestException {
+        return getSummaryStats(null);
     }
 
     /**
@@ -118,12 +118,12 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
      *                  {@link AllTeamsSummary}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     * @see #getOverallStats()
+     * @see #getSummaryStats()
      */
-    public HttpResponse<String> getOverallStats(final String entityTag) throws FoldingRestException {
+    public HttpResponse<String> getSummaryStats(final String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(statsUrl + "/overall"))
+            .uri(URI.create(statsUrl + "/summary"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -136,9 +136,9 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new FoldingRestException("Error sending HTTP request to get overall TC stats", e);
+            throw new FoldingRestException("Error sending HTTP request to get summary TC stats", e);
         } catch (final IOException e) {
-            throw new FoldingRestException("Error sending HTTP request to get overall TC stats", e);
+            throw new FoldingRestException("Error sending HTTP request to get summary TC stats", e);
         }
     }
 
@@ -193,7 +193,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the overall {@code Team Competition} {@link me.zodac.folding.api.tc.Team} leaderboard.
+     * Send a <b>GET</b> request to retrieve the {@code Team Competition} {@link me.zodac.folding.api.tc.Team} leaderboard.
      *
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
@@ -204,7 +204,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     }
 
     /**
-     * Send a <b>GET</b> request to retrieve the overall {@code Team Competition} {@link me.zodac.folding.api.tc.Team} leaderboard.
+     * Send a <b>GET</b> request to retrieve the {@code Team Competition} {@link me.zodac.folding.api.tc.Team} leaderboard.
      *
      * <p>
      * <b>NOTE:</b> If the server has a cached {@link HttpResponse} based on the {@code ETag}, an empty {@link HttpResponse#body()} is returned.

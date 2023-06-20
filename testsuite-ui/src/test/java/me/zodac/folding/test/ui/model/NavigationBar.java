@@ -34,6 +34,9 @@ public final class NavigationBar {
     public static final String NAVIGATION_BAR_ID_VALUE = "navbar";
     public static final By NAVIGATION_BAR = By.id(NAVIGATION_BAR_ID_VALUE);
 
+    public static final String FOOTER_CONTENT_ID_VALUE = "footer-content";
+    public static final By FOOTER = By.id(FOOTER_CONTENT_ID_VALUE);
+
     public static final String TITLE_ID_VALUE = "navbar-title";
     public static final By TITLE = By.id(TITLE_ID_VALUE);
 

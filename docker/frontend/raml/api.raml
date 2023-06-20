@@ -699,7 +699,7 @@ traits:
     description:
     responses:
       200:
-        description: "Retrieve the overall stats for teams/users"
+        description: "Retrieve all stats for teams/users"
         body:
           application/json:
             example: !include responses/stats/statsGet.json
@@ -750,15 +750,15 @@ traits:
             description: "System user does not have the correct role to perform this request"
           503:
             description: "The system is not in a valid state to execute write requests"
-  /overall:
+  /summary:
     get:
       description:
       responses:
         200:
-          description: "Returns the overall stats (total stats of all teams) for the competition"
+          description: "Returns the summary of stats (total stats of all teams) for the competition"
           body:
             application/json:
-              example: !include responses/stats/statsGetOverall.json
+              example: !include responses/stats/statsGetSummary.json
         503:
           description: "The system is not in a valid state to execute read requests"
   /users/{userId}:

@@ -84,30 +84,34 @@
 
 <br/>
 
-<button onclick="toggleMainButtonStyle('overall_button', this.classList)" class="btn btn-primary" id="overall_button"
-        href="#overall_div" data-bs-toggle="collapse" role="button">Summary
-</button>
+<div id="view_buttons">
+    <button onclick="toggleMainButtonStyle('summary_button', this.classList)" class="btn btn-primary" id="summary_button"
+            href="#summary_div" data-bs-toggle="collapse" role="button">Summary
+    </button>
 
-<button onclick="toggleMainButtonStyle('leaderboard_button', this.classList)" class="btn btn-success"
-        id="leaderboard_button"
-        href="#leaderboard_div" data-bs-toggle="collapse" role="button">Leaderboard
-</button>
+    <button onclick="toggleMainButtonStyle('leaderboard_button', this.classList)" class="btn btn-success"
+            id="leaderboard_button"
+            href="#leaderboard_div" data-bs-toggle="collapse" role="button">Leaderboard
+    </button>
 
-<button onclick="toggleMainButtonStyle('stats_button', this.classList)" class="btn btn-primary" id="stats_button"
-        href="#stats_div" data-bs-toggle="collapse" role="button">Team Stats
-</button>
+    <button onclick="toggleMainButtonStyle('stats_button', this.classList)" class="btn btn-primary" id="stats_button"
+            href="#stats_div" data-bs-toggle="collapse" role="button">Team Stats
+    </button>
 
-<button onclick="toggleMainButtonStyle('category_button', this.classList)" class="btn btn-primary" id="category_button"
-        href="#category_div" data-bs-toggle="collapse" role="button">Category Leaderboard
-</button>
+    <button onclick="toggleMainButtonStyle('category_button', this.classList)" class="btn btn-primary" id="category_button"
+            href="#category_div" data-bs-toggle="collapse" role="button">Category Leaderboard
+    </button>
+</div>
 
 <div id="loader" class="loader"></div>
 
 <!-- These will be populated by index.js -->
-<div id="overall_div" class="collapse"></div>
-<div id="leaderboard_div" class="collapse show"></div>
-<div id="stats_div" class="collapse"></div>
-<div id="category_div" class="collapse"></div>
+<div id="main_parent">
+    <div id="summary_div" class="collapse"></div>
+    <div id="leaderboard_div" class="collapse show"></div>
+    <div id="stats_div" class="collapse"></div>
+    <div id="category_div" class="collapse"></div>
+</div>
 
 <!-- Toasts, which will be triggered to show by JS scripts -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
@@ -124,9 +128,9 @@
 
 <footer id="footer">
     <div id="footer-content">
-        Folding@Home data provided by <a href="https://stats.foldingathome.org/donor">Folding@Home Statistics</a> |
+        Folding@Home data provided by <a href="https://stats.foldingathome.org/donor/">Folding@Home Statistics</a> |
         Hardware PPD data provided by <a href="https://folding.lar.systems/">LARS PPD DB</a> (<a
-            href="https://chrome.google.com/webstore/detail/folding-at-home-in-the-da/alpjkkbjnbkddolgnicglknicbgfahoe">Chrome
+            href="https://chrome.google.com/webstore/detail/folding-at-home-in-the-da/alpjkkbjnbkddolgnicglknicbgfahoe/">Chrome
         Extension</a>)
     </div>
 </footer>

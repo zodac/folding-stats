@@ -34,7 +34,8 @@ import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
 
 /**
- * POJO containing the overall result for a single month of the {@code Team Competition}.
+ * POJO containing the result for all {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s for a single month of the
+ * {@code Team Competition}.
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter

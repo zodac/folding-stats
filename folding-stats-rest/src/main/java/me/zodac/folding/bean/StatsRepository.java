@@ -146,7 +146,7 @@ public class StatsRepository {
     }
 
     /**
-     * Creates a {@link UserStats} for the total overall stats for the provided {@link User}.
+     * Creates a {@link UserStats} for the total stats for the provided {@link User}.
      *
      * @param userStats the {@link UserStats} to be created
      * @return the created {@link UserStats}
@@ -229,7 +229,7 @@ public class StatsRepository {
     }
 
     /**
-     * Creates a {@link UserStats} for the initial overall stats for the provided {@link User} at the start of the monitoring period.
+     * Creates a {@link UserStats} for the initial stats for the provided {@link User} at the start of the monitoring period.
      *
      * @param userStats the {@link UserStats} to be created
      * @return the created {@link UserStats}

@@ -117,9 +117,9 @@ public class TeamCompetitionStatsController implements TeamCompetitionStatsEndpo
     @Override
     @ReadRequired
     @PermitAll
-    @GetMapping(path = "/overall", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/summary", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CompetitionSummary> getCompetitionStats() {
-        AUDIT_LOGGER.debug("GET request received to show TC overall stats");
+        AUDIT_LOGGER.debug("GET request received to show TC summary stats");
         visitCounter.increment();
         final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
         return ok(allTeamsSummary.competitionSummary());

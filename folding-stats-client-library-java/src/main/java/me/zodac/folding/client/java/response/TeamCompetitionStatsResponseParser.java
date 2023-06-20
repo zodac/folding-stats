@@ -51,12 +51,12 @@ public final class TeamCompetitionStatsResponseParser {
     }
 
     /**
-     * Returns the {@link CompetitionSummary} retrieved by {@link TeamCompetitionStatsRequestSender#getOverallStats()}.
+     * Returns the {@link CompetitionSummary} retrieved by {@link TeamCompetitionStatsRequestSender#getSummaryStats()}.
      *
      * @param response the {@link HttpResponse} to parse
      * @return the retrieved {@link CompetitionSummary}
      */
-    public static CompetitionSummary getOverallStats(final HttpResponse<String> response) {
+    public static CompetitionSummary getSummaryStats(final HttpResponse<String> response) {
         return RestUtilConstants.GSON.fromJson(response.body(), CompetitionSummary.class);
     }
 

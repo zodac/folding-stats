@@ -49,7 +49,7 @@ public interface TeamCompetitionStatsEndpoint {
     ResponseEntity<CompetitionSummary> getCompetitionStats();
 
     /**
-     * {@link GetMapping} request to retrieve the {@code Team Competition} overall {@link AllTeamsSummary}.
+     * {@link GetMapping} request to retrieve the {@code Team Competition} {@link AllTeamsSummary}.
      *
      * @return {@link me.zodac.folding.rest.response.Responses#ok(Object)} containing the {@link AllTeamsSummary}
      */

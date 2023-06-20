@@ -23,6 +23,8 @@ package me.zodac.folding.test.ui.model;
 public final class Attribute {
 
     public static final String CLASS = "class";
+    public static final String HREF = "href";
+    public static final String ID = "id";
 
     private Attribute() {
 

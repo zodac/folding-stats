@@ -45,7 +45,7 @@ public final class TeamCompetitionStatsUtils {
     }
 
     /**
-     * Get the overall TC results.
+     * Get all stats from the TC results.
      *
      * @return the TC {@link AllTeamsSummary}
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request

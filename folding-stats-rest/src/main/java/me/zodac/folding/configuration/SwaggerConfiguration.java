@@ -45,7 +45,7 @@ import org.springframework.context.annotation.PropertySource;
 public class SwaggerConfiguration {
 
     /**
-     * Defines the Swagger documentation for the overall project.
+     * Defines the Swagger documentation for the project.
      *
      * @param applicationName    the name of the {@link FoldingStatsApplication}
      * @param applicationVersion the version of the {@link FoldingStatsApplication}

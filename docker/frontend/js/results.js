@@ -34,7 +34,7 @@ function getPastResult(month, monthName, year) {
     }
 
     show("loader")
-    hide("past_result")
+    hide("main_parent")
 
     fetch(REST_ENDPOINT_URL+"/results/result/" + selectedYear + "/" + selectedMonth)
     .then(response => {
@@ -55,7 +55,7 @@ function getPastResult(month, monthName, year) {
         loadCategoryLeaderboard(jsonResponse['userCategoryLeaderboard'])
 
         hide("loader")
-        show("past_result")
+        show("main_parent")
     })
     .catch((error) => {
         hide("loader")

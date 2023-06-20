@@ -17,12 +17,13 @@
 
 package me.zodac.folding.test.ui;
 
-import static me.zodac.folding.test.ui.util.Logger.logWithBlankLine;
+import static me.zodac.folding.test.ui.util.Logger.log;
 import static me.zodac.folding.test.ui.util.TestExecutor.executeWithDriver;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.stream.Stream;
+import me.zodac.folding.test.ui.model.Attribute;
 import me.zodac.folding.test.ui.model.NavigationBar;
 import me.zodac.folding.test.ui.model.Tag;
 import me.zodac.folding.test.ui.util.BrowserType;
@@ -52,7 +53,7 @@ class PageLoadTest {
     @ParameterizedTest
     @MethodSource("browserAndFrontendLinkProvider")
     void loadAllPages(final BrowserType browserType, final FrontendLink frontendLink) {
-        logWithBlankLine("Loading '%s' browser at '%s'", browserType.displayName(), frontendLink.url());
+        log("Loading '%s' browser at '%s'", browserType.displayName(), frontendLink.url());
 
         executeWithDriver(browserType, driver -> {
             driver.navigate().to(frontendLink.url());
@@ -81,6 +82,24 @@ class PageLoadTest {
                 assertThat(navigationBarLink.findElement(Tag.A).getText())
                     .isEqualTo(NavigationBar.EXPECTED_TAB_NAME_BY_INDEX.get(i));
             }
+
+            // Confirm footer and content
+            final WebElement footer = driver.findElement(NavigationBar.FOOTER);
+            assertThat(footer.getText())
+                .contains("Folding@Home data provided by Folding@Home Statistics")
+                .contains("Hardware PPD data provided by LARS PPD DB");
+
+            final List<String> footerHrefAttributes = footer.findElements(Tag.A)
+                .stream()
+                .map(footerLink -> footerLink.getAttribute(Attribute.HREF))
+                .toList();
+
+            assertThat(footerHrefAttributes)
+                .contains(
+                    "https://stats.foldingathome.org/donor/",
+                    "https://folding.lar.systems/",
+                    "https://chrome.google.com/webstore/detail/folding-at-home-in-the-da/alpjkkbjnbkddolgnicglknicbgfahoe/"
+                );
         });
     }
 

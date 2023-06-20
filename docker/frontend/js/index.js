@@ -25,59 +25,59 @@ function toggleTeam(teamNumber, classList) {
     }
 }
 
-function loadOverallStats() {
-    fetch(REST_ENDPOINT_URL+'/stats/overall')
+function loadSummaryStats() {
+    fetch(REST_ENDPOINT_URL+'/stats/summary')
         .then(response => {
             return response.json()
         })
         .then(function(jsonResponse) {
         // Build competition stats
-        const overallTableHeaders = ["Total Points", "Total Units"]
-        const overallTableProperties = ["totalMultipliedPoints", "totalUnits"]
+        const summaryTableHeaders = ["Total Points", "Total Units"]
+        const summaryTableProperties = ["totalMultipliedPoints", "totalUnits"]
 
-        overallDiv = document.getElementById("overall_div")
+        summaryDiv = document.getElementById("summary_div")
 
-        overallTitle = document.createElement("h2")
-        overallTitle.setAttribute("class", "navbar-brand")
-        overallTitle.innerHTML = "Overall Stats"
-        overallDiv.append(overallTitle)
+        summaryTitle = document.createElement("h2")
+        summaryTitle.setAttribute("id", "summary_title")
+        summaryTitle.setAttribute("class", "navbar-brand")
+        summaryTitle.innerHTML = "Summary of Stats"
+        summaryDiv.append(summaryTitle)
 
-        overallTable = document.createElement("table")
-        overallTable.setAttribute("id", "overall")
-        overallTable.setAttribute("class", "table table-dark table-striped table-hover")
+        summaryTable = document.createElement("table")
+        summaryTable.setAttribute("id", "summary")
+        summaryTable.setAttribute("class", "table table-dark table-striped table-hover")
 
-        overallTableHead = document.createElement("thead")
-        overallTableHeaderRow = document.createElement("tr")
-        overallTableHeaders.forEach(function (header, i) {
-            overallTableHeader = document.createElement("th")
-            overallTableHeader.setAttribute("onclick", "sortTable(" + i + ", 'overall')")
-            overallTableHeader.setAttribute("scope", "col")
-            overallTableHeader.innerHTML = header
+        summaryTableHead = document.createElement("thead")
+        summaryTableHeaderRow = document.createElement("tr")
+        summaryTableHeaders.forEach(function (header, i) {
+            summaryTableHeader = document.createElement("th")
+            summaryTableHeader.setAttribute("scope", "col")
+            summaryTableHeader.innerHTML = header
 
-            overallTableHeaderRow.append(overallTableHeader)
+            summaryTableHeaderRow.append(summaryTableHeader)
         })
-        overallTableHead.append(overallTableHeaderRow)
-        overallTable.append(overallTableHead)
+        summaryTableHead.append(summaryTableHeaderRow)
+        summaryTable.append(summaryTableHead)
 
-        overallTableBody = document.createElement("tbody")
-        overallTableBodyRow = document.createElement("tr")
-        overallTableProperties.forEach(function (property, i) {
-            overallTableBodyCell = document.createElement("td")
+        summaryTableBody = document.createElement("tbody")
+        summaryTableBodyRow = document.createElement("tr")
+        summaryTableProperties.forEach(function (property, i) {
+            summaryTableBodyCell = document.createElement("td")
 
             if(property === "totalMultipliedPoints"){
-                overallTableBodyCell.setAttribute("data-bs-toggle", "tooltip")
-                overallTableBodyCell.setAttribute("data-placement", "top")
-                overallTableBodyCell.setAttribute("title", "Unmultiplied: " + jsonResponse["totalPoints"].toLocaleString())
-                new bootstrap.Tooltip(overallTableBodyCell)
+                summaryTableBodyCell.setAttribute("data-bs-toggle", "tooltip")
+                summaryTableBodyCell.setAttribute("data-placement", "top")
+                summaryTableBodyCell.setAttribute("title", "Unmultiplied: " + jsonResponse["totalPoints"].toLocaleString())
+                new bootstrap.Tooltip(summaryTableBodyCell)
             }
 
-            overallTableBodyCell.innerHTML = jsonResponse[property].toLocaleString()
-            overallTableBodyRow.append(overallTableBodyCell)
+            summaryTableBodyCell.innerHTML = jsonResponse[property].toLocaleString()
+            summaryTableBodyRow.append(summaryTableBodyCell)
         })
-        overallTableBody.append(overallTableBodyRow)
-        overallTable.append(overallTableBody)
+        summaryTableBody.append(summaryTableBodyRow)
+        summaryTable.append(summaryTableBody)
 
-        overallDiv.append(overallTable)
+        summaryDiv.append(summaryTable)
     })
 }
 
@@ -93,6 +93,7 @@ function loadTeamLeaderboard() {
         leaderboardDiv = document.getElementById("leaderboard_div")
 
         leaderboardTitle = document.createElement("h2")
+        leaderboardTitle.setAttribute("id", "leaderboard_title")
         leaderboardTitle.setAttribute("class", "navbar-brand")
         leaderboardTitle.innerHTML = "Team Leaderboard"
 
@@ -179,18 +180,20 @@ function loadCategoryLeaderboard() {
         const categoryProperties = ["rank", "displayName", "hardware", "multipliedPoints", "units", "diffToLeader", "diffToNext"]
 
         categoryLeaderboardTitle = document.createElement("h2")
+        categoryLeaderboardTitle.setAttribute("id", "category_leaderboard_title")
         categoryLeaderboardTitle.setAttribute("class", "navbar-brand")
         categoryLeaderboardTitle.innerHTML = "Category Leaderboard"
         categoryDiv.append(categoryLeaderboardTitle)
 
         Object.keys(jsonResponse).forEach(function(key) {
             var keyDisplay = getCategoryFrontend(key)
+            var tableId = "category_" + key.replace(/\s+/g, "_").toLowerCase()
+
             categoryTitle = document.createElement("h2")
+            categoryTitle.setAttribute("id", tableId + "_title")
             categoryTitle.setAttribute("class", "navbar-brand")
             categoryTitle.innerHTML = keyDisplay
             categoryDiv.append(categoryTitle)
-
-            tableId = "category_" + key.replace(/\s+/g, "_").toLowerCase()
 
             categoryTable = document.createElement("table")
             categoryTable.setAttribute("id", tableId)
@@ -253,6 +256,7 @@ function loadTeamStats() {
         statsDiv = document.getElementById("stats_div")
 
         statsTitle = document.createElement("h2")
+        statsTitle.setAttribute("id", "stats_title")
         statsTitle.setAttribute("class", "navbar-brand")
         statsTitle.innerHTML = "Individual Team Stats"
         statsDiv.append(statsTitle)
@@ -274,6 +278,7 @@ function loadTeamStats() {
             metadataDiv.setAttribute("id", "team_"+teamNumber+"_metadata")
 
             teamTitle = document.createElement("h2")
+            teamTitle.setAttribute("id", "team_"+teamNumber+"_stats_title")
             teamTitle.setAttribute("class", "navbar-brand")
             teamTitle.innerHTML = "Rank #" + team['rank'] + ": "
 
@@ -425,7 +430,7 @@ function loadTeamStats() {
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
-    loadOverallStats()
+    loadSummaryStats()
     loadTeamLeaderboard()
     loadCategoryLeaderboard()
     loadTeamStats()

@@ -622,7 +622,7 @@ public class Storage {
     }
 
     /**
-     * Creates a {@link UserStats} for the total overall stats for a {@link User}.
+     * Creates a {@link UserStats} for the total stats for a {@link User}.
      *
      * <p>
      * Persists it with the {@link DbManager}, then adds it to the {@code totalStatsCache}.
@@ -788,7 +788,7 @@ public class Storage {
     }
 
     /**
-     * Creates a {@link UserStats} for the initial overall stats for the provided {@link User} at the start of the monitoring period.
+     * Creates a {@link UserStats} for the initial stats for the provided {@link User} at the start of the monitoring period.
      *
      * <p>
      * Persists it with the {@link DbManager}, then adds it to the {@code initialStatsCache}.
@@ -954,7 +954,7 @@ public class Storage {
         LOGGER.info("TcStatsCache: {}", tcStatsCache.asMap());
         LOGGER.info("TotalStatsCache: {}", totalStatsCache.asMap());
 
-        // TC overall
+        // TC all stats
         LOGGER.info("AllTeamsSummaryCache: {}", allTeamsSummaryCache.asMap());
     }
 

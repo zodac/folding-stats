@@ -232,7 +232,7 @@ class ResetTest {
 
         final AllTeamsSummary resultAfterReset = TeamCompetitionStatsUtils.getStats();
         assertThat(resultAfterReset.competitionSummary().totalPoints())
-            .as("Expected no points overall: " + result)
+            .as("Expected no points in summary: " + result)
             .isZero();
 
         final TeamSummary firstTeamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, firstTeam.teamName());

@@ -119,14 +119,14 @@ class TeamCompetitionStatsTest {
     }
 
     @Test
-    void whenNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoOverallStats() throws FoldingRestException {
-        final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getOverallStats();
+    void whenNoTeamsExistInTheSystem_thenResponseIsReturnedWithNoSummaryStats() throws FoldingRestException {
+        final HttpResponse<String> response = TEAM_COMPETITION_REQUEST_SENDER.getSummaryStats();
 
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
-        final CompetitionSummary result = TeamCompetitionStatsResponseParser.getOverallStats(response);
+        final CompetitionSummary result = TeamCompetitionStatsResponseParser.getSummaryStats(response);
 
         assertThat(result.totalPoints())
             .as("Expected no points: " + result)
@@ -142,7 +142,7 @@ class TeamCompetitionStatsTest {
     }
 
     @Test
-    void whenOneTeamExistsWithOneUser_andUserEarnsStats_thenUserAndTeamAndOverallStartWithNoStats_thenAllIncrementAsUserPointsIncrease()
+    void whenOneTeamExistsWithOneUser_andUserEarnsStats_thenUserAndTeamAndSummaryStartWithNoStats_thenAllIncrementAsUserPointsIncrease()
         throws FoldingRestException {
         final Team team = TeamUtils.create(generateTeam());
         final User user = UserUtils.create(generateUserWithTeamId(team.id()));
@@ -385,17 +385,17 @@ class TeamCompetitionStatsTest {
             .as("Expected second team to be rank 1: " + secondTeamSummaryAfterSecondUpdate)
             .isEqualTo(1);
 
-        final HttpResponse<String> overallResultAfterSecondUpdate = TEAM_COMPETITION_REQUEST_SENDER.getOverallStats();
-        final CompetitionSummary overallResult = TeamCompetitionStatsResponseParser.getOverallStats(overallResultAfterSecondUpdate);
+        final HttpResponse<String> summaryResultAfterSecondUpdate = TEAM_COMPETITION_REQUEST_SENDER.getSummaryStats();
+        final CompetitionSummary summaryResult = TeamCompetitionStatsResponseParser.getSummaryStats(summaryResultAfterSecondUpdate);
 
-        assertThat(overallResult)
-            .as("Expected overall stats to be same as competition stats")
+        assertThat(summaryResult)
+            .as("Expected summary stats to be same as competition stats")
             .isEqualTo(resultAfterSecondUpdate.competitionSummary());
 
-        assertThat(overallResult.totalMultipliedPoints())
+        assertThat(summaryResult.totalMultipliedPoints())
             .isEqualTo(30_000L);
 
-        assertThat(overallResult.totalUnits())
+        assertThat(summaryResult.totalUnits())
             .isEqualTo(30);
     }
 
@@ -870,28 +870,28 @@ class TeamCompetitionStatsTest {
     @Test
     void whenGettingStatsForUser_andUserRankIs2ndInTeamBut3rdInCompetition_thenResponseHasTeamRankListed() throws FoldingRestException {
         final Team mainTeam = TeamUtils.create(generateTeam());
-        final User firstInTeamFirstOverall = UserUtils.create(generateUserWithTeamIdAndCategory(mainTeam.id(), Category.AMD_GPU));
+        final User firstInTeamFirstRank = UserUtils.create(generateUserWithTeamIdAndCategory(mainTeam.id(), Category.AMD_GPU));
 
-        final User secondInTeamThirdOverall = UserUtils.create(generateUserWithTeamIdAndCategory(mainTeam.id(), Category.NVIDIA_GPU));
-        final int secondInTeamThirdOverallId = secondInTeamThirdOverall.id();
+        final User secondInTeamThirdRank = UserUtils.create(generateUserWithTeamIdAndCategory(mainTeam.id(), Category.NVIDIA_GPU));
+        final int secondInTeamThirdRankId = secondInTeamThirdRank.id();
 
         final Team otherTeam = TeamUtils.create(generateTeam());
-        final User firstInTeamSecondOverall = UserUtils.create(generateUserWithTeamId(otherTeam.id()));
+        final User firstInTeamSecondRank = UserUtils.create(generateUserWithTeamId(otherTeam.id()));
 
         manuallyUpdateStats();
-        final UserSummary resultBeforeStats = TeamCompetitionStatsUtils.getStatsForUser(secondInTeamThirdOverallId);
+        final UserSummary resultBeforeStats = TeamCompetitionStatsUtils.getStatsForUser(secondInTeamThirdRankId);
         assertThat(resultBeforeStats.rankInTeam())
             .as("Expected all users to start at rank 1: " + resultBeforeStats)
             .isEqualTo(1);
 
-        StubbedFoldingEndpointUtils.addPoints(firstInTeamFirstOverall, 10_000L);
-        StubbedFoldingEndpointUtils.addPoints(secondInTeamThirdOverall, 1_000L);
-        StubbedFoldingEndpointUtils.addPoints(firstInTeamSecondOverall, 5_000L);
+        StubbedFoldingEndpointUtils.addPoints(firstInTeamFirstRank, 10_000L);
+        StubbedFoldingEndpointUtils.addPoints(secondInTeamThirdRank, 1_000L);
+        StubbedFoldingEndpointUtils.addPoints(firstInTeamSecondRank, 5_000L);
         manuallyUpdateStats();
 
-        final UserSummary resultAfterStats = TeamCompetitionStatsUtils.getStatsForUser(secondInTeamThirdOverallId);
+        final UserSummary resultAfterStats = TeamCompetitionStatsUtils.getStatsForUser(secondInTeamThirdRankId);
         assertThat(resultAfterStats.rankInTeam())
-            .as("Expected user to be third overall, but second in team: " + resultBeforeStats)
+            .as("Expected user to be third rank, but second in team: " + resultBeforeStats)
             .isEqualTo(2);
     }
 
