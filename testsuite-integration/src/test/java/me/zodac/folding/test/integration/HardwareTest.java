@@ -32,6 +32,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Collection;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
@@ -50,6 +51,7 @@ import me.zodac.folding.test.integration.util.rest.response.HttpResponseHeaderUt
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
@@ -67,6 +69,102 @@ class HardwareTest {
     @AfterAll
     static void tearDown() throws FoldingRestException {
         SystemCleaner.cleanSystemForSimpleTests();
+    }
+
+    @Test
+    @Order(1)
+    void whenGettingAllHardware_givenNoHardwareHasBeenCreated_thenEmptyJsonResponseIsReturned_andHas200Status() throws FoldingRestException {
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final Collection<Hardware> allHardware = HardwareResponseParser.getAll(response);
+        final int xTotalCount = HttpResponseHeaderUtils.getTotalCount(response);
+
+        assertThat(xTotalCount)
+            .isEqualTo(allHardware.size());
+
+        assertThat(allHardware)
+            .isEmpty();
+    }
+
+    @Test
+    void whenCreatingHardware_givenPayloadIsValid_thenTheCreatedHardwareIsReturnedInResponse_andHasId_andResponseHas201Status()
+        throws FoldingRestException {
+        final HardwareRequest hardwareToCreate = TestGenerator.generateHardware();
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+            .as("Did not receive a 201_CREATED HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_CREATED);
+
+        final Hardware actual = HardwareResponseParser.create(response);
+        assertThat(actual)
+            .as("Did not receive created object as JSON response: " + response.body())
+            .extracting("hardwareName", "displayName", "multiplier")
+            .containsExactly(hardwareToCreate.getHardwareName(), hardwareToCreate.getDisplayName(), hardwareToCreate.getMultiplier());
+    }
+
+    @Test
+    void whenGettingHardware_givenValidHardwareId_thenHardwareIsReturned_andHas200Status() throws FoldingRestException {
+        final int hardwareId = HardwareUtils.create(TestGenerator.generateHardware()).id();
+
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final Hardware hardware = HardwareResponseParser.get(response);
+        assertThat(hardware.id())
+            .as("Did not receive the expected hardware: " + response.body())
+            .isEqualTo(hardwareId);
+    }
+
+    @Test
+    void whenGettingHardware_givenValidHardwareName_thenHardwareIsReturned_andHas200Status() throws FoldingRestException {
+        final String hardwareName = HardwareUtils.create(TestGenerator.generateHardware()).hardwareName();
+
+        final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareName);
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final Hardware hardware = HardwareResponseParser.get(response);
+        assertThat(hardware.hardwareName())
+            .as("Did not receive the expected hardware: " + response.body())
+            .isEqualTo(hardwareName);
+    }
+
+    @Test
+    void whenUpdatingHardware_givenValidHardwareId_andValidPayload_thenUpdatedHardwareIsReturned_andNoNewHardwareIsCreated_andHas200Status()
+        throws FoldingRestException {
+        final Hardware createdHardware = HardwareUtils.create(TestGenerator.generateHardware());
+        final int initialSize = HardwareUtils.getNumberOfHardware();
+
+        final HardwareRequest updatedHardware = HardwareRequest.builder()
+            .hardwareName(createdHardware.hardwareName())
+            .displayName(createdHardware.displayName())
+            .hardwareMake(createdHardware.hardwareMake().toString())
+            .hardwareType(createdHardware.hardwareType().toString())
+            .multiplier(createdHardware.multiplier())
+            .averagePpd(createdHardware.averagePpd())
+            .build();
+
+        final HttpResponse<String> response =
+            HARDWARE_REQUEST_SENDER.update(createdHardware.id(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final Hardware actual = HardwareResponseParser.update(response);
+        assertThat(actual.isEqualRequest(updatedHardware))
+            .as("Did not receive created object as JSON response: " + response.body())
+            .isTrue();
+
+        final int allHardwareAfterUpdate = HardwareUtils.getNumberOfHardware();
+        assertThat(allHardwareAfterUpdate)
+            .as("Expected no new hardware instances to be created")
+            .isEqualTo(initialSize);
     }
 
     // Negative/alternative test cases
