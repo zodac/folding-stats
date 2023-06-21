@@ -55,6 +55,7 @@
         <resilience4j.version>2.0.2</resilience4j.version>
         <spring-boot.version>3.1.0</spring-boot.version>
         <springdoc-openapi-starter.version>2.1.0</springdoc-openapi-starter.version>
+        <slf4j-api>2.0.7</slf4j-api>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.24.2</assertj-core.version>
@@ -70,6 +71,7 @@
         <maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.6.0</maven-dependency-plugin.version>
+        <maven-enforcer-plugin.version>3.3.0</maven-enforcer-plugin.version>
         <maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
         <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
@@ -193,6 +195,12 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.checkerframework</groupId>
+                        <artifactId>checker-qual</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>io.github.resilience4j</groupId>
@@ -361,6 +369,24 @@
                 <artifactId>selenium-java</artifactId>
                 <version>${selenium.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <!-- Conflicting Dependencies -->
+            <!-- The below dependencies are pulled in by multiple dependencies, so we define a version to keep the classpath consistent -->
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-observation</artifactId>
+                <version>${micrometer.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-core</artifactId>
+                <version>${micrometer.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -632,6 +658,47 @@
                             <version>${checkstyle.version}</version>
                         </dependency>
                     </dependencies>
+                </plugin>
+
+                <!-- Manual execution: -->
+                <!-- mvn enforcer:enforce -Dlint -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${maven-enforcer-plugin.version}</version>
+                    <configuration>
+                        <rules>
+                            <banDynamicVersions>
+                                <excludedScopes/>
+                                <ignores>
+                                    <ignore>me.zodac:folding-stats-*:jar:optimized:*</ignore>
+                                </ignores>
+                            </banDynamicVersions>
+                            <bannedDependencies>
+                                <excludes>
+                                    <!-- JUnit4 -->
+                                    <exclude>junit:junit</exclude>
+                                    <exclude>junit:junit-dep</exclude>
+                                </excludes>
+                            </bannedDependencies>
+                            <dependencyConvergence/>
+                            <requireJavaVersion>
+                                <version>[${java-release},)</version>
+                            </requireJavaVersion>
+                            <requireMavenVersion>
+                                <version>[3.8.6,4.0)</version>
+                            </requireMavenVersion>
+                        </rules>
+                        <skip>${skip-linters}</skip>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>enforce</goal>
+                            </goals>
+                            <phase>validate</phase>
+                        </execution>
+                    </executions>
                 </plugin>
 
                 <!-- Manual execution: -->
