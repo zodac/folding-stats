@@ -196,6 +196,7 @@
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
                 <exclusions>
+                    <!-- Conflicts with version in caffeine, this one is older and less important -->
                     <exclusion>
                         <groupId>org.checkerframework</groupId>
                         <artifactId>checker-qual</artifactId>
@@ -416,7 +417,6 @@
                         </execution>
                     </executions>
                 </plugin>
-
                 <plugin>
                     <groupId>com.lazerycode.jmeter</groupId>
                     <artifactId>jmeter-maven-plugin</artifactId>
@@ -671,12 +671,13 @@
                             <banDynamicVersions>
                                 <excludedScopes/>
                                 <ignores>
+                                    <!-- Exclude our own JARs optimised by ProGuard -->
                                     <ignore>me.zodac:folding-stats-*:jar:optimized:*</ignore>
                                 </ignores>
                             </banDynamicVersions>
                             <bannedDependencies>
                                 <excludes>
-                                    <!-- JUnit4 -->
+                                    <!-- Ban JUnit4, to not conflict with JUnit5 -->
                                     <exclude>junit:junit</exclude>
                                     <exclude>junit:junit-dep</exclude>
                                 </excludes>
@@ -708,7 +709,8 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${maven-javadoc-plugin.version}</version>
                     <configuration>
-                        <doclint>all</doclint>
+                        <!-- Excluding 'missing' due to 'use of default constructor, which does not provide a comment' false positive -->
+                        <doclint>all,-missing</doclint>
                         <excludePackageNames>me.zodac.folding.db.postgres.gen:me.zodac.folding.db.postgres.gen.*</excludePackageNames>
                         <!-- Would prefer this to be true, but annoying false positive with default constructors -->
                         <failOnWarnings>false</failOnWarnings>
@@ -1082,22 +1084,4 @@
             </properties>
         </profile>
     </profiles>
-
-    <repositories>
-        <repository>
-            <id>maven-public</id>
-            <url>https://nexus.zodac.me/repository/maven-group/</url>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <url>https://nexus.zodac.me/repository/maven-snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>nexus-releases</id>
-            <url>https://nexus.zodac.me/repository/maven-releases/</url>
-        </repository>
-    </distributionManagement>
 </project>
