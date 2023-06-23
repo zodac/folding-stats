@@ -12,6 +12,12 @@
     <artifactId>folding-stats-api</artifactId>
     <name>[${project.parent.artifactId}] API module</name>
 
+    <properties>
+        <!-- JaCoCo Configuration -->
+        <line-coverage>0.10</line-coverage>
+        <branch-coverage>0.15</branch-coverage>
+    </properties>
+
     <dependencies>
         <!-- 3PP Dependencies -->
         <!-- Required for custom LocalDateTime serializer/deserializer -->
@@ -52,6 +58,10 @@
             </plugin>
 
             <!-- Execute tests -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

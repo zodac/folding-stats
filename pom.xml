@@ -39,6 +39,9 @@
         <skip-ui-tests>true</skip-ui-tests>
         <!-- Adding so Maven plugins will not copy/compile test resources -->
         <maven.test.skip>${skip-tests}</maven.test.skip>
+        <!-- JaCoCo Configuration (overridden in each child module) -->
+        <line-coverage>0.0</line-coverage>
+        <branch-coverage>0.0</branch-coverage>
 
         <!-- 3PP Versions -->
         <caffeine.version>3.1.6</caffeine.version>
@@ -67,6 +70,7 @@
 
         <!-- Plugin Versions -->
         <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
         <jmeter-maven-plugin.version>3.7.0</jmeter-maven-plugin.version>
         <maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
@@ -75,7 +79,9 @@
         <maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
         <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+        <maven-project-info-reports-plugin.version>3.4.5</maven-project-info-reports-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <maven-site-plugin.version>4.0.0-M8</maven-site-plugin.version>
         <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
         <versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
 
@@ -521,6 +527,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>${maven-project-info-reports-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>${maven-resources-plugin.version}</version>
                     <configuration>
@@ -529,16 +540,8 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
-                    <configuration>
-                        <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
-                        <skipTests>${skip-tests}</skipTests>
-                        <includes>
-                            <include>**/*Suite.java</include>
-                            <include>**/*Test.java</include>
-                        </includes>
-                    </configuration>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>${maven-site-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -549,6 +552,66 @@
                         <!-- If a valid update becomes available, it can be updated and removed from below -->
                         <excludes/>
                         <generateBackupPoms>false</generateBackupPoms>
+                    </configuration>
+                </plugin>
+
+                <!-- Test Execution -->
+                <!-- Must be run with tests, cannot be run alone -->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco-maven-plugin.version}</version>
+                    <configuration>
+                        <rules>
+                            <rule>
+                                <element>BUNDLE</element>
+                                <limits>
+                                    <limit>
+                                        <counter>LINE</counter>
+                                        <value>COVEREDRATIO</value>
+                                        <minimum>${line-coverage}</minimum>
+                                    </limit>
+                                    <limit>
+                                        <counter>BRANCH</counter>
+                                        <value>COVEREDRATIO</value>
+                                        <minimum>${branch-coverage}</minimum>
+                                    </limit>
+                                </limits>
+                            </rule>
+                        </rules>
+                        <skip>${skip-tests}</skip>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>default-prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>default-report</id>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>default-check</id>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                    <configuration>
+                        <failIfNoSpecifiedTests>false</failIfNoSpecifiedTests>
+                        <skipTests>${skip-tests}</skipTests>
+                        <includes>
+                            <include>**/*Test.java</include>
+                        </includes>
                     </configuration>
                 </plugin>
 
