@@ -81,7 +81,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <skipTests>${skip-integration-tests}</skipTests>
-                    <systemProperties combine.children="append">
+                    <systemPropertyVariables combine.children="append">
                         <property>
                             <name>testIpAddress</name>
                             <!-- Value for Windows 10 Docker for Windows -->
@@ -107,7 +107,7 @@
                             <name>operaPort</name>
                             <value>4447</value>
                         </property>
-                    </systemProperties>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
 

@@ -40,9 +40,22 @@ class UserTest {
         final User user =
             User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, hardware, team, Role.CAPTAIN);
 
-        assertThat(user)
-            .extracting("id", "foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "role")
-            .containsExactly(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, Role.CAPTAIN);
+        assertThat(user.id())
+            .isEqualTo(1);
+        assertThat(user.foldingUserName())
+            .isEqualTo("user");
+        assertThat(user.displayName())
+            .isEqualTo("user");
+        assertThat(user.passkey())
+            .isEqualTo(DUMMY_PASSKEY);
+        assertThat(user.category())
+            .isEqualTo(Category.AMD_GPU);
+        assertThat(user.profileLink())
+            .isEqualTo(VALID_PROFILE_LINK);
+        assertThat(user.liveStatsLink())
+            .isEqualTo(VALID_LIVE_STATS_LINK);
+        assertThat(user.role())
+            .isEqualTo(Role.CAPTAIN);
 
         assertThat(user.hardware())
             .isEqualTo(hardware);

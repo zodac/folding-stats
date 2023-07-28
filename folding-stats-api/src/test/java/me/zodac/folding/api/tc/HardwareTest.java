@@ -31,9 +31,20 @@ class HardwareTest {
     void testCreate() {
         final Hardware hardware = Hardware.create(1, "hardware", "hardware", HardwareMake.AMD, HardwareType.GPU, 1.0D, 1L);
 
-        assertThat(hardware)
-            .extracting("id", "hardwareName", "displayName", "hardwareMake", "hardwareType", "multiplier", "averagePpd")
-            .containsExactly(1, "hardware", "hardware", HardwareMake.AMD, HardwareType.GPU, 1.0D, 1L);
+        assertThat(hardware.id())
+            .isEqualTo(1);
+        assertThat(hardware.hardwareName())
+            .isEqualTo("hardware");
+        assertThat(hardware.displayName())
+            .isEqualTo("hardware");
+        assertThat(hardware.hardwareMake())
+            .isEqualTo(HardwareMake.AMD);
+        assertThat(hardware.hardwareType())
+            .isEqualTo(HardwareType.GPU);
+        assertThat(hardware.multiplier())
+            .isEqualTo(1.0D);
+        assertThat(hardware.averagePpd())
+            .isEqualTo(1L);
     }
 
     @Test

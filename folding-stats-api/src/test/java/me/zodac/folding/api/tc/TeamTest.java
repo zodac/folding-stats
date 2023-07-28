@@ -33,9 +33,14 @@ class TeamTest {
     void testCreate() {
         final Team team = Team.create(1, "teamName", "teamDescription", VALID_FORUM_LINK);
 
-        assertThat(team)
-            .extracting("id", "teamName", "teamDescription", "forumLink")
-            .containsExactly(1, "teamName", "teamDescription", VALID_FORUM_LINK);
+        assertThat(team.id())
+            .isEqualTo(1);
+        assertThat(team.teamName())
+            .isEqualTo("teamName");
+        assertThat(team.teamDescription())
+            .isEqualTo("teamDescription");
+        assertThat(team.forumLink())
+            .isEqualTo(VALID_FORUM_LINK);
     }
 
     @Test

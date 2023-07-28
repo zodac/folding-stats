@@ -44,35 +44,35 @@
         <branch-coverage>0.0</branch-coverage>
 
         <!-- 3PP Versions -->
-        <caffeine.version>3.1.6</caffeine.version>
+        <caffeine.version>3.1.7</caffeine.version>
         <gson.version>2.10.1</gson.version>
         <hikariCP.version>5.0.1</hikariCP.version>
         <jakartaee-web-api.version>10.0.0</jakartaee-web-api.version>
-        <jersey-server.version>3.1.2</jersey-server.version>
-        <jooq.version>3.18.4</jooq.version>
+        <jersey-server.version>3.1.3</jersey-server.version>
+        <jooq.version>3.18.5</jooq.version>
         <jsoup.version>1.16.1</jsoup.version>
-        <log4j.version>2.20.0</log4j.version>
+        <log4j.version>3.0.0-alpha1</log4j.version>
         <lombok.version>1.18.28</lombok.version>
-        <micrometer.version>1.11.1</micrometer.version>
+        <micrometer.version>1.11.2</micrometer.version>
         <postgresql.version>42.6.0</postgresql.version>
-        <resilience4j.version>2.0.2</resilience4j.version>
-        <spring-boot.version>3.1.0</spring-boot.version>
+        <resilience4j.version>2.1.0</resilience4j.version>
+        <spring-boot.version>3.1.2</spring-boot.version>
         <springdoc-openapi-starter.version>2.1.0</springdoc-openapi-starter.version>
-        <slf4j-api>2.0.7</slf4j-api>
+        <slf4j-api.version>2.0.7</slf4j-api.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.24.2</assertj-core.version>
         <embedded-postgres.version>2.0.4</embedded-postgres.version>
         <embedded-postgres-binaries-bom.version>15.3.0</embedded-postgres-binaries-bom.version>
-        <flyway-core>9.19.4</flyway-core>
-        <junit-bom.version>5.10.0-M1</junit-bom.version>
-        <selenium.version>4.10.0</selenium.version>
+        <flyway-core>9.21.1</flyway-core>
+        <junit-bom.version>5.10.0</junit-bom.version>
+        <selenium-java.version>4.10.0</selenium-java.version>
 
         <!-- Plugin Versions -->
         <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
-        <jmeter-maven-plugin.version>3.7.0</jmeter-maven-plugin.version>
-        <maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
+        <jmeter-maven-plugin.version>3.8.0</jmeter-maven-plugin.version>
+        <maven-clean-plugin.version>3.3.1</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.6.0</maven-dependency-plugin.version>
         <maven-enforcer-plugin.version>3.3.0</maven-enforcer-plugin.version>
@@ -81,13 +81,13 @@
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-project-info-reports-plugin.version>3.4.5</maven-project-info-reports-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-        <maven-site-plugin.version>4.0.0-M8</maven-site-plugin.version>
+        <maven-site-plugin.version>4.0.0-M9</maven-site-plugin.version>
         <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
         <versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>10.12.0</checkstyle.version>
-        <error_prone_core.version>2.19.1</error_prone_core.version>
+        <checkstyle.version>10.12.1</checkstyle.version>
+        <error_prone_core.version>2.20.0</error_prone_core.version>
         <licenses.version>1</licenses.version>
         <pitest-junit5-plugin.version>1.2.0</pitest-junit5-plugin.version>
         <pmd.version>6.55.0</pmd.version>
@@ -99,8 +99,8 @@
         <maven-checkstyle-plugin.version>3.3.0</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.21.0</maven-pmd-plugin.version>
-        <pitest-maven.version>1.14.1</pitest-maven.version>
-        <spotbugs-maven-plugin.version>4.7.3.4</spotbugs-maven-plugin.version>
+        <pitest-maven.version>1.14.2</pitest-maven.version>
+        <spotbugs-maven-plugin.version>4.7.3.5</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
@@ -116,8 +116,8 @@
         <spotbugs-exclude-file>${project.parent.basedir}/ci/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
 
         <!-- ProGuard 3PP Versions -->
-        <proguard-base.version>7.3.2</proguard-base.version>
-        <proguard-core.version>9.0.9</proguard-core.version>
+        <proguard-base.version>7.4.0-beta01</proguard-base.version>
+        <proguard-core.version>9.0.10</proguard-core.version>
 
         <!-- ProGuard Plugin Versions -->
         <proguard-maven-plugin.version>2.6.0</proguard-maven-plugin.version>
@@ -292,27 +292,27 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aop</artifactId>
-                <version>6.0.9</version>
+                <version>6.0.11</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>6.0.9</version>
+                <version>6.0.11</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-expression</artifactId>
-                <version>6.0.9</version>
+                <version>6.0.11</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>6.0.9</version>
+                <version>6.0.11</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-webmvc</artifactId>
-                <version>6.0.9</version>
+                <version>6.0.11</version>
             </dependency>
 
             <!-- [CVE-2023-20873] -->
@@ -374,7 +374,7 @@
             <dependency>
                 <groupId>org.seleniumhq.selenium</groupId>
                 <artifactId>selenium-java</artifactId>
-                <version>${selenium.version}</version>
+                <version>${selenium-java.version}</version>
                 <scope>test</scope>
             </dependency>
 
@@ -393,7 +393,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>${slf4j-api}</version>
+                <version>${slf4j-api.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

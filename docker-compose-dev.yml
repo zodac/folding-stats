@@ -32,9 +32,9 @@ services:
       dockerfile: docker/backend/Dockerfile
       args:
         # Docker image versions
-        DEBIAN_VERSION: "11.7"
+        DEBIAN_VERSION: "12.1"
         JAVA_VERSION: "20"
-        MAVEN_VERSION: "3.9.1"
+        MAVEN_VERSION: "3.9.3"
         # Build arguments
         KEYSTORE_PASSWORD: "shroot"
         NEXUS_URL: "${NEXUS_URL}"
@@ -109,7 +109,7 @@ services:
       - "5433:5432"
 
   selenium_chrome:
-    image: selenium/standalone-chrome:113.0
+    image: selenium/standalone-chrome:114.0
     container_name: selenium_chrome
     hostname: selenium_chrome
     depends_on:
@@ -120,7 +120,7 @@ services:
       - development
 
   selenium_firefox:
-    image: selenium/standalone-firefox:112.0
+    image: selenium/standalone-firefox:114.0
     container_name: selenium_firefox
     hostname: selenium_firefox
     depends_on:
