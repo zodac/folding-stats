@@ -19,7 +19,8 @@
     <properties>
         <!-- Project Properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java-release>19</java-release>
+        <java-release>20</java-release>
+        <maven-release>3.9.3</maven-release>
 
         <!-- License Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
@@ -64,7 +65,7 @@
         <assertj-core.version>3.24.2</assertj-core.version>
         <embedded-postgres.version>2.0.4</embedded-postgres.version>
         <embedded-postgres-binaries-bom.version>15.3.0</embedded-postgres-binaries-bom.version>
-        <flyway-core>9.21.1</flyway-core>
+        <flyway-core.version>9.21.1</flyway-core.version>
         <junit-bom.version>5.10.0</junit-bom.version>
         <selenium-java.version>4.10.0</selenium-java.version>
 
@@ -355,7 +356,7 @@
             <dependency>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-core</artifactId>
-                <version>${flyway-core}</version>
+                <version>${flyway-core.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -750,7 +751,7 @@
                                 <version>[${java-release},)</version>
                             </requireJavaVersion>
                             <requireMavenVersion>
-                                <version>[3.8.6,4.0)</version>
+                                <version>[${maven-release},4.0)</version>
                             </requireMavenVersion>
                         </rules>
                         <skip>${skip-linters}</skip>
