@@ -18,6 +18,7 @@
 package me.zodac.folding.test.ui.util;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import org.openqa.selenium.remote.AbstractDriverOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -45,7 +46,7 @@ final class RemoteWebDriverFactory {
             final AbstractDriverOptions<?> options = browserType.options();
             options.setAcceptInsecureCerts(true); // Needed as we use a self-signed certificate in the dev environment
 
-            final URL url = new URL(String.format(WEB_DRIVER_URL_FORMAT, TEST_IP_ADDRESS, browserType.portNumber()));
+            final URL url = URI.create(String.format(WEB_DRIVER_URL_FORMAT, TEST_IP_ADDRESS, browserType.portNumber())).toURL();
             return new RemoteWebDriver(url, options);
         } catch (final MalformedURLException e) {
             throw new AssertionError(String.format("Error initialising web driver for %s", browserType), e);
