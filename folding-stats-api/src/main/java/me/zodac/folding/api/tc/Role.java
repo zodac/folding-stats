@@ -26,7 +26,7 @@ import java.util.List;
 public enum Role {
 
     /**
-     * The {@link User} is the captain of the @link Team}.
+     * The {@link User} is the captain of the {@link Team}.
      */
     CAPTAIN(true),
 

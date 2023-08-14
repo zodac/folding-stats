@@ -19,10 +19,12 @@ package me.zodac.folding.rest.exception;
 
 import java.io.Serial;
 import java.time.Year;
+import lombok.Getter;
 
 /**
  * {@link Exception} to be thrown when a provided {@link String} year is not a valid {@link Year}.
  */
+@Getter
 public class InvalidYearException extends RuntimeException {
 
     @Serial
@@ -42,14 +44,5 @@ public class InvalidYearException extends RuntimeException {
     public InvalidYearException(final String year, final Throwable cause) {
         super(cause);
         this.year = year;
-    }
-
-    /**
-     * The invalid year.
-     *
-     * @return the invalid year
-     */
-    public String getYear() {
-        return year;
     }
 }

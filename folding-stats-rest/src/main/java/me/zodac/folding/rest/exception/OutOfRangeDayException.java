@@ -18,10 +18,12 @@
 package me.zodac.folding.rest.exception;
 
 import java.io.Serial;
+import lombok.Getter;
 
 /**
  * {@link Exception} to be thrown when a provided {@link String} day is not valid for the month/year.
  */
+@Getter
 public class OutOfRangeDayException extends RuntimeException {
 
     @Serial
@@ -54,32 +56,5 @@ public class OutOfRangeDayException extends RuntimeException {
         this.year = year;
         this.month = month;
         this.day = day;
-    }
-
-    /**
-     * The year of the out of range day.
-     *
-     * @return the year
-     */
-    public int getYear() {
-        return year;
-    }
-
-    /**
-     * The month of the out of range day.
-     *
-     * @return the month
-     */
-    public int getMonth() {
-        return month;
-    }
-
-    /**
-     * The invalid day.
-     *
-     * @return the invalid day
-     */
-    public int getDay() {
-        return day;
     }
 }

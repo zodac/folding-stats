@@ -18,10 +18,12 @@
 package me.zodac.folding.rest.exception;
 
 import java.io.Serial;
+import lombok.Getter;
 
 /**
  * {@link Exception} to be thrown when a provided {@link String} day is not a valid {@link Integer}.
  */
+@Getter
 public class InvalidDayException extends RuntimeException {
 
     @Serial
@@ -41,14 +43,5 @@ public class InvalidDayException extends RuntimeException {
     public InvalidDayException(final String day, final Throwable cause) {
         super(cause);
         this.day = day;
-    }
-
-    /**
-     * The invalid day.
-     *
-     * @return the invalid day
-     */
-    public String getDay() {
-        return day;
     }
 }

@@ -198,7 +198,7 @@ class StringUtilsTest {
     void whenUnescapeHtml_givenUnescapedHtml_thenInputIsReturned() {
         final String result = StringUtils.unescapeHtml("hello world");
         assertThat(result)
-            .isEqualTo(result);
+            .isEqualTo("hello world");
     }
 
     @Test

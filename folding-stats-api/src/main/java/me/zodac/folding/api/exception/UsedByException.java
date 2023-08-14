@@ -31,6 +31,7 @@ import me.zodac.folding.api.ResponsePojo;
 /**
  * Exception thrown when a {@link ResponsePojo} being deleted is still in use by another {@link ResponsePojo}.
  */
+@Getter
 public class UsedByException extends RuntimeException {
 
     @Serial
@@ -50,15 +51,6 @@ public class UsedByException extends RuntimeException {
     public UsedByException(final ResponsePojo invalidObject, final Collection<? extends ResponsePojo> usedBy) {
         super();
         usedByFailure = new UsedByFailure(invalidObject, usedBy);
-    }
-
-    /**
-     * The {@link UsedByFailure}.
-     *
-     * @return the {@link UsedByFailure}
-     */
-    public UsedByFailure getUsedByFailure() {
-        return usedByFailure;
     }
 
     /**

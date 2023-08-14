@@ -21,7 +21,6 @@ import static me.zodac.folding.test.ui.util.Logger.log;
 import static me.zodac.folding.test.ui.util.TestExecutor.executeWithDriver;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.net.MalformedURLException;
 import java.util.List;
 import me.zodac.folding.test.ui.model.Attribute;
 import me.zodac.folding.test.ui.model.NavigationBar;
@@ -42,7 +41,7 @@ class UserHourlyTest {
 
     @ParameterizedTest
     @EnumSource(BrowserType.class)
-    void loadUserHourlyPage(final BrowserType browserType) throws MalformedURLException {
+    void loadUserHourlyPage(final BrowserType browserType) {
         log("Loading '%s' browser at '%s'", browserType.displayName(), FRONTEND_LINK.url());
 
         executeWithDriver(browserType, driver -> {

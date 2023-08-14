@@ -33,6 +33,7 @@ import me.zodac.folding.api.ResponsePojo;
 /**
  * Exception thrown when an object being validated fails a validation constraint.
  */
+@Getter
 public class ValidationException extends RuntimeException {
 
     @Serial
@@ -86,15 +87,6 @@ public class ValidationException extends RuntimeException {
     public ValidationException(final RequestPojo invalidObject, final Collection<String> errors) {
         super();
         validationFailure = new ValidationFailure(invalidObject, errors);
-    }
-
-    /**
-     * The {@link ValidationFailure}.
-     *
-     * @return the {@link ValidationFailure}
-     */
-    public ValidationFailure getValidationFailure() {
-        return validationFailure;
     }
 
     /**

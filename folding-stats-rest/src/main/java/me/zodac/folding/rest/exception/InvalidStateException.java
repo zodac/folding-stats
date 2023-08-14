@@ -18,11 +18,13 @@
 package me.zodac.folding.rest.exception;
 
 import java.io.Serial;
+import lombok.Getter;
 import me.zodac.folding.api.tc.change.UserChangeState;
 
 /**
  * {@link Exception} thrown when a {@link UserChangeState} is updated, but an update is not allowed.
  */
+@Getter
 public class InvalidStateException extends RuntimeException {
 
     @Serial
@@ -48,23 +50,5 @@ public class InvalidStateException extends RuntimeException {
         super();
         this.fromState = fromState;
         this.toState = toState;
-    }
-
-    /**
-     * The current {@link UserChangeState} being changed.
-     *
-     * @return the from {@link UserChangeState}
-     */
-    public UserChangeState getFromState() {
-        return fromState;
-    }
-
-    /**
-     * The wanted {@link UserChangeState} to which we would like to change.
-     *
-     * @return the to {@link UserChangeState}
-     */
-    public UserChangeState getToState() {
-        return toState;
     }
 }

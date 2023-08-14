@@ -26,6 +26,7 @@ import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.rest.api.header.RestHeader;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -191,7 +192,7 @@ public final class Responses {
         return responseWithLocation(entity, entityId, HttpStatus.CREATED);
     }
 
-    private static <E> ResponseEntity<E> responseWithLocation(final E entity, final int entityId, final HttpStatus httpStatus) {
+    private static <E> ResponseEntity<E> responseWithLocation(final E entity, final int entityId, final HttpStatusCode httpStatus) {
         final URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")

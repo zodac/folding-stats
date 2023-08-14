@@ -18,11 +18,13 @@
 package me.zodac.folding.rest.exception;
 
 import java.io.Serial;
+import lombok.Getter;
 import me.zodac.folding.rest.api.LoginCredentials;
 
 /**
  * {@link Exception} to be thrown when a provided {@link LoginCredentials} is not valid.
  */
+@Getter
 public class InvalidLoginCredentialsException extends RuntimeException {
 
     @Serial
@@ -52,14 +54,5 @@ public class InvalidLoginCredentialsException extends RuntimeException {
     public InvalidLoginCredentialsException(final LoginCredentials loginCredentials, final Throwable cause) {
         super(cause);
         this.loginCredentials = loginCredentials;
-    }
-
-    /**
-     * The invalid {@link LoginCredentials}.
-     *
-     * @return the invalid {@link LoginCredentials}
-     */
-    public LoginCredentials getLoginCredentials() {
-        return loginCredentials;
     }
 }

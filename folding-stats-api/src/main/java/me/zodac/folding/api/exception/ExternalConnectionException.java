@@ -18,10 +18,12 @@
 package me.zodac.folding.api.exception;
 
 import java.io.Serial;
+import lombok.Getter;
 
 /**
  * {@link Exception} for errors when connecting to an external service, or when an unexpected response is returned.
  */
+@Getter
 public class ExternalConnectionException extends Exception {
 
     @Serial
@@ -53,14 +55,5 @@ public class ExternalConnectionException extends Exception {
     public ExternalConnectionException(final String url, final String message, final Throwable cause) {
         super(message, cause);
         this.url = url;
-    }
-
-    /**
-     * The URL that could not be connected to, causing the {@link ExternalConnectionException} to be thrown.
-     *
-     * @return the failing URL
-     */
-    public String getUrl() {
-        return url;
     }
 }

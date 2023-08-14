@@ -33,6 +33,7 @@ import me.zodac.folding.api.ResponsePojo;
 /**
  * Exception thrown when a {@link RequestPojo} being validated conflicts with an existing {@link ResponsePojo}.
  */
+@Getter
 public class ConflictException extends RuntimeException {
 
     @Serial
@@ -64,15 +65,6 @@ public class ConflictException extends RuntimeException {
      */
     public ConflictException(final RequestPojo invalidObject, final ResponsePojo conflictingObject, final String conflictingAttribute) {
         this(invalidObject, conflictingObject, List.of(conflictingAttribute));
-    }
-
-    /**
-     * The {@link ConflictFailure}.
-     *
-     * @return the {@link ConflictFailure}
-     */
-    public ConflictFailure getConflictFailure() {
-        return conflictFailure;
     }
 
     /**

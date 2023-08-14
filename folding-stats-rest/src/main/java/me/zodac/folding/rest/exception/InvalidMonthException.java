@@ -19,10 +19,12 @@ package me.zodac.folding.rest.exception;
 
 import java.io.Serial;
 import java.time.Month;
+import lombok.Getter;
 
 /**
  * {@link Exception} to be thrown when a provided {@link String} month is not a valid {@link Month}.
  */
+@Getter
 public class InvalidMonthException extends RuntimeException {
 
     @Serial
@@ -42,14 +44,5 @@ public class InvalidMonthException extends RuntimeException {
     public InvalidMonthException(final String month, final Throwable cause) {
         super(cause);
         this.month = month;
-    }
-
-    /**
-     * The invalid month.
-     *
-     * @return the invalid month
-     */
-    public String getMonth() {
-        return month;
     }
 }
