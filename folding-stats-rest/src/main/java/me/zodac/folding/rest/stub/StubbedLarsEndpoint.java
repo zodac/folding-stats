@@ -42,10 +42,6 @@ import org.springframework.web.bind.annotation.RestController;
  * Stubbed endpoint for the LARS PPD DB. Used to retrieve metadata about a piece of hardware, rather than going to the real API.
  *
  * <p>
- * Since the LARS DB does not have an API, the production code scrapes the HTML page itself. To correctly test, we will need to reconstruct the HTML
- * structure (at least the parts that the production code expected), then populate our configured hardware in a similar way to the LARS DB itself.
- *
- * <p>
  * We expose additional endpoints to allow the tests to provide {@link LarsGpu}s to the system.
  *
  * @see <a href="https://folding.lar.systems/">LARS PPD DB</a>
@@ -60,7 +56,24 @@ public class StubbedLarsEndpoint {
     private static final LarsGpuResponse LARS_GPU_RESPONSE = createLarsResponse();
 
     /**
-     * {@link PostMapping} request that allows tests to provide a single {@link LarsGpu} to be added to the stubbed response.
+     * {@link GetMapping} request that returns the configured hardware in the same format as the LARS DB HTML output.
+     *
+     * <p>
+     * Shadows the existing {@code /api/gpu_ppd/gpu_rank_list.json} GET endpoint for retrieving the GPU PPD DB.
+     *
+     * @return the {@link LarsGpuResponse} response
+     */
+    @GetMapping(path = "/gpu_rank_list.json", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<LarsGpuResponse> getGpus() {
+        return ok(LARS_GPU_RESPONSE);
+    }
+
+    /**
+     * {@link PostMapping} request that adds a single {@link LarsGpu} to be added to the stubbed GPU PPD DB.
+     *
+     * <p>
+     * This does not shadow an existing endpoint. Since in the test environment we do not want to maintain an actual DB for multiple GPUs, we can
+     * manually create and add them here.
      *
      * @param larsGpu the {@link LarsGpu} to add
      * @return {@link HttpStatus#CREATED} {@link ResponseEntity}
@@ -81,6 +94,9 @@ public class StubbedLarsEndpoint {
     /**
      * {@link DeleteMapping} request to remove all {@link LarsGpu}s from the stubbed endpoint.
      *
+     * <p>
+     * This does not shadow an existing endpoint. Used for the test environment to clean up all user units.
+     *
      * @return {@link HttpStatus#OK} {@link ResponseEntity}
      */
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -90,30 +106,9 @@ public class StubbedLarsEndpoint {
         return ok();
     }
 
-    /**
-     * {@link GetMapping} request that returns the configured hardware in the same format as the LARS DB HTML output.
-     *
-     * <p>
-     * Used by production code, not by tests directly, though tests should populate the hardware using {@link #addGpu(LarsGpu)}.
-     *
-     * @return the {@link LarsGpuResponse} response
-     * @see StubbedLarsEndpoint#addGpu(LarsGpu)
-     */
-    @GetMapping(path = "/gpu_rank_list.json", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<LarsGpuResponse> getGpus() {
-        return ok(LARS_GPU_RESPONSE);
-    }
-
     private static LarsGpuResponse createLarsResponse() {
         final LarsGpuResponse larsGpuResponse = new LarsGpuResponse();
-        larsGpuResponse.setApiName("");
-        larsGpuResponse.setApiDescription("");
-        larsGpuResponse.setApiLicence("");
-        larsGpuResponse.setCreditLinkWebsite("");
-        larsGpuResponse.setCreditLinkChromeExtension("");
-        larsGpuResponse.setDateOfLastUpdate("");
         larsGpuResponse.setRankedGpus(new ArrayList<>());
-
         return larsGpuResponse;
     }
 }

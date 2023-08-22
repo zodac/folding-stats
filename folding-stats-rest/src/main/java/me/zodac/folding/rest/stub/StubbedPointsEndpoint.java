@@ -57,6 +57,9 @@ public class StubbedPointsEndpoint {
     /**
      * {@link GetMapping} request that retrieves the points for a Folding@Home user.
      *
+     * <p>
+     * Shadows the existing {@code /user/{user}/stats?passkey={passkey}} GET endpoint for retrieving user points.
+     *
      * @param foldingUserName the Folding@Home user's username
      * @param passkey         the Folding@Home user's passkey
      * @return the Folding@Home user's {@link PointsResponse}
@@ -71,14 +74,18 @@ public class StubbedPointsEndpoint {
     }
 
     /**
-     * {@link PostMapping} request that sets the points for a Folding@Home user.
+     * {@link PostMapping} request that adds points for a Folding@Home user.
      *
      * <p>
-     * Since in the test environment we do not want a user to actually have to complete units and earn points, we can manually set them here.
+     * This does not shadow an existing endpoint. Since in the test environment we do not want a user to actually have to complete units and
+     * earn points, we can manually set them here.
+     *
+     * <p>
+     * If the input {@code points} is <b>0</b>, the user's points will be set to <b>0</b>, rather than having no change.
      *
      * @param foldingUserName the Folding@Home user's username
      * @param passkey         the Folding@Home user's passkey
-     * @param points          the points to set
+     * @param points          the points to add for the user (can be positive or negative)
      * @return {@link HttpStatus#CREATED} {@link ResponseEntity}
      */
     @PostMapping(value = "/{foldingUserName}/stats", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -102,6 +109,9 @@ public class StubbedPointsEndpoint {
 
     /**
      * {@link DeleteMapping} request that resets the points for all Folding@Home users.
+     *
+     * <p>
+     * This does not shadow an existing endpoint. Used for the test environment to clean up all user points.
      *
      * @return {@link HttpStatus#OK} {@link ResponseEntity}
      */
