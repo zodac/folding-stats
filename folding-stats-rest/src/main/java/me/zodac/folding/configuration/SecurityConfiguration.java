@@ -17,10 +17,8 @@
 
 package me.zodac.folding.configuration;
 
-import com.google.gson.Gson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,7 +29,6 @@ import org.springframework.security.web.SecurityFilterChain;
  * {@link Configuration} class used configure Spring security related options.
  */
 @Configuration
-@ConditionalOnClass(Gson.class)
 public class SecurityConfiguration {
 
     private static final Logger LOGGER = LogManager.getLogger();
