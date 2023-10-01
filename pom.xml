@@ -53,21 +53,21 @@
         <jooq.version>3.18.6</jooq.version>
         <jsoup.version>1.16.1</jsoup.version>
         <log4j.version>3.0.0-alpha1</log4j.version>
-        <lombok.version>1.18.28</lombok.version>
-        <micrometer.version>1.11.3</micrometer.version>
+        <lombok.version>1.18.30</lombok.version>
+        <micrometer.version>1.11.4</micrometer.version>
         <postgresql.version>42.6.0</postgresql.version>
         <resilience4j.version>2.1.0</resilience4j.version>
-        <spring-boot.version>3.1.3</spring-boot.version>
-        <springdoc-openapi-starter.version>2.2.0</springdoc-openapi-starter.version>
-        <slf4j-api.version>2.0.7</slf4j-api.version>
+        <spring-boot.version>3.1.4</spring-boot.version>
+        <springdoc-openapi-starter-common.version>2.2.0</springdoc-openapi-starter-common.version>
+        <slf4j-api.version>2.0.9</slf4j-api.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.24.2</assertj-core.version>
         <embedded-postgres.version>2.0.4</embedded-postgres.version>
-        <embedded-postgres-binaries-bom.version>15.4.0</embedded-postgres-binaries-bom.version>
-        <flyway-core.version>9.22.0</flyway-core.version>
+        <embedded-postgres-binaries-bom.version>16.0.0</embedded-postgres-binaries-bom.version>
+        <flyway-core.version>9.22.2</flyway-core.version>
         <junit-bom.version>5.10.0</junit-bom.version>
-        <selenium-java.version>4.12.0</selenium-java.version>
+        <selenium-java.version>4.13.0</selenium-java.version>
 
         <!-- Plugin Versions -->
         <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
@@ -76,7 +76,7 @@
         <maven-clean-plugin.version>3.3.1</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.6.0</maven-dependency-plugin.version>
-        <maven-enforcer-plugin.version>3.4.0</maven-enforcer-plugin.version>
+        <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
         <maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
         <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
@@ -84,7 +84,7 @@
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
         <maven-site-plugin.version>4.0.0-M9</maven-site-plugin.version>
         <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
-        <versions-maven-plugin.version>2.16.0</versions-maven-plugin.version>
+        <versions-maven-plugin.version>2.16.1</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
         <checkstyle.version>10.12.3</checkstyle.version>
@@ -96,12 +96,12 @@
 
         <!-- Linter Plugin Versions -->
         <dependency-check-maven.version>8.4.0</dependency-check-maven.version>
-        <license-maven-plugin.version>4.2</license-maven-plugin.version>
+        <license-maven-plugin.version>4.3</license-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.3.0</maven-checkstyle-plugin.version>
-        <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.6.0</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.21.0</maven-pmd-plugin.version>
-        <pitest-maven.version>1.14.4</pitest-maven.version>
-        <spotbugs-maven-plugin.version>4.7.3.5</spotbugs-maven-plugin.version>
+        <pitest-maven.version>1.15.0</pitest-maven.version>
+        <spotbugs-maven-plugin.version>4.7.3.6</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
@@ -117,7 +117,7 @@
         <spotbugs-exclude-file>${project.parent.basedir}/ci/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
 
         <!-- ProGuard 3PP Versions -->
-        <proguard-base.version>7.4.0-beta01</proguard-base.version>
+        <proguard-base.version>7.4.0-beta02</proguard-base.version>
         <proguard-core.version>9.1.0</proguard-core.version>
 
         <!-- ProGuard Plugin Versions -->
@@ -273,6 +273,18 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-security</artifactId>
                 <version>${spring-boot.version}</version>
+                <exclusions>
+                    <!-- Already being brought in explicitly -->
+                    <exclusion>
+                        <groupId>io.micrometer</groupId>
+                        <artifactId>micrometer-observation</artifactId>
+                    </exclusion>
+                    <!-- Excluding spring dependencies, since spring-boot-starter-security updates versions slower than others -->
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -283,12 +295,28 @@
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-json</artifactId>
                     </exclusion>
+                    <!-- Already being brought in explicitly -->
+                    <exclusion>
+                        <groupId>io.micrometer</groupId>
+                        <artifactId>micrometer-observation</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-                <version>${springdoc-openapi-starter.version}</version>
+                <artifactId>springdoc-openapi-starter-common</artifactId>
+                <version>${springdoc-openapi-starter-common.version}</version>
+                <exclusions>
+                    <!-- Removing SLF4J, not needed for annotations -->
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-autoconfigure</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Test Dependencies -->
@@ -338,39 +366,11 @@
             </dependency>
 
             <!-- Conflicting Dependencies -->
-            <!-- The below dependencies are pulled in by multiple dependencies, so we define a version to keep the classpath consistent -->
-            <dependency>
-                <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-core</artifactId>
-                <version>${micrometer.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-observation</artifactId>
-                <version>${micrometer.version}</version>
-            </dependency>
+            <!-- Used by [HikariCP, resilience4j-core, resilience4j-retry], setting to latest available -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-autoconfigure</artifactId>
-                <version>${spring-boot.version}</version>
-            </dependency>
-
-            <!-- CVE Dependencies -->
-            <!-- [CVE-2023-41080] -->
-            <dependency>
-                <groupId>org.apache.tomcat.embed</groupId>
-                <artifactId>tomcat-embed-core</artifactId>
-                <version>10.1.13</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.tomcat.embed</groupId>
-                <artifactId>tomcat-embed-websocket</artifactId>
-                <version>10.1.13</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
