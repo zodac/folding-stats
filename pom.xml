@@ -58,7 +58,7 @@
         <postgresql.version>42.6.0</postgresql.version>
         <resilience4j.version>2.1.0</resilience4j.version>
         <spring-boot.version>3.1.4</spring-boot.version>
-        <springdoc-openapi-starter-common.version>2.2.0</springdoc-openapi-starter-common.version>
+        <springdoc-openapi.version>2.2.0</springdoc-openapi.version>
         <slf4j-api.version>2.0.9</slf4j-api.version>
 
         <!-- Test 3PP Versions -->
@@ -304,13 +304,18 @@
             </dependency>
             <dependency>
                 <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-starter-common</artifactId>
-                <version>${springdoc-openapi-starter-common.version}</version>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc-openapi.version}</version>
                 <exclusions>
                     <!-- Removing SLF4J, not needed for annotations -->
                     <exclusion>
                         <groupId>org.slf4j</groupId>
                         <artifactId>slf4j-api</artifactId>
+                    </exclusion>
+                    <!-- Brought in by spring-boot-starter-web -->
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-webmvc</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.springframework.boot</groupId>

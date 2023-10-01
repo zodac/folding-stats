@@ -21,9 +21,9 @@ import java.util.Collection;
 import java.util.stream.Stream;
 
 /**
- * Enum defining the frontend API's URL links.
+ * Enum defining the frontend API's Swagger UI URL links.
  */
-public enum ApiLink {
+public enum SwaggerLink {
 
     /**
      * The URL for the Swagger API JSON.
@@ -31,34 +31,34 @@ public enum ApiLink {
     SWAGGER_DOCS_URL("http://backend-dev:8079/folding/api-docs"),
 
     /**
-     * The URL for the Swagger UI for the {@code FoldingStats} project.
+     * The URL for the Swagger API JSON for the {@code FoldingStats} project.
      */
-    SWAGGER_PROJECT_DOCS_URL("http://backend-dev:8079/folding/api-docs/FoldingStats"),
+    SWAGGER_DOCS_PROJECT_URL("http://backend-dev:8079/folding/api-docs/FoldingStats"),
 
     /**
      * The URL for the Swagger UI.
      */
     SWAGGER_UI_URL("http://backend-dev:8079/folding/swagger-ui/index.html");
 
-    private static final Collection<ApiLink> ALL_VALUES = Stream.of(values())
+    private static final Collection<SwaggerLink> ALL_VALUES = Stream.of(values())
         .toList();
 
     private final String url;
 
-    ApiLink(final String url) {
+    SwaggerLink(final String url) {
         this.url = url;
     }
 
     /**
-     * Retrieve all available {@link ApiLink}s.
+     * Retrieve all available {@link SwaggerLink}s.
      *
      * <p>
-     * Should be used instead of {@link ApiLink#values()}, as that recalculates the array for each call,
+     * Should be used instead of {@link SwaggerLink#values()}, as that recalculates the array for each call,
      * while this method uses a static {@link Collection}.
      *
-     * @return a {@link Collection} of all {@link ApiLink}s
+     * @return a {@link Collection} of all {@link SwaggerLink}s
      */
-    public static Collection<ApiLink> getAllValues() {
+    public static Collection<SwaggerLink> getAllValues() {
         return ALL_VALUES;
     }
 
