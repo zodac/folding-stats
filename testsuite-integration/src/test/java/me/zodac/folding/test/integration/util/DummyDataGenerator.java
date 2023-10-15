@@ -30,16 +30,15 @@ import me.zodac.folding.test.integration.util.rest.request.HardwareUtils;
 import me.zodac.folding.test.integration.util.rest.request.TeamUtils;
 
 /**
- * Utility class used to generate {@link HardwareRequest}, {@link TeamRequest} and {@link UserRequest} instances for
- * test cases.
+ * Utility class used to generate {@link HardwareRequest}, {@link TeamRequest} and {@link UserRequest} instances for test cases.
  */
-public final class TestGenerator {
+public final class DummyDataGenerator {
 
     private static final AtomicInteger HARDWARE_COUNT = new AtomicInteger(1);
     private static final AtomicInteger USER_COUNT = new AtomicInteger(1);
     private static final AtomicInteger TEAM_COUNT = new AtomicInteger(1);
 
-    private TestGenerator() {
+    private DummyDataGenerator() {
 
     }
 

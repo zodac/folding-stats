@@ -17,7 +17,7 @@
 
 package me.zodac.folding.test.integration.util.rest.request;
 
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.integration.util.rest.response.HttpResponseHeaderUtils.getTotalCount;
 
 import java.net.HttpURLConnection;

@@ -57,8 +57,8 @@ public enum Category {
     private static final Collection<Category> ALL_VALUES = List.of(values());
 
     private final int permittedUsers;
-    private final EnumSet<HardwareMake> supportedHardwareMakes;
-    private final EnumSet<HardwareType> supportedHardwareTypes;
+    private final Set<HardwareMake> supportedHardwareMakes;
+    private final Set<HardwareType> supportedHardwareTypes;
 
     /**
      * Constructs a {@link Category}.

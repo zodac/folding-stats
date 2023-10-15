@@ -92,7 +92,7 @@ public class UserTcStats extends UserStats {
      * @return the empty {@link UserTcStats}
      */
     public static UserTcStats empty(final int userId) {
-        return create(userId, DATE_TIME_UTILS.currentUtcTimestamp(), Stats.DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, Stats.DEFAULT_UNITS);
+        return create(userId, DATE_TIME_UTILS.currentUtcTimestamp(), DEFAULT_POINTS, DEFAULT_MULTIPLIED_POINTS, DEFAULT_UNITS);
     }
 
     /**
@@ -107,9 +107,9 @@ public class UserTcStats extends UserStats {
      * @return the new {@link UserTcStats} instances with {@link OffsetTcStats} applied
      */
     public UserTcStats add(final OffsetTcStats offsetTcStats) {
-        final long offsetPoints = Math.max(points() + offsetTcStats.pointsOffset(), Stats.DEFAULT_POINTS);
+        final long offsetPoints = Math.max(points() + offsetTcStats.pointsOffset(), DEFAULT_POINTS);
         final long offsetMultipliedPoints = Math.max(multipliedPoints + offsetTcStats.multipliedPointsOffset(), DEFAULT_MULTIPLIED_POINTS);
-        final int offsetUnits = Math.max(units() + offsetTcStats.unitsOffset(), Stats.DEFAULT_UNITS);
+        final int offsetUnits = Math.max(units() + offsetTcStats.unitsOffset(), DEFAULT_UNITS);
 
         return create(userId(), timestamp(), offsetPoints, offsetMultipliedPoints, offsetUnits);
     }
@@ -126,9 +126,9 @@ public class UserTcStats extends UserStats {
      * @return the new {@link UserTcStats} instances with {@link OffsetTcStats} applied
      */
     public UserTcStats subtract(final UserTcStats userTcStats) {
-        final long updatedPoints = Math.max(points() - userTcStats.points(), Stats.DEFAULT_POINTS);
+        final long updatedPoints = Math.max(points() - userTcStats.points(), DEFAULT_POINTS);
         final long updatedMultipliedPoints = Math.max(multipliedPoints - userTcStats.multipliedPoints, DEFAULT_MULTIPLIED_POINTS);
-        final int updatedUnits = Math.max(units() - userTcStats.units(), Stats.DEFAULT_UNITS);
+        final int updatedUnits = Math.max(units() - userTcStats.units(), DEFAULT_UNITS);
 
         return create(userId(), timestamp(), updatedPoints, updatedMultipliedPoints, updatedUnits);
     }

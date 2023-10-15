@@ -20,14 +20,14 @@ package me.zodac.folding.test.integration;
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
 import static me.zodac.folding.rest.api.util.RestUtilConstants.GSON;
 import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.INVALID_PASSWORD;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.INVALID_USERNAME;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.READ_ONLY_USER;
+import static me.zodac.folding.test.integration.util.DummyDataGenerator.generateTeam;
+import static me.zodac.folding.test.integration.util.DummyDataGenerator.nextTeamName;
 import static me.zodac.folding.test.integration.util.SystemCleaner.cleanSystemForSimpleTests;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.INVALID_PASSWORD;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.INVALID_USERNAME;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.READ_ONLY_USER;
 import static me.zodac.folding.test.integration.util.TestConstants.FOLDING_URL;
-import static me.zodac.folding.test.integration.util.TestGenerator.generateTeam;
-import static me.zodac.folding.test.integration.util.TestGenerator.nextTeamName;
 import static me.zodac.folding.test.integration.util.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
 import static me.zodac.folding.test.integration.util.rest.request.TeamUtils.create;
 import static me.zodac.folding.test.integration.util.rest.response.HttpResponseHeaderUtils.getEntityTag;
@@ -46,8 +46,8 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
+import me.zodac.folding.test.integration.util.DummyDataGenerator;
 import me.zodac.folding.test.integration.util.TestConstants;
-import me.zodac.folding.test.integration.util.TestGenerator;
 import me.zodac.folding.test.integration.util.rest.request.TeamUtils;
 import me.zodac.folding.test.integration.util.rest.request.UserUtils;
 import org.junit.jupiter.api.AfterAll;
@@ -361,7 +361,7 @@ class TeamTest {
     @Test
     void whenDeletingTeam_givenTheTeamIsLinkedToUser_thenResponseHas409Status() throws FoldingRestException {
         final int teamId = create(generateTeam()).id();
-        UserUtils.create(TestGenerator.generateUserWithTeamId(teamId));
+        UserUtils.create(DummyDataGenerator.generateUserWithTeamId(teamId));
 
         final HttpResponse<Void> deleteTeamResponse = TEAM_REQUEST_SENDER.delete(teamId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(deleteTeamResponse.statusCode())

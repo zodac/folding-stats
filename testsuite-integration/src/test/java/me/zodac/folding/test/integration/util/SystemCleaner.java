@@ -17,7 +17,7 @@
 
 package me.zodac.folding.test.integration.util;
 
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.integration.util.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
 import static me.zodac.folding.test.integration.util.rest.request.TeamUtils.TEAM_REQUEST_SENDER;
 import static me.zodac.folding.test.integration.util.rest.request.UserUtils.USER_REQUEST_SENDER;

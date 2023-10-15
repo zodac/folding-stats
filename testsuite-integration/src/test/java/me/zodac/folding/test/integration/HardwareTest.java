@@ -20,10 +20,10 @@ package me.zodac.folding.test.integration;
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
 import static me.zodac.folding.rest.api.util.RestUtilConstants.GSON;
 import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.INVALID_PASSWORD;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.INVALID_USERNAME;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.READ_ONLY_USER;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.INVALID_PASSWORD;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.INVALID_USERNAME;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.READ_ONLY_USER;
 import static me.zodac.folding.test.integration.util.rest.request.HardwareUtils.HARDWARE_REQUEST_SENDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,9 +42,9 @@ import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
+import me.zodac.folding.test.integration.util.DummyDataGenerator;
 import me.zodac.folding.test.integration.util.SystemCleaner;
 import me.zodac.folding.test.integration.util.TestConstants;
-import me.zodac.folding.test.integration.util.TestGenerator;
 import me.zodac.folding.test.integration.util.rest.request.HardwareUtils;
 import me.zodac.folding.test.integration.util.rest.request.UserUtils;
 import me.zodac.folding.test.integration.util.rest.response.HttpResponseHeaderUtils;
@@ -92,7 +92,7 @@ class HardwareTest {
     @Test
     void whenCreatingHardware_givenPayloadIsValid_thenTheCreatedHardwareIsReturnedInResponse_andHasId_andResponseHas201Status()
         throws FoldingRestException {
-        final HardwareRequest hardwareToCreate = TestGenerator.generateHardware();
+        final HardwareRequest hardwareToCreate = DummyDataGenerator.generateHardware();
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 201_CREATED HTTP response: " + response.body())
@@ -107,7 +107,7 @@ class HardwareTest {
 
     @Test
     void whenGettingHardware_givenValidHardwareId_thenHardwareIsReturned_andHas200Status() throws FoldingRestException {
-        final int hardwareId = HardwareUtils.create(TestGenerator.generateHardware()).id();
+        final int hardwareId = HardwareUtils.create(DummyDataGenerator.generateHardware()).id();
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
         assertThat(response.statusCode())
@@ -122,7 +122,7 @@ class HardwareTest {
 
     @Test
     void whenGettingHardware_givenValidHardwareName_thenHardwareIsReturned_andHas200Status() throws FoldingRestException {
-        final String hardwareName = HardwareUtils.create(TestGenerator.generateHardware()).hardwareName();
+        final String hardwareName = HardwareUtils.create(DummyDataGenerator.generateHardware()).hardwareName();
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareName);
         assertThat(response.statusCode())
@@ -138,7 +138,7 @@ class HardwareTest {
     @Test
     void whenUpdatingHardware_givenValidHardwareId_andValidPayload_thenUpdatedHardwareIsReturned_andNoNewHardwareIsCreated_andHas200Status()
         throws FoldingRestException {
-        final Hardware createdHardware = HardwareUtils.create(TestGenerator.generateHardware());
+        final Hardware createdHardware = HardwareUtils.create(DummyDataGenerator.generateHardware());
         final int initialSize = HardwareUtils.getNumberOfHardware();
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
@@ -171,7 +171,7 @@ class HardwareTest {
 
     @Test
     void whenCreatingHardware_givenHardwareWithTheSameNameAlreadyExists_then409ResponseIsReturned() throws FoldingRestException {
-        final HardwareRequest hardwareToCreate = TestGenerator.generateHardware();
+        final HardwareRequest hardwareToCreate = DummyDataGenerator.generateHardware();
         HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(),
             ADMIN_USER.password()); // Send one request and ignore it (even if the user already exists, we can verify the conflict with the next one)
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -227,7 +227,7 @@ class HardwareTest {
 
     @Test
     void whenCreatingHardware_givenTeamWithInvalidMultiplier_thenJsonResponseWithErrorIsReturned_andHas400Status() throws FoldingRestException {
-        final String hardwareName = TestGenerator.nextHardwareName();
+        final String hardwareName = DummyDataGenerator.nextHardwareName();
         final HardwareRequest hardwareRequest = HardwareRequest.builder()
             .hardwareName(hardwareName)
             .displayName(hardwareName)
@@ -249,7 +249,7 @@ class HardwareTest {
 
     @Test
     void whenUpdatingHardware_givenNonExistingHardwareId_thenNoJsonResponseIsReturned_andHas404Status() throws FoldingRestException {
-        final HardwareRequest updatedHardware = TestGenerator.generateHardware();
+        final HardwareRequest updatedHardware = DummyDataGenerator.generateHardware();
         final HttpResponse<String> response =
             HARDWARE_REQUEST_SENDER.update(TestConstants.NON_EXISTING_ID, updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
@@ -263,7 +263,7 @@ class HardwareTest {
 
     @Test
     void whenUpdatingHardware_givenInvalidHardwareId_thenResponseHas400Status() throws IOException, InterruptedException, FoldingRestException {
-        final Hardware createdHardware = HardwareUtils.create(TestGenerator.generateHardware());
+        final Hardware createdHardware = HardwareUtils.create(DummyDataGenerator.generateHardware());
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
             .hardwareName(createdHardware.hardwareName())
@@ -320,7 +320,7 @@ class HardwareTest {
     @Test
     void whenUpdatingHardware_givenValidHardwareId_andPayloadHasNoChanges_thenOriginalHardwareIsReturned_andHas200Status()
         throws FoldingRestException {
-        final Hardware createdHardware = HardwareUtils.create(TestGenerator.generateHardware());
+        final Hardware createdHardware = HardwareUtils.create(DummyDataGenerator.generateHardware());
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
             .hardwareName(createdHardware.hardwareName())
@@ -346,8 +346,8 @@ class HardwareTest {
 
     @Test
     void whenDeletingHardware_givenTheHardwareIsLinkedToUser_thenResponseHas409Status() throws FoldingRestException {
-        final int hardwareId = HardwareUtils.create(TestGenerator.generateHardware()).id();
-        final UserRequest user = TestGenerator.generateUserWithHardwareId(hardwareId);
+        final int hardwareId = HardwareUtils.create(DummyDataGenerator.generateHardware()).id();
+        final UserRequest user = DummyDataGenerator.generateUserWithHardwareId(hardwareId);
         UserUtils.create(user);
 
         final HttpResponse<Void> deleteHardwareResponse = HARDWARE_REQUEST_SENDER.delete(hardwareId, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -359,7 +359,7 @@ class HardwareTest {
     @Test
     void whenGettingHardwareById_givenRequestUsesPreviousEntityTag_andHardwareHasNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
-        final int hardwareId = HardwareUtils.create(TestGenerator.generateHardware()).id();
+        final int hardwareId = HardwareUtils.create(DummyDataGenerator.generateHardware()).id();
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
         assertThat(response.statusCode())
@@ -381,7 +381,7 @@ class HardwareTest {
     @Test
     void whenGettingAllHardware_givenRequestUsesPreviousEntityTag_andHardwareHasNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
-        HardwareUtils.create(TestGenerator.generateHardware());
+        HardwareUtils.create(DummyDataGenerator.generateHardware());
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();
         assertThat(response.statusCode())
@@ -402,7 +402,7 @@ class HardwareTest {
 
     @Test
     void whenCreatingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status() throws IOException, InterruptedException {
-        final HardwareRequest hardwareToCreate = TestGenerator.generateHardware();
+        final HardwareRequest hardwareToCreate = DummyDataGenerator.generateHardware();
 
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardwareToCreate)))
@@ -419,7 +419,7 @@ class HardwareTest {
     @Test
     void whenUpdatingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException, IOException, InterruptedException {
-        final Hardware createdHardware = HardwareUtils.create(TestGenerator.generateHardware());
+        final Hardware createdHardware = HardwareUtils.create(DummyDataGenerator.generateHardware());
 
         final HardwareRequest updatedHardware = HardwareRequest.builder()
             .hardwareName(createdHardware.hardwareName())
@@ -442,7 +442,7 @@ class HardwareTest {
     @Test
     void whenDeletingHardware_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException, IOException, InterruptedException {
-        final int hardwareId = HardwareUtils.create(TestGenerator.generateHardware()).id();
+        final int hardwareId = HardwareUtils.create(DummyDataGenerator.generateHardware()).id();
 
         final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
@@ -459,7 +459,7 @@ class HardwareTest {
     @Test
     void whenCreatingHardware_givenAuthentication_andAuthenticationHasInvalidUser_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException {
-        final HardwareRequest hardwareToCreate = TestGenerator.generateHardware();
+        final HardwareRequest hardwareToCreate = DummyDataGenerator.generateHardware();
         final HttpResponse<String> response =
             HARDWARE_REQUEST_SENDER.create(hardwareToCreate, INVALID_USERNAME.userName(), INVALID_USERNAME.password());
         assertThat(response.statusCode())
@@ -470,7 +470,7 @@ class HardwareTest {
     @Test
     void whenCreatingHardware_givenAuthentication_andAuthenticationHasInvalidPassword_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException {
-        final HardwareRequest hardwareToCreate = TestGenerator.generateHardware();
+        final HardwareRequest hardwareToCreate = DummyDataGenerator.generateHardware();
         final HttpResponse<String> response =
             HARDWARE_REQUEST_SENDER.create(hardwareToCreate, INVALID_PASSWORD.userName(), INVALID_PASSWORD.password());
         assertThat(response.statusCode())
@@ -481,7 +481,7 @@ class HardwareTest {
     @Test
     void whenCreatingHardware_givenAuthentication_andUserDoesNotHaveAdminRole_thenRequestFails_andResponseHas403Status()
         throws FoldingRestException {
-        final HardwareRequest hardwareToCreate = TestGenerator.generateHardware();
+        final HardwareRequest hardwareToCreate = DummyDataGenerator.generateHardware();
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, READ_ONLY_USER.userName(), READ_ONLY_USER.password());
         assertThat(response.statusCode())
             .as("Did not receive a 403_FORBIDDEN HTTP response: " + response.body())
@@ -506,7 +506,7 @@ class HardwareTest {
     @Test
     void whenUpdatingHardware_givenEmptyPayload_thenRequestFails_andResponseHas400Status()
         throws FoldingRestException, IOException, InterruptedException {
-        final int hardwareId = HardwareUtils.create(TestGenerator.generateHardware()).id();
+        final int hardwareId = HardwareUtils.create(DummyDataGenerator.generateHardware()).id();
 
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.noBody())
@@ -523,7 +523,7 @@ class HardwareTest {
 
     @Test
     void whenCreatingHardware_andContentTypeIsNotJson_thenResponse415Status() throws IOException, InterruptedException {
-        final HardwareRequest hardwareToCreate = TestGenerator.generateHardware();
+        final HardwareRequest hardwareToCreate = DummyDataGenerator.generateHardware();
 
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(hardwareToCreate)))

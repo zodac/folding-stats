@@ -28,7 +28,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
  */
 final class RemoteWebDriverFactory {
 
-    private static final String TEST_IP_ADDRESS = System.getProperty("testIpAddress", "127.0.0.1");
+    private static final String TEST_IP_ADDRESS = System.getProperty("testIpAddress", "127.0.0.1"); // NOPMD: AvoidUsingHardCodedIP - Fine here
     private static final String WEB_DRIVER_URL_FORMAT = "http://%s:%s/wd/hub";
 
     private RemoteWebDriverFactory() {

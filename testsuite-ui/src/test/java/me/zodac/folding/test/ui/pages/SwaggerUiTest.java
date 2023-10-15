@@ -17,8 +17,8 @@
 
 package me.zodac.folding.test.ui.pages;
 
+import static me.zodac.folding.test.ui.util.Executor.executeWithDriver;
 import static me.zodac.folding.test.ui.util.Logger.log;
-import static me.zodac.folding.test.ui.util.TestExecutor.executeWithDriver;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import me.zodac.folding.test.ui.util.BrowserType;

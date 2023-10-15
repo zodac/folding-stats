@@ -20,13 +20,13 @@ package me.zodac.folding.db.postgres;
 /**
  * Utility class to generate IDs/names for tests.
  */
-final class TestGenerator {
+final class DummyDataGenerator {
 
     private static int hardwareCount = 1;
     private static int userCount = 1;
     private static int teamCount = 1;
 
-    private TestGenerator() {
+    private DummyDataGenerator() {
 
     }
 

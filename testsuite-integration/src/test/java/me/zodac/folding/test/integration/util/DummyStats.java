@@ -22,20 +22,21 @@ package me.zodac.folding.test.integration.util;
  * Used since the normal stubbed endpoints insert stats with the timestamp based on the time of execution, whereas for
  * historic stats, we want to specify the timestamps.
  */
-public record TestStats(int userId, String timestamp, long points, long multipliedPoints, int units) {
+// Replace usage with UserTcStats?
+public record DummyStats(int userId, String timestamp, long points, long multipliedPoints, int units) {
 
     /**
-     * Creates an instance of {@link TestStats}.
+     * Creates an instance of {@link DummyStats}.
      *
      * @param userId           the {@link me.zodac.folding.api.tc.User} ID
      * @param timestamp        the {@link java.sql.Timestamp} the stats were retrieved, as a {@link String}
      * @param points           the points
      * @param multipliedPoints the multiplied points
      * @param units            the units
-     * @return the created {@link TestStats}
+     * @return the created {@link DummyStats}
      */
-    public static TestStats create(final int userId, final String timestamp, final long points, final long multipliedPoints, final int units) {
-        return new TestStats(userId, timestamp, points, multipliedPoints, units);
+    public static DummyStats create(final int userId, final String timestamp, final long points, final long multipliedPoints, final int units) {
+        return new DummyStats(userId, timestamp, points, multipliedPoints, units);
     }
 
     @Override

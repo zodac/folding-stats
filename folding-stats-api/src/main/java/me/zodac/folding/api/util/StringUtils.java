@@ -45,11 +45,7 @@ public final class StringUtils {
      * @return {@code true} if the {@link String} is either empty, or a valid URL
      */
     public static boolean isBlankOrValidUrl(final String input) {
-        if (isBlank(input)) {
-            return true;
-        }
-
-        return isValidUrl(input);
+        return isBlank(input) || isValidUrl(input);
     }
 
     /**

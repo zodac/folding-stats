@@ -20,7 +20,7 @@ package me.zodac.folding.test.integration.util;
 /**
  * Simple {@link Enum} containing the username and password data for test execution. Using default details that should not be used in production.
  */
-public enum TestAuthenticationData {
+public enum DummyAuthenticationData {
 
     /**
      * A valid user with the 'admin' role.
@@ -46,12 +46,12 @@ public enum TestAuthenticationData {
     private final String password;
 
     /**
-     * Constructs a {@link TestAuthenticationData}.
+     * Constructs a {@link DummyAuthenticationData}.
      *
      * @param userName the username
      * @param password the password
      */
-    TestAuthenticationData(final String userName, final String password) {
+    DummyAuthenticationData(final String userName, final String password) {
         this.userName = userName;
         this.password = password;
     }

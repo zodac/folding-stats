@@ -20,10 +20,10 @@ package me.zodac.folding.test.integration;
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
 import static me.zodac.folding.rest.api.util.RestUtilConstants.GSON;
 import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.INVALID_PASSWORD;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.INVALID_USERNAME;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.READ_ONLY_USER;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.INVALID_PASSWORD;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.INVALID_USERNAME;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.READ_ONLY_USER;
 import static me.zodac.folding.test.integration.util.rest.request.UserUtils.USER_REQUEST_SENDER;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,10 +47,10 @@ import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
+import me.zodac.folding.test.integration.util.DummyDataGenerator;
 import me.zodac.folding.test.integration.util.PasskeyChecker;
 import me.zodac.folding.test.integration.util.SystemCleaner;
 import me.zodac.folding.test.integration.util.TestConstants;
-import me.zodac.folding.test.integration.util.TestGenerator;
 import me.zodac.folding.test.integration.util.rest.request.HardwareUtils;
 import me.zodac.folding.test.integration.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.integration.util.rest.request.TeamUtils;
@@ -94,8 +94,8 @@ class UserTest {
 
     @Test
     void whenGettingAllUsers_givenSomeUsersHaveBeenCreated_thenAllAreReturned_andPasskeyIsHidden_andHas200Status() throws FoldingRestException {
-        UserUtils.create(TestGenerator.generateUser());
-        UserUtils.create(TestGenerator.generateUser());
+        UserUtils.create(DummyDataGenerator.generateUser());
+        UserUtils.create(DummyDataGenerator.generateUser());
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithoutPasskeys();
         assertThat(response.statusCode())
@@ -118,8 +118,8 @@ class UserTest {
     @Test
     void whenGettingAllUsers_givenSomeUsersHaveBeenCreated_andPasskeysAreRequest_thenAllAreReturned_andPasskeyIsShown_andHas200Status()
         throws FoldingRestException {
-        UserUtils.create(TestGenerator.generateUser());
-        UserUtils.create(TestGenerator.generateUser());
+        UserUtils.create(DummyDataGenerator.generateUser());
+        UserUtils.create(DummyDataGenerator.generateUser());
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithPasskeys(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
@@ -142,7 +142,7 @@ class UserTest {
     @Test
     void whenCreatingUser_givenPayloadIsValid_thenTheCreatedUserIsReturnedInResponse_andHasId_andResponseHas201Status()
         throws FoldingRestException {
-        final UserRequest userToCreate = TestGenerator.generateUser();
+        final UserRequest userToCreate = DummyDataGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -160,7 +160,7 @@ class UserTest {
 
     @Test
     void whenGettingUser_givenValidUserId_thenUserIsReturned_andPasskeyIsMasked_andHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
+        final int userId = UserUtils.create(DummyDataGenerator.generateUser()).id();
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.get(userId);
         assertThat(response.statusCode())
@@ -176,7 +176,7 @@ class UserTest {
 
     @Test
     void whenGettingUserWithPasskey_givenValidUserId_thenUserIsReturned_andPasskeyIsNotMasked_andHas200Status() throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
+        final int userId = UserUtils.create(DummyDataGenerator.generateUser()).id();
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.getWithPasskey(userId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
@@ -193,7 +193,7 @@ class UserTest {
     @Test
     void whenUpdatingUser_givenValidUserId_andValidPayload_thenUpdatedUserIsReturned_andNoNewUserIsCreated_andHas200Status()
         throws FoldingRestException {
-        final User createdUser = UserUtils.create(TestGenerator.generateUser());
+        final User createdUser = UserUtils.create(DummyDataGenerator.generateUser());
         final int initialSize = UserUtils.getNumberOfUsers();
 
         final String updatedPasskey = "updatedPasskey123456789012345678";
@@ -232,7 +232,7 @@ class UserTest {
     @Test
     void whenDeletingUser_givenValidUserId_thenUserIsDeleted_andHas200Status_andUserCountIsReduced_andUserCannotBeRetrievedAgain()
         throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
+        final int userId = UserUtils.create(DummyDataGenerator.generateUser()).id();
         final int initialSize = UserUtils.getNumberOfUsers();
 
         final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(userId, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -256,7 +256,7 @@ class UserTest {
     @Test
     void whenCreatingUser_givenUserWithInvalidHardwareId_thenJsonResponseWithErrorIsReturned_andHas400Status() throws FoldingRestException {
         final int invalidHardwareId = 0;
-        final UserRequest user = TestGenerator.generateUserWithHardwareId(invalidHardwareId);
+        final UserRequest user = DummyDataGenerator.generateUserWithHardwareId(invalidHardwareId);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(user, ADMIN_USER.userName(), ADMIN_USER.password());
 
@@ -271,7 +271,7 @@ class UserTest {
 
     @Test
     void whenCreatingUser_givenUserHasNoUnitsCompleted_thenUserIsNotCreated_andHas400Status() throws FoldingRestException {
-        final UserRequest user = TestGenerator.generateUser();
+        final UserRequest user = DummyDataGenerator.generateUser();
         StubbedFoldingEndpointUtils.disableUser(user);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(user, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -283,7 +283,7 @@ class UserTest {
 
     @Test
     void whenCreatingUser_givenUserWithTheSameFoldingNameAndPasskeyAlreadyExists_thenA409ResponseIsReturned() throws FoldingRestException {
-        final UserRequest userToCreate = TestGenerator.generateUser();
+        final UserRequest userToCreate = DummyDataGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         USER_REQUEST_SENDER.create(userToCreate, ADMIN_USER.userName(),
@@ -328,7 +328,7 @@ class UserTest {
 
     @Test
     void whenUpdatingUser_givenNonExistingUserId_thenResponseHas404Status() throws FoldingRestException {
-        final UserRequest updatedUser = TestGenerator.generateUser();
+        final UserRequest updatedUser = DummyDataGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(updatedUser);
 
         final HttpResponse<String> response =
@@ -341,7 +341,7 @@ class UserTest {
     @Test
     void whenUpdatingUser_givenInvalidUserId_thenNoJsonResponseIsReturned_andHas400Status()
         throws IOException, InterruptedException, FoldingRestException {
-        final User createdUser = UserUtils.create(TestGenerator.generateUser());
+        final User createdUser = UserUtils.create(DummyDataGenerator.generateUser());
 
         final String updatedPasskey = "updatedPasskey123456789012345678";
         final UserRequest userToUpdate = UserRequest.builder()
@@ -376,7 +376,7 @@ class UserTest {
 
     @Test
     void whenDeletingUser_givenUserIsTeamCaptain_thenResponseHas400Status() throws FoldingRestException {
-        final User captainUser = UserUtils.create(TestGenerator.generateCaptainUser());
+        final User captainUser = UserUtils.create(DummyDataGenerator.generateCaptainUser());
         final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(captainUser.id(), ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
@@ -414,7 +414,7 @@ class UserTest {
 
     @Test
     void whenUpdatingUser_givenValidUserId_andPayloadHasNoChanges_thenOriginalUserIsReturned_andHas200Status() throws FoldingRestException {
-        final User createdUser = UserUtils.create(TestGenerator.generateUser());
+        final User createdUser = UserUtils.create(DummyDataGenerator.generateUser());
         final UserRequest userToUpdate = UserRequest.builder()
             .foldingUserName(createdUser.foldingUserName())
             .displayName(createdUser.displayName())
@@ -445,7 +445,7 @@ class UserTest {
 
     @Test
     void whenGettingUserById_givenRequestUsesPreviousEntityTag_andUserHasNotChanged_thenResponseHas304Status_andNoBody() throws FoldingRestException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
+        final int userId = UserUtils.create(DummyDataGenerator.generateUser()).id();
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.get(userId);
         assertThat(response.statusCode())
@@ -467,7 +467,7 @@ class UserTest {
     @Test
     void whenGettingAllUsersWithoutPasskeys_givenRequestUsesPreviousEntityTag_andUsersHaveNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
-        UserUtils.create(TestGenerator.generateUser());
+        UserUtils.create(DummyDataGenerator.generateUser());
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithoutPasskeys();
         assertThat(response.statusCode())
@@ -489,7 +489,7 @@ class UserTest {
     @Test
     void whenGettingAllUsersWithPasskeys_givenRequestUsesPreviousEntityTag_andUsersHaveNotChanged_thenResponseHas304Status_andNoBody()
         throws FoldingRestException {
-        UserUtils.create(TestGenerator.generateUser());
+        UserUtils.create(DummyDataGenerator.generateUser());
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithPasskeys(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
@@ -511,7 +511,7 @@ class UserTest {
     @Test
     void whenCreatingUser_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException, IOException, InterruptedException {
-        final UserRequest userToCreate = TestGenerator.generateUser();
+        final UserRequest userToCreate = DummyDataGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         final HttpRequest request = HttpRequest.newBuilder()
@@ -530,7 +530,7 @@ class UserTest {
     @Test
     void whenUpdatingUser_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException, IOException, InterruptedException {
-        final User createdUser = UserUtils.create(TestGenerator.generateUser());
+        final User createdUser = UserUtils.create(DummyDataGenerator.generateUser());
 
         final UserRequest userToUpdate = UserRequest.builder()
             .foldingUserName(createdUser.foldingUserName())
@@ -561,7 +561,7 @@ class UserTest {
     @Test
     void whenDeletingUser_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException, IOException, InterruptedException {
-        final int userId = UserUtils.create(TestGenerator.generateUser()).id();
+        final int userId = UserUtils.create(DummyDataGenerator.generateUser()).id();
 
         final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
@@ -579,7 +579,7 @@ class UserTest {
     @Test
     void whenCreatingUser_givenAuthentication_andAuthenticationHasInvalidUser_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException {
-        final UserRequest userToCreate = TestGenerator.generateUser();
+        final UserRequest userToCreate = DummyDataGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, INVALID_USERNAME.userName(), INVALID_USERNAME.password());
@@ -591,7 +591,7 @@ class UserTest {
     @Test
     void whenCreatingUser_givenAuthentication_andAuthenticationHasInvalidPassword_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException {
-        final UserRequest userToCreate = TestGenerator.generateUser();
+        final UserRequest userToCreate = DummyDataGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, INVALID_PASSWORD.userName(), INVALID_PASSWORD.password());
@@ -603,7 +603,7 @@ class UserTest {
     @Test
     void whenCreatingUser_givenAuthentication_andUserDoesNotHaveAdminRole_thenRequestFails_andResponseHas403Status()
         throws FoldingRestException {
-        final UserRequest userToCreate = TestGenerator.generateUser();
+        final UserRequest userToCreate = DummyDataGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, READ_ONLY_USER.userName(), READ_ONLY_USER.password());
@@ -630,7 +630,7 @@ class UserTest {
     @Test
     void whenUpdatingUser_givenEmptyPayload_thenRequestFails_andResponseHas400Status()
         throws FoldingRestException, IOException, InterruptedException {
-        final User createdUser = UserUtils.create(TestGenerator.generateUser());
+        final User createdUser = UserUtils.create(DummyDataGenerator.generateUser());
 
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.noBody())
@@ -647,7 +647,7 @@ class UserTest {
 
     @Test
     void whenCreatingUser_andOptionalFieldIsEmptyString_thenValueShouldBeNullNotEmpty() throws FoldingRestException {
-        final UserRequest user = TestGenerator.generateUser();
+        final UserRequest user = DummyDataGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(user);
         final int userId = UserUtils.create(user).id();
 
@@ -660,7 +660,7 @@ class UserTest {
 
     @Test
     void whenUpdatingUser_andOptionalFieldIsEmptyString_thenValueShouldBeNullNotEmpty() throws FoldingRestException {
-        final User createdUser = UserUtils.create(TestGenerator.generateUserWithLiveStatsLink("http://google.com"));
+        final User createdUser = UserUtils.create(DummyDataGenerator.generateUserWithLiveStatsLink("http://google.com"));
 
         final UserRequest userToUpdate = UserRequest.builder()
             .foldingUserName(createdUser.foldingUserName())
@@ -689,8 +689,8 @@ class UserTest {
 
     @Test
     void whenUpdatingHardware_givenUserUsesTheHardware_thenUserWillReflectTheChanges_andResponseHas200Status() throws FoldingRestException {
-        final Hardware hardware = HardwareUtils.create(TestGenerator.generateHardware());
-        final UserRequest userRequest = TestGenerator.generateUserWithHardwareId(hardware.id());
+        final Hardware hardware = HardwareUtils.create(DummyDataGenerator.generateHardware());
+        final UserRequest userRequest = DummyDataGenerator.generateUserWithHardwareId(hardware.id());
         final User user = UserUtils.create(userRequest);
         final User initialUser = UserUtils.get(user.id());
 
@@ -739,8 +739,8 @@ class UserTest {
 
     @Test
     void whenUpdatingTeam_givenUserIsOnTheTeam_thenUserWillReflectTheChanges_andResponseHas200Status() throws FoldingRestException {
-        final Team team = TeamUtils.create(TestGenerator.generateTeam());
-        final UserRequest userRequest = TestGenerator.generateUserWithTeamId(team.id());
+        final Team team = TeamUtils.create(DummyDataGenerator.generateTeam());
+        final UserRequest userRequest = DummyDataGenerator.generateUserWithTeamId(team.id());
         final User user = UserUtils.create(userRequest);
         final User initialUser = UserUtils.get(user.id());
 
@@ -781,16 +781,16 @@ class UserTest {
     @Test
     void whenCreatingUser_givenUserIsCaptain_andCaptainAlreadyExistsInTeam_thenUserBecomesCaptain_andOldUserIsRemovedAsCaptain()
         throws FoldingRestException {
-        final User existingCaptain = UserUtils.create(TestGenerator.generateCaptainUser());
+        final User existingCaptain = UserUtils.create(DummyDataGenerator.generateCaptainUser());
 
         final User retrievedExistingCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.id()));
         assertThat(retrievedExistingCaptain.role().isCaptain())
             .as("Expected existing user to be captain")
             .isTrue();
 
-        final Hardware newHardware = HardwareUtils.create(TestGenerator.generateHardwareFromCategory(Category.AMD_GPU));
+        final Hardware newHardware = HardwareUtils.create(DummyDataGenerator.generateHardwareFromCategory(Category.AMD_GPU));
         final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName(TestGenerator.nextUserName())
+            .foldingUserName(DummyDataGenerator.nextUserName())
             .displayName("newUser")
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.AMD_GPU.toString())
@@ -815,11 +815,11 @@ class UserTest {
     @Test
     void whenUpdatingUser_givenUserIsCaptain_andCaptainAlreadyExistsInTeam_thenUserReplacesOldUserAsCaptain()
         throws FoldingRestException {
-        final Hardware newHardware = HardwareUtils.create(TestGenerator.generateHardwareFromCategory(Category.AMD_GPU));
+        final Hardware newHardware = HardwareUtils.create(DummyDataGenerator.generateHardwareFromCategory(Category.AMD_GPU));
 
-        final User existingCaptain = UserUtils.create(TestGenerator.generateCaptainUser());
+        final User existingCaptain = UserUtils.create(DummyDataGenerator.generateCaptainUser());
         final User nonCaptain = UserUtils.create(UserRequest.builder()
-            .foldingUserName(TestGenerator.nextUserName())
+            .foldingUserName(DummyDataGenerator.nextUserName())
             .displayName("newUser")
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.AMD_GPU.toString())
@@ -837,7 +837,7 @@ class UserTest {
             .isFalse();
 
         final User newCaptain = UserUtils.update(nonCaptain.id(), UserRequest.builder()
-            .foldingUserName(TestGenerator.nextUserName())
+            .foldingUserName(DummyDataGenerator.nextUserName())
             .displayName("newUser")
             .passkey("DummyPasskey12345678901234567890")
             .category(Category.AMD_GPU.toString())
@@ -860,8 +860,8 @@ class UserTest {
     void whenUpdatingUser_givenUserIsCaptain_andUserIsChangingTeams_andCaptainAlreadyExistsInTeam_thenUserReplacesOldUserAsCaptain()
         throws FoldingRestException {
 
-        final User firstTeamCaptain = UserUtils.create(TestGenerator.generateCaptainUser());
-        final User secondTeamCaptain = UserUtils.create(TestGenerator.generateCaptainUser());
+        final User firstTeamCaptain = UserUtils.create(DummyDataGenerator.generateCaptainUser());
+        final User secondTeamCaptain = UserUtils.create(DummyDataGenerator.generateCaptainUser());
 
         final User retrievedFirstTeamCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(firstTeamCaptain.id()));
         assertThat(retrievedFirstTeamCaptain.role().isCaptain())
@@ -894,7 +894,7 @@ class UserTest {
 
     @Test
     void whenCreatingUser_andContentTypeIsNotJson_thenResponse415Status() throws IOException, InterruptedException, FoldingRestException {
-        final UserRequest userToCreate = TestGenerator.generateUser();
+        final UserRequest userToCreate = DummyDataGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
 
         final HttpRequest request = HttpRequest.newBuilder()

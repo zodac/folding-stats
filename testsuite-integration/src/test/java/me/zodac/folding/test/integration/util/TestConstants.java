@@ -20,10 +20,10 @@ package me.zodac.folding.test.integration.util;
 /**
  * Constants class for test convenience.
  */
-public final class TestConstants {
+public final class TestConstants { // NOPMD: DataClass - Happy to break encapsulation here
 
     // URL
-    public static final String TEST_IP_ADDRESS = System.getProperty("testIpAddress", "127.0.0.1");
+    public static final String TEST_IP_ADDRESS = System.getProperty("testIpAddress", "127.0.0.1"); // NOPMD: AvoidUsingHardCodedIP - Fine here
     public static final String FOLDING_URL = String.format("http://%s:8079/folding", TEST_IP_ADDRESS);
 
     // ID

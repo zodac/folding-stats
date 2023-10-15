@@ -18,7 +18,7 @@
 package me.zodac.folding.test.integration;
 
 import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.integration.util.TestConstants.FOLDING_URL;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,8 +42,8 @@ import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
+import me.zodac.folding.test.integration.util.DummyDataGenerator;
 import me.zodac.folding.test.integration.util.SystemCleaner;
-import me.zodac.folding.test.integration.util.TestGenerator;
 import me.zodac.folding.test.integration.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.integration.util.rest.request.TeamCompetitionStatsUtils;
 import me.zodac.folding.test.integration.util.rest.request.TeamUtils;
@@ -71,8 +71,8 @@ class MonthlyResultTest {
 
     @Test
     void whenGettingMonthlyResult_andGivenMonthHasNoStats_thenEmptyResultIsReturned_andResponseHas200Status() throws FoldingRestException {
-        final Team team = TeamUtils.create(TestGenerator.generateTeam());
-        UserUtils.create(TestGenerator.generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU));
+        final Team team = TeamUtils.create(DummyDataGenerator.generateTeam());
+        UserUtils.create(DummyDataGenerator.generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU));
 
         TeamCompetitionStatsUtils.manuallyUpdateStats();
         MONTHLY_RESULT_REQUEST_SENDER.manualSave(ADMIN_USER.userName(), ADMIN_USER.password());
@@ -123,8 +123,8 @@ class MonthlyResultTest {
 
     @Test
     void whenGettingMonthlyResult_andGivenMonthHasOneUser_thenResultIsReturned_andResponseHas200Status() throws FoldingRestException {
-        final Team team = TeamUtils.create(TestGenerator.generateTeam());
-        final User user = UserUtils.create(TestGenerator.generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU));
+        final Team team = TeamUtils.create(DummyDataGenerator.generateTeam());
+        final User user = UserUtils.create(DummyDataGenerator.generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU));
 
         StubbedFoldingEndpointUtils.addPoints(user, 10_000L);
         TeamCompetitionStatsUtils.manuallyUpdateStats();
@@ -176,18 +176,18 @@ class MonthlyResultTest {
     @Test
     void whenGettingMonthlyResult_andGivenMonthHasMultipleUsers_thenResultIsReturnedWithCorrectRanks_andResponseHas200Stats()
         throws FoldingRestException {
-        final Team firstTeam = TeamUtils.create(TestGenerator.generateTeam());
-        final User firstUser = UserUtils.create(TestGenerator.generateUserWithTeamIdAndCategory(firstTeam.id(), Category.NVIDIA_GPU));
+        final Team firstTeam = TeamUtils.create(DummyDataGenerator.generateTeam());
+        final User firstUser = UserUtils.create(DummyDataGenerator.generateUserWithTeamIdAndCategory(firstTeam.id(), Category.NVIDIA_GPU));
         StubbedFoldingEndpointUtils.addPoints(firstUser, 10_000L);
 
-        final Team secondTeam = TeamUtils.create(TestGenerator.generateTeam());
-        final User secondUser = UserUtils.create(TestGenerator.generateUserWithTeamIdAndCategory(secondTeam.id(), Category.NVIDIA_GPU));
-        final User thirdUser = UserUtils.create(TestGenerator.generateUserWithTeamIdAndCategory(secondTeam.id(), Category.AMD_GPU));
+        final Team secondTeam = TeamUtils.create(DummyDataGenerator.generateTeam());
+        final User secondUser = UserUtils.create(DummyDataGenerator.generateUserWithTeamIdAndCategory(secondTeam.id(), Category.NVIDIA_GPU));
+        final User thirdUser = UserUtils.create(DummyDataGenerator.generateUserWithTeamIdAndCategory(secondTeam.id(), Category.AMD_GPU));
         StubbedFoldingEndpointUtils.addPoints(secondUser, 9_000L);
         StubbedFoldingEndpointUtils.addPoints(thirdUser, 11_000L);
 
-        final Team thirdTeam = TeamUtils.create(TestGenerator.generateTeam());
-        final User fourthUser = UserUtils.create(TestGenerator.generateUserWithTeamIdAndCategory(thirdTeam.id(), Category.WILDCARD));
+        final Team thirdTeam = TeamUtils.create(DummyDataGenerator.generateTeam());
+        final User fourthUser = UserUtils.create(DummyDataGenerator.generateUserWithTeamIdAndCategory(thirdTeam.id(), Category.WILDCARD));
         StubbedFoldingEndpointUtils.addPoints(fourthUser, 30_000L);
 
         TeamCompetitionStatsUtils.manuallyUpdateStats();
@@ -270,8 +270,8 @@ class MonthlyResultTest {
     @Test
     void whenGettingMonthlyResult_andGivenMonthHasMultipleEntriesForMonth_thenLatestResultIsReturnedWithCorrectRanks_andResponseHas200Stats()
         throws FoldingRestException {
-        final Team team = TeamUtils.create(TestGenerator.generateTeam());
-        final User user = UserUtils.create(TestGenerator.generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU));
+        final Team team = TeamUtils.create(DummyDataGenerator.generateTeam());
+        final User user = UserUtils.create(DummyDataGenerator.generateUserWithTeamIdAndCategory(team.id(), Category.NVIDIA_GPU));
 
         StubbedFoldingEndpointUtils.addPoints(user, 10_000L);
         TeamCompetitionStatsUtils.manuallyUpdateStats();

@@ -33,8 +33,8 @@ import me.zodac.folding.client.java.response.TeamCompetitionStatsResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
 import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
+import me.zodac.folding.test.integration.util.DummyDataGenerator;
 import me.zodac.folding.test.integration.util.SystemCleaner;
-import me.zodac.folding.test.integration.util.TestGenerator;
 import me.zodac.folding.test.integration.util.rest.request.StubbedFoldingEndpointUtils;
 import me.zodac.folding.test.integration.util.rest.request.TeamCompetitionStatsUtils;
 import me.zodac.folding.test.integration.util.rest.request.TeamUtils;
@@ -79,16 +79,16 @@ class TeamCompetitionLeaderboardTest {
     @Test
     void whenGettingTeamLeaderboard_andTeamsExistWithStats_thenTeamsAreOrderedCorrectly_andPointsDiffIsCorrectlyCalculated()
         throws FoldingRestException {
-        final Team firstTeam = TeamUtils.create(TestGenerator.generateTeam());
-        final User firstUser = UserUtils.create(TestGenerator.generateUserWithTeamId(firstTeam.id()));
+        final Team firstTeam = TeamUtils.create(DummyDataGenerator.generateTeam());
+        final User firstUser = UserUtils.create(DummyDataGenerator.generateUserWithTeamId(firstTeam.id()));
         StubbedFoldingEndpointUtils.addPoints(firstUser, 10_000L);
 
-        final Team secondTeam = TeamUtils.create(TestGenerator.generateTeam());
-        final User secondUser = UserUtils.create(TestGenerator.generateUserWithTeamId(secondTeam.id()));
+        final Team secondTeam = TeamUtils.create(DummyDataGenerator.generateTeam());
+        final User secondUser = UserUtils.create(DummyDataGenerator.generateUserWithTeamId(secondTeam.id()));
         StubbedFoldingEndpointUtils.addPoints(secondUser, 15_000L);
 
-        final Team thirdTeam = TeamUtils.create(TestGenerator.generateTeam());
-        final User thirdUser = UserUtils.create(TestGenerator.generateUserWithTeamId(thirdTeam.id()));
+        final Team thirdTeam = TeamUtils.create(DummyDataGenerator.generateTeam());
+        final User thirdUser = UserUtils.create(DummyDataGenerator.generateUserWithTeamId(thirdTeam.id()));
         StubbedFoldingEndpointUtils.addPoints(thirdUser, 1_000L);
 
         TeamCompetitionStatsUtils.manuallyUpdateStats();
@@ -147,18 +147,18 @@ class TeamCompetitionLeaderboardTest {
     @Test
     void whenGettingCategoryLeaderboard_andUsersExistWithStats_thenUsersAreGroupedByCategory_andPointsDiffIsCalculatedCorrectly()
         throws FoldingRestException {
-        final Team firstTeam = TeamUtils.create(TestGenerator.generateTeam());
-        final User firstUser = UserUtils.create(TestGenerator.generateUserWithTeamIdAndCategory(firstTeam.id(), Category.AMD_GPU));
+        final Team firstTeam = TeamUtils.create(DummyDataGenerator.generateTeam());
+        final User firstUser = UserUtils.create(DummyDataGenerator.generateUserWithTeamIdAndCategory(firstTeam.id(), Category.AMD_GPU));
         StubbedFoldingEndpointUtils.addPoints(firstUser, 10_000L);
 
-        final Team secondTeam = TeamUtils.create(TestGenerator.generateTeam());
-        final User secondUser = UserUtils.create(TestGenerator.generateUserWithTeamIdAndCategory(secondTeam.id(), Category.AMD_GPU));
+        final Team secondTeam = TeamUtils.create(DummyDataGenerator.generateTeam());
+        final User secondUser = UserUtils.create(DummyDataGenerator.generateUserWithTeamIdAndCategory(secondTeam.id(), Category.AMD_GPU));
         StubbedFoldingEndpointUtils.addPoints(secondUser, 15_000L);
 
-        final Team thirdTeam = TeamUtils.create(TestGenerator.generateTeam());
-        final User thirdUser = UserUtils.create(TestGenerator.generateUserWithTeamIdAndCategory(thirdTeam.id(), Category.AMD_GPU));
+        final Team thirdTeam = TeamUtils.create(DummyDataGenerator.generateTeam());
+        final User thirdUser = UserUtils.create(DummyDataGenerator.generateUserWithTeamIdAndCategory(thirdTeam.id(), Category.AMD_GPU));
         StubbedFoldingEndpointUtils.addPoints(thirdUser, 1_000L);
-        final User fourthUser = UserUtils.create(TestGenerator.generateUserWithTeamIdAndCategory(thirdTeam.id(), Category.NVIDIA_GPU));
+        final User fourthUser = UserUtils.create(DummyDataGenerator.generateUserWithTeamIdAndCategory(thirdTeam.id(), Category.NVIDIA_GPU));
         StubbedFoldingEndpointUtils.addPoints(fourthUser, 1_000L);
 
         TeamCompetitionStatsUtils.manuallyUpdateStats();

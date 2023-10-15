@@ -85,7 +85,7 @@ public class UserStats extends Stats {
      * @return the empty {@link UserStats}
      */
     public static UserStats empty() {
-        return create(User.EMPTY_USER_ID, DATE_TIME_UTILS.currentUtcTimestamp(), Stats.DEFAULT_POINTS, Stats.DEFAULT_UNITS);
+        return create(User.EMPTY_USER_ID, DATE_TIME_UTILS.currentUtcTimestamp(), DEFAULT_POINTS, DEFAULT_UNITS);
     }
 
     @Override

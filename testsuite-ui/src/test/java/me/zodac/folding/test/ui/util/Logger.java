@@ -39,15 +39,4 @@ public final class Logger {
         final String logEntry = format + "%n";
         System.out.printf(logEntry, args); // NOPMD: SystemPrintln - Easier than adding a logger to test module
     }
-
-    /**
-     * Log an entry to the console, starting and ending with a line break.
-     *
-     * @param format a format {@link String}
-     * @param args   arguments referenced by the format specifiers in the {@code format} {@link String}
-     */
-    public static void logWithBlankLine(final String format, final Object... args) {
-        final String logEntry = "%n" + format;
-        log(logEntry, args);
-    }
 }

@@ -17,9 +17,9 @@
 
 package me.zodac.folding.db.postgres;
 
-import static me.zodac.folding.db.postgres.TestGenerator.nextHardwareName;
-import static me.zodac.folding.db.postgres.TestGenerator.nextTeamName;
-import static me.zodac.folding.db.postgres.TestGenerator.nextUserName;
+import static me.zodac.folding.db.postgres.DummyDataGenerator.nextHardwareName;
+import static me.zodac.folding.db.postgres.DummyDataGenerator.nextTeamName;
+import static me.zodac.folding.db.postgres.DummyDataGenerator.nextUserName;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

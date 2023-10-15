@@ -18,9 +18,9 @@
 package me.zodac.folding.test.integration;
 
 import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.ADMIN_USER;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.INVALID_USERNAME;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.READ_ONLY_USER;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.INVALID_USERNAME;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.READ_ONLY_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;

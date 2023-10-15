@@ -22,6 +22,7 @@ import static me.zodac.folding.api.state.OperationType.WRITE;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The various states that the system can be in at a given time.
@@ -55,7 +56,7 @@ public enum SystemState {
      */
     WRITE_EXECUTED(READ, WRITE);
 
-    private final EnumSet<OperationType> permittedOperationTypes;
+    private final Set<OperationType> permittedOperationTypes;
 
     /**
      * Constructs the {@link SystemState}.

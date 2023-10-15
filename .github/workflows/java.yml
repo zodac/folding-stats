@@ -23,6 +23,7 @@ jobs:
       - name: Setup Maven Action
         uses: s4u/setup-maven-action@v1.10.0
         with:
+          java-distribution: 'temurin'
           java-version: '21'
           maven-version: '3.9.4'
       - name: Cache local .m2

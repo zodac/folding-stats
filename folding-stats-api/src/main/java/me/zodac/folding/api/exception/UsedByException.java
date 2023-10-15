@@ -18,14 +18,9 @@
 package me.zodac.folding.api.exception;
 
 import java.io.Serial;
+import java.io.Serializable;
 import java.util.Collection;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import me.zodac.folding.api.ResponsePojo;
 
 /**
@@ -56,15 +51,7 @@ public class UsedByException extends RuntimeException {
     /**
      * Failure POJO used for REST response.
      */
-    @NoArgsConstructor
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    @Accessors(fluent = true)
-    @Getter
-    @Setter
-    @ToString(doNotUseGetters = true)
-    public static class UsedByFailure {
+    public record UsedByFailure(ResponsePojo invalidObject, Collection<? extends ResponsePojo> usedBy) implements Serializable {
 
-        private ResponsePojo invalidObject;
-        private Collection<? extends ResponsePojo> usedBy;
     }
 }

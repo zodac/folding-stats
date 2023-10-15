@@ -23,9 +23,9 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 /**
  * Utility class used to help execute tests.
  */
-public final class TestExecutor {
+public final class Executor {
 
-    private TestExecutor() {
+    private Executor() {
 
     }
 

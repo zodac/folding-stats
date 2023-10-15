@@ -87,7 +87,7 @@ public class LoginController implements LoginEndpoint {
         AUDIT_LOGGER.info("Login request received");
         loginAttempts.increment();
 
-        if (EncodingUtils.isInvalidBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword())) {
+        if (EncodingUtils.isInvalidBasicAuthentication(loginCredentials.encodedUserNameAndPassword())) {
             AUDIT_LOGGER.error("Invalid payload: {}", loginCredentials);
             failedLogins.increment();
             throw new InvalidLoginCredentialsException(loginCredentials);
@@ -95,7 +95,7 @@ public class LoginController implements LoginEndpoint {
 
         try {
             final Map<String, String> decodedUserNameAndPassword =
-                EncodingUtils.decodeBasicAuthentication(loginCredentials.getEncodedUserNameAndPassword());
+                EncodingUtils.decodeBasicAuthentication(loginCredentials.encodedUserNameAndPassword());
             final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
             final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
             AUDIT_LOGGER.debug("Login request received for user: '{}'", userName);

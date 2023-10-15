@@ -25,8 +25,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import me.zodac.folding.test.integration.util.DummyStats;
 import me.zodac.folding.test.integration.util.TestConstants;
-import me.zodac.folding.test.integration.util.TestStats;
 import org.postgresql.util.PSQLException;
 
 /**
@@ -90,14 +90,14 @@ public final class DatabaseUtils {
     }
 
     /**
-     * Insert {@link TestStats} into the provided {@code tableName}.
+     * Insert {@link DummyStats} into the provided {@code tableName}.
      *
      * @param tableName the name of the table
-     * @param stats     the {@link TestStats} to be persisted
+     * @param stats     the {@link DummyStats} to be persisted
      */
-    public static void insertStats(final String tableName, final TestStats... stats) {
+    public static void insertStats(final String tableName, final DummyStats... stats) {
         final String insertStatement = String.format("INSERT INTO %s VALUES %s;", tableName,
-            Arrays.stream(stats).map(TestStats::toString).collect(Collectors.joining(",")));
+            Arrays.stream(stats).map(DummyStats::toString).collect(Collectors.joining(",")));
 
         try (final Connection connection = DriverManager.getConnection(JDBC_CONNECTION_URL, JDBC_CONNECTION_PROPERTIES);
              final PreparedStatement preparedStatement = connection.prepareStatement(insertStatement)) {

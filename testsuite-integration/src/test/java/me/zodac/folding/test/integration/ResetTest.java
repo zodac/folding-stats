@@ -17,13 +17,13 @@
 
 package me.zodac.folding.test.integration;
 
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.integration.util.DummyDataGenerator.generateHardwareFromCategory;
+import static me.zodac.folding.test.integration.util.DummyDataGenerator.generateTeam;
+import static me.zodac.folding.test.integration.util.DummyDataGenerator.generateUserWithTeamIdAndCategory;
+import static me.zodac.folding.test.integration.util.DummyDataGenerator.nextUserName;
 import static me.zodac.folding.test.integration.util.SystemCleaner.cleanSystemForComplexTests;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.integration.util.TestConstants.FOLDING_URL;
-import static me.zodac.folding.test.integration.util.TestGenerator.generateHardwareFromCategory;
-import static me.zodac.folding.test.integration.util.TestGenerator.generateTeam;
-import static me.zodac.folding.test.integration.util.TestGenerator.generateUserWithTeamIdAndCategory;
-import static me.zodac.folding.test.integration.util.TestGenerator.nextUserName;
 import static me.zodac.folding.test.integration.util.rest.request.TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER;
 import static me.zodac.folding.test.integration.util.rest.request.TeamCompetitionStatsUtils.getActiveUserFromTeam;
 import static me.zodac.folding.test.integration.util.rest.request.TeamCompetitionStatsUtils.getTeamFromCompetition;

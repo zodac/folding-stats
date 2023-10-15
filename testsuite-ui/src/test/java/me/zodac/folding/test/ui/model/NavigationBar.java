@@ -23,7 +23,7 @@ import org.openqa.selenium.By;
 /**
  * Constants for the navigation bar on the UI.
  */
-public final class NavigationBar {
+public final class NavigationBar { // NOPMD: DataClass - Happy to break encapsulation here
 
     // Expected values
     public static final String EXPECTED_NAVIGATION_BAR_TITLE = "Extreme Team Folding";

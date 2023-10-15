@@ -10,18 +10,12 @@
     </description>
 
     <rule ref="category/java/bestpractices.xml">
-        <!-- Mostly used for tests -->
-        <exclude name="AvoidUsingHardCodedIP"/>
         <!-- Don't think a rule is necessary, should take it on a case-by-case basis to use a Supplier -->
         <exclude name="GuardLogStatement"/>
         <!-- False positives with other assertion libraries -->
         <exclude name="JUnitTestsShouldIncludeAssert"/>
         <!-- I have no problem with multiple asserts in my tests -->
         <exclude name="JUnitTestContainsTooManyAsserts"/>
-        <!-- False positives with AssertJ using #as() to include an error message -->
-        <exclude name="JUnitAssertionsShouldIncludeMessage"/>
-        <!-- False positives when using 2D arrays -->
-        <exclude name="UseVarargs"/>
     </rule>
     <!-- When using an indexed FOR loop, certain scenarios exist where I'd like to skip the increment -->
     <rule ref="category/java/bestpractices.xml/AvoidReassigningLoopVariables">
@@ -69,7 +63,7 @@
         <exclude name="AvoidCatchingGenericException"/>
         <!-- A little hit & miss -->
         <exclude name="GodClass"/>
-        <!-- I like chaining methods... -->
+        <!-- I like chaining methods -->
         <exclude name="LawOfDemeter"/>
         <!-- Not necessary -->
         <exclude name="LoosePackageCoupling"/>
@@ -112,27 +106,18 @@
     <rule ref="category/java/errorprone.xml">
         <!-- Don't agree, not worth it -->
         <exclude name="AvoidDuplicateLiterals"/>
-
         <!-- Disagree, nicer to have getters with the field name -->
         <exclude name="AvoidFieldNameMatchingMethodName"/>
-
-        <!-- Quite a few false positives -->
-        <exclude name="NonSerializableClass"/>
-
-        <!-- Helper classes can cause this to fail, not worth changing them -->
-        <exclude name="TestClassWithoutTestCases"/>
     </rule>
 
     <rule ref="category/java/multithreading.xml">
-        <!-- False positives in TeamCompetitionStatsEndpoint#getCategoryLeaderboard() -->
-        <!-- No need for concurrency in a @RequestScoped EJB, certainly not for an internal function -->
+        <!-- Need to interrupt the thread when catching an InterruptedException -->
+        <exclude name="DoNotUseThreads"/>
+        <!-- Not necessary, see https://github.com/pmd/pmd/issues/2926 for discussion -->
         <exclude name="UseConcurrentHashMap"/>
     </rule>
 
-    <rule ref="category/java/performance.xml">
-        <!-- False positives in TeamCompetitionStatsEndpoint#getCategoryLeaderboard() -->
-        <exclude name="AvoidInstantiatingObjectsInLoops"/>
-    </rule>
+    <rule ref="category/java/performance.xml"/>
 
     <rule ref="category/java/security.xml"/>
 </ruleset>

@@ -19,12 +19,12 @@ package me.zodac.folding.test.integration;
 
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
 import static me.zodac.folding.rest.api.util.RestUtilConstants.HTTP_CLIENT;
+import static me.zodac.folding.test.integration.util.DummyAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.integration.util.DummyDataGenerator.generateUser;
 import static me.zodac.folding.test.integration.util.PasskeyChecker.assertPasskeyIsHidden;
 import static me.zodac.folding.test.integration.util.PasskeyChecker.assertPasskeyIsShown;
 import static me.zodac.folding.test.integration.util.SystemCleaner.cleanSystemForComplexTests;
-import static me.zodac.folding.test.integration.util.TestAuthenticationData.ADMIN_USER;
 import static me.zodac.folding.test.integration.util.TestConstants.FOLDING_URL;
-import static me.zodac.folding.test.integration.util.TestGenerator.generateUser;
 import static me.zodac.folding.test.integration.util.rest.request.UserUtils.USER_REQUEST_SENDER;
 import static me.zodac.folding.test.integration.util.rest.response.HttpResponseHeaderUtils.getTotalCount;
 import static org.assertj.core.api.Assertions.assertThat;
