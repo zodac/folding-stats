@@ -19,7 +19,6 @@ package me.zodac.folding.bean.tc;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
@@ -70,7 +69,7 @@ public class LeaderboardStatsGenerator {
 
         if (teamResults.isEmpty()) {
             LOGGER.warn("No TC teams to show");
-            return Collections.emptyList();
+            return List.of();
         }
 
         final TeamLeaderboardEntry leader = TeamLeaderboardEntry.createLeader(teamResults.get(0));
@@ -120,7 +119,7 @@ public class LeaderboardStatsGenerator {
     private static List<UserCategoryLeaderboardEntry> getUserLeaderboardForCategory(final List<? extends UserSummary> userResults) {
         // If we have no users for the category, no need to do anything
         if (userResults.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         final UserSummary firstResult = userResults.get(0);

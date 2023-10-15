@@ -26,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -422,8 +421,8 @@ class PostgresDbManagerTest {
                     TeamSummary.createWithDefaultRank(
                         generateTeam(),
                         "Captain1",
-                        Collections.emptyList(),
-                        Collections.emptyList()
+                        List.of(),
+                        List.of()
                     ),
                     0L, 0L
                 )
@@ -439,8 +438,8 @@ class PostgresDbManagerTest {
                         1, 0L, 0L
                     )
                 ),
-                Category.NVIDIA_GPU, Collections.emptyList(),
-                Category.WILDCARD, Collections.emptyList()
+                Category.NVIDIA_GPU, List.of(),
+                Category.WILDCARD, List.of()
             ),
             DateTimeConverterUtils.getLocalDateTimeOf(firstResultYear, firstResultMonth)
         );
@@ -454,8 +453,8 @@ class PostgresDbManagerTest {
                     TeamSummary.createWithDefaultRank(
                         generateTeam(),
                         "Captain2",
-                        Collections.emptyList(),
-                        Collections.emptyList()
+                        List.of(),
+                        List.of()
                     ),
                     0L, 0L
                 )
@@ -471,8 +470,8 @@ class PostgresDbManagerTest {
                         1, 0L, 0L
                     )
                 ),
-                Category.AMD_GPU, Collections.emptyList(),
-                Category.WILDCARD, Collections.emptyList()
+                Category.AMD_GPU, List.of(),
+                Category.WILDCARD, List.of()
             ),
             DateTimeConverterUtils.getLocalDateTimeOf(secondResultYear, secondResultMonth)
         );

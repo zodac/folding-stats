@@ -23,7 +23,7 @@ import java.time.Duration;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -605,7 +605,7 @@ public class Storage {
     @NotCached
     public Collection<HistoricStats> getHistoricStats(final int userId, final Year year, final Month month, final int day) {
         if (year == null) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         return dbManagerFunction(dbManager -> {

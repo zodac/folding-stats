@@ -19,8 +19,8 @@
     <properties>
         <!-- Project Properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java-release>20</java-release>
-        <maven-release>3.9.3</maven-release>
+        <java-release>21</java-release>
+        <maven-release>3.9.4</maven-release>
 
         <!-- License Properties -->
         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->

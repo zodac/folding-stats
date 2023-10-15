@@ -20,7 +20,6 @@ package me.zodac.folding.api.tc.result;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -109,7 +108,7 @@ class MonthlyResultTest {
                             1
                         )
                     ),
-                    Collections.emptyList()
+                    List.of()
                 ),
                 0L, 0L
             )
@@ -117,7 +116,7 @@ class MonthlyResultTest {
 
         final MonthlyResult monthlyResult = MonthlyResult.createWithCurrentDateTime(
             teamLeaderboardEntries,
-            Collections.emptyMap()
+            Map.of()
         );
 
         assertThat(monthlyResult.hasNoStats())
@@ -161,8 +160,8 @@ class MonthlyResultTest {
     @Test
     void verifyUpdateEmptyCategories() {
         final MonthlyResult monthlyResult = MonthlyResult.createWithCurrentDateTime(
-            Collections.emptyList(),
-            Collections.emptyMap()
+            List.of(),
+            Map.of()
         );
 
         Set.of(

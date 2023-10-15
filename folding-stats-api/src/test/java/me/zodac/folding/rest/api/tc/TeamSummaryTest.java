@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
@@ -169,7 +168,7 @@ class TeamSummaryTest {
     @Test
     void testCreate_nullTeam() {
         assertThatThrownBy(
-            () -> TeamSummary.createWithDefaultRank(null, "captainName", Collections.emptyList(), Collections.emptyList()))
+            () -> TeamSummary.createWithDefaultRank(null, "captainName", List.of(), List.of()))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("team");
     }
@@ -178,7 +177,7 @@ class TeamSummaryTest {
     void testCreate_nullCaptainName_noException() {
         final UserSummary userSummary = createUserSummary(1, 10);
         final Team team = userSummary.user().team();
-        final TeamSummary teamSummary = TeamSummary.createWithDefaultRank(team, null, Collections.emptyList(), Collections.emptyList());
+        final TeamSummary teamSummary = TeamSummary.createWithDefaultRank(team, null, List.of(), List.of());
 
         assertThat(teamSummary.captainName())
             .isNull();

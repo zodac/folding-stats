@@ -18,7 +18,7 @@
 package me.zodac.folding.bean.tc.validation;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.UsedByException;
@@ -135,7 +135,7 @@ public class TeamValidator {
 
     private Collection<User> getUsersOnTeam(final int teamId) {
         if (teamId == Team.EMPTY_TEAM_ID) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         return foldingRepository.getAllUsersWithoutPasskeys()

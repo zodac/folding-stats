@@ -19,7 +19,6 @@ package me.zodac.folding.rest.api.tc.leaderboard;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Collections;
 import java.util.List;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
@@ -43,7 +42,7 @@ class TeamLeaderboardEntryTest {
         final UserSummary userSummary1 = UserSummary.create(user, 25L, 2_500L, 5, 1);
         final UserSummary userSummary2 = UserSummary.create(user, 20L, 2_000L, 4, 2);
         final TeamSummary teamSummary =
-            TeamSummary.createWithDefaultRank(user.team(), "captain", List.of(userSummary1, userSummary2), Collections.emptyList());
+            TeamSummary.createWithDefaultRank(user.team(), "captain", List.of(userSummary1, userSummary2), List.of());
 
         final TeamLeaderboardEntry teamLeaderboardEntry = TeamLeaderboardEntry.createLeader(teamSummary);
 
@@ -68,7 +67,7 @@ class TeamLeaderboardEntryTest {
         final UserSummary userSummary1 = UserSummary.create(user, 10L, 1_000L, 2, 1);
         final UserSummary userSummary2 = UserSummary.create(user, 5L, 500L, 1, 2);
         final TeamSummary teamSummary =
-            TeamSummary.createWithPoints(user.team(), "captain", 15L, 1_500L, 3, 2, List.of(userSummary1, userSummary2), Collections.emptyList());
+            TeamSummary.createWithPoints(user.team(), "captain", 15L, 1_500L, 3, 2, List.of(userSummary1, userSummary2), List.of());
 
         final TeamLeaderboardEntry teamLeaderboardEntry = TeamLeaderboardEntry.create(teamSummary, 5_000L, 5_000L);
 

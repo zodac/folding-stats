@@ -7,9 +7,8 @@ fi
 
 echo "Starting ${instance_type} instance"
 
-# 'add-opens' is needed to allow Gson to serialise 'Collections.emptyList()'
 java \
-  --add-opens java.base/java.util=ALL-UNNAMED \
   -jar \
+  -Xms"${JVM_MIN}" -Xmx"${JVM_MAX}" \
   -Dspring.profiles.active="${instance_type}" \
   /folding-stats.jar

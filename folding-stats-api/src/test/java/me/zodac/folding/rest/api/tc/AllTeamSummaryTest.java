@@ -20,7 +20,6 @@ package me.zodac.folding.rest.api.tc;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
@@ -71,7 +70,7 @@ class AllTeamSummaryTest {
     }
 
     private static TeamSummary createTeamSummary(final UserSummary... userSummaries) {
-        return TeamSummary.createWithDefaultRank(userSummaries[0].user().team(), "captain", List.of(userSummaries), Collections.emptyList());
+        return TeamSummary.createWithDefaultRank(userSummaries[0].user().team(), "captain", List.of(userSummaries), List.of());
     }
 
     private static UserSummary createUserSummary(final int units) {

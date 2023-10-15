@@ -18,7 +18,6 @@
 package me.zodac.folding.api.tc.result;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -83,18 +82,18 @@ public final class MonthlyResult {
      * Creates an empty {@link MonthlyResult}.
      *
      * <p>
-     * Will contain an {@link Collections#emptyList()} for {@code teamLeaderboard}, and {@code userCategoryLeaderboard} will be populated with an
-     * entry for each instance of {@link Category#getAllValues()}, with a default value of {@link Collections#emptyList()}.
+     * Will contain an {@link List#of()} for {@code teamLeaderboard}, and {@code userCategoryLeaderboard} will be populated with an
+     * entry for each instance of {@link Category#getAllValues()}, with a default value of {@link List#of()}.
      *
      * @return the empty {@link MonthlyResult}
      */
     public static MonthlyResult empty() {
         final Map<Category, List<UserCategoryLeaderboardEntry>> emptyCategoryResult = new EnumMap<>(Category.class);
         for (final Category category : Category.getAllValues()) {
-            emptyCategoryResult.put(category, Collections.emptyList());
+            emptyCategoryResult.put(category, List.of());
         }
 
-        return createWithCurrentDateTime(Collections.emptyList(), emptyCategoryResult);
+        return createWithCurrentDateTime(List.of(), emptyCategoryResult);
     }
 
     /**
@@ -103,7 +102,7 @@ public final class MonthlyResult {
      * <p>
      * Since it is possible there are no {@link me.zodac.folding.api.tc.User}s for a given {@link Category}, there will be no entry for that
      * {@link Category} in the {@code userCategoryLeaderboard}. We will instead iterate though {@link Category#getAllValues()} and add an entry for
-     * each missing {@link Category}, with a default value of {@link Collections#emptyList()}.
+     * each missing {@link Category}, with a default value of {@link List#of()}.
      *
      * @param monthlyResult the {@link MonthlyResult} to update
      * @return the updated {@link MonthlyResult}
@@ -113,7 +112,7 @@ public final class MonthlyResult {
         final Map<Category, List<UserCategoryLeaderboardEntry>> categories = new EnumMap<>(Category.class);
 
         for (final Category category : Category.getAllValues()) {
-            categories.put(category, userCategoryLeaderboard.getOrDefault(category, Collections.emptyList()));
+            categories.put(category, userCategoryLeaderboard.getOrDefault(category, List.of()));
         }
 
         return create(monthlyResult.teamLeaderboard, categories, monthlyResult.utcTimestamp);

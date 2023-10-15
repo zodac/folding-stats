@@ -19,7 +19,6 @@ package me.zodac.folding.bean;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import me.zodac.folding.api.UserAuthenticationResult;
@@ -122,7 +121,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
 
     private Collection<User> getUsersWithHardware(final Hardware hardware) {
         if (hardware.id() == Hardware.EMPTY_HARDWARE_ID) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         return getAllUsersWithPasskeys()
@@ -398,7 +397,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     @Override
     public Collection<User> getUsersOnTeam(final Team team) {
         if (team.id() == Team.EMPTY_TEAM_ID) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         return getAllUsersWithPasskeys()
@@ -445,7 +444,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
             return storage.getAllUserChanges(List.of(UserChangeState.APPROVED_NEXT_MONTH), 0L);
         } catch (final Exception e) {
             LOGGER.warn("Error retrieving all user changes for next month", e);
-            return Collections.emptyList();
+            return List.of();
         }
     }
 

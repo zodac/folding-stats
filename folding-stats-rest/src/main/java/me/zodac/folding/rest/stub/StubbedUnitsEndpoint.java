@@ -19,7 +19,6 @@ package me.zodac.folding.rest.stub;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,7 +130,7 @@ public class StubbedUnitsEndpoint {
             return List.of(UnitsResponse.create(unitsByUserAndPasskey.get(key)));
         }
 
-        return Collections.emptyList();
+        return List.of();
     }
 
     private record UnitsResponse(int finished) {

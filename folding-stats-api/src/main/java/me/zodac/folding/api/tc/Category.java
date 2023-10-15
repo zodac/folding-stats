@@ -50,7 +50,7 @@ public enum Category {
     /**
      * Not a valid {@link Category}.
      */
-    INVALID(0, Collections.emptySet(), Collections.emptySet());
+    INVALID(0, Set.of(), Set.of());
 
     private static final int DEFAULT_USERS_PER_CATEGORY = 1;
 

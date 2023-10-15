@@ -33,8 +33,8 @@ services:
       args:
         # Docker image versions
         DEBIAN_VERSION: "12.1"
-        JAVA_VERSION: "20"
-        MAVEN_VERSION: "3.9.3"
+        JAVA_VERSION: "21"
+        MAVEN_VERSION: "3.9.4"
         # Build arguments
         KEYSTORE_PASSWORD: "shroot"
         NEXUS_URL: "${NEXUS_URL}"
@@ -47,6 +47,8 @@ services:
       REDIRECT_URL: "https://127.0.0.1:81"
       # Spring configuration
       DEPLOYMENT_TYPE: "test"
+      JVM_MAX: "512m"
+      JVM_MIN: "128m"
       MULTIPLE_LOG_FILES: "false"
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57:00 on the last day of the month
       ENABLE_LARS_HARDWARE_UPDATE: "false"

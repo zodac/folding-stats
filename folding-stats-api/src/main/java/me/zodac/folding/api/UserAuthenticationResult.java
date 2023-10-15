@@ -17,7 +17,6 @@
 
 package me.zodac.folding.api;
 
-import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -37,7 +36,7 @@ public record UserAuthenticationResult(boolean userExists, boolean passwordMatch
      * @return the {@link UserAuthenticationResult}
      */
     public static UserAuthenticationResult userDoesNotExist() {
-        return new UserAuthenticationResult(false, false, Collections.emptySet());
+        return new UserAuthenticationResult(false, false, Set.of());
     }
 
     /**
@@ -46,7 +45,7 @@ public record UserAuthenticationResult(boolean userExists, boolean passwordMatch
      * @return the {@link UserAuthenticationResult}
      */
     public static UserAuthenticationResult invalidPassword() {
-        return new UserAuthenticationResult(true, false, Collections.emptySet());
+        return new UserAuthenticationResult(true, false, Set.of());
     }
 
     /**

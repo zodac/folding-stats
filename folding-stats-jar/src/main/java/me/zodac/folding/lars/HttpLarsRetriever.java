@@ -26,7 +26,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import me.zodac.folding.api.exception.ExternalConnectionException;
@@ -73,7 +72,7 @@ public final class HttpLarsRetriever implements LarsRetriever {
             return retrieveResponseAndParseGpus(gpuApiUrl);
         } catch (final Exception e) {
             LARS_LOGGER.warn("Error retrieving data from LARS GPU DB", e);
-            return Collections.emptySet();
+            return Set.of();
         }
     }
 

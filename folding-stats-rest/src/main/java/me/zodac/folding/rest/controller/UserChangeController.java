@@ -28,7 +28,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
@@ -133,7 +133,7 @@ public class UserChangeController implements UserChangeEndpoint {
 
         final Collection<UserChangeState> states = getStatesBasedOnInput(state);
         if (states.isEmpty()) {
-            return ok(Collections.emptyList());
+            return ok(List.of());
         }
 
         final Collection<UserChange> userChanges = foldingRepository.getAllUserChangesWithoutPasskeys(states, numberOfMonths);
@@ -164,7 +164,7 @@ public class UserChangeController implements UserChangeEndpoint {
 
         final Collection<UserChangeState> states = getStatesBasedOnInput(state);
         if (states.isEmpty()) {
-            return ok(Collections.emptyList());
+            return ok(List.of());
         }
 
         final Collection<UserChange> userChanges = foldingRepository.getAllUserChangesWithPasskeys(states, numberOfMonths);

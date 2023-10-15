@@ -20,7 +20,7 @@ package me.zodac.folding.api.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -31,8 +31,8 @@ class CollectionUtilsTest {
 
     @Test
     void whenContainsNoMatches_givenTwoEmptyCollections_thenTheReturnedValueIsTrue() {
-        final Collection<String> first = Collections.emptyList();
-        final Collection<String> second = Collections.emptyList();
+        final Collection<String> first = List.of();
+        final Collection<String> second = List.of();
 
         final boolean result = CollectionUtils.containsNoMatches(first, second);
 
@@ -91,8 +91,8 @@ class CollectionUtilsTest {
 
     @Test
     void whenExistsInFirstOnly_givenTwoCollections_andBothAreEmpty_thenEmptySetIsReturned() {
-        final Collection<String> first = Collections.emptyList();
-        final Collection<String> second = Collections.emptyList();
+        final Collection<String> first = Set.of();
+        final Collection<String> second = Set.of();
 
         final Set<String> result = CollectionUtils.existsInFirstOnly(first, second);
 
@@ -114,7 +114,7 @@ class CollectionUtilsTest {
     @Test
     void whenExistsInFirstOnly_givenTwoCollections_andFirstHasElements_andSecondIsEmpty_thenFirstElementsAreReturned() {
         final Collection<String> first = Set.of("one", "two");
-        final Collection<String> second = Collections.emptyList();
+        final Collection<String> second = Set.of();
 
         final Set<String> result = CollectionUtils.existsInFirstOnly(first, second);
 
@@ -124,7 +124,7 @@ class CollectionUtilsTest {
 
     @Test
     void whenExistsInFirstOnly_givenTwoCollections_andFirstIsEmpty_andSecondHasElements_thenEmptySetIsReturned() {
-        final Collection<String> first = Collections.emptyList();
+        final Collection<String> first = Set.of();
         final Collection<String> second = Set.of("one", "two");
 
         final Set<String> result = CollectionUtils.existsInFirstOnly(first, second);

@@ -18,8 +18,8 @@
 package me.zodac.folding.bean.tc.validation;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import me.zodac.folding.api.UserAuthenticationResult;
@@ -145,7 +145,7 @@ class MockFoldingRepository implements FoldingRepository {
     @Override
     public Collection<User> getUsersOnTeam(final Team team) {
         if (team.id() == Team.EMPTY_TEAM_ID) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         return getAllUsersWithPasskeys()
