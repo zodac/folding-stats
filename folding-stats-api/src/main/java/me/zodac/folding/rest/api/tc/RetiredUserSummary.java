@@ -17,38 +17,21 @@
 
 package me.zodac.folding.rest.api.tc;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.util.StringUtils;
 
 /**
  * Summary of the stats of a retired {@link me.zodac.folding.api.tc.User} in the {@code Team Competition}.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Accessors(fluent = true)
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public non-sealed class RetiredUserSummary implements RankableSummary {
+public record RetiredUserSummary(int id,
+                                 String displayName,
+                                 long points,
+                                 long multipliedPoints,
+                                 int units,
+                                 int rankInTeam
+) implements RankableSummary {
 
     private static final int DEFAULT_USER_RANK = 1;
-
-    private int id;
-    private String displayName;
-
-    private long points;
-    private long multipliedPoints;
-    private int units;
-    private int rankInTeam;
 
     /**
      * Creates a {@link RetiredUserSummary}.

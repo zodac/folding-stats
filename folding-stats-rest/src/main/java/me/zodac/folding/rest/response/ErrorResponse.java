@@ -17,15 +17,6 @@
 
 package me.zodac.folding.rest.response;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
-
 /**
  * Simple POJO used for REST responses where an error message is required. Allows us to have a JSON payload with a name value, instead of the response
  * body simply being a {@link String}.
@@ -38,16 +29,7 @@ import lombok.experimental.Accessors;
  *     }
  * </pre>
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Accessors(fluent = true)
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class ErrorResponse {
-
-    private String error;
+public record ErrorResponse(String error) {
 
     /**
      * Creates an {@link ErrorResponse}.

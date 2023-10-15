@@ -17,36 +17,21 @@
 
 package me.zodac.folding.api.tc.stats;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import me.zodac.folding.rest.api.tc.request.OffsetTcStatsRequest;
 
 /**
  * POJO defining a stats offset for a {@link me.zodac.folding.api.tc.User} within the {@code Team Competition}. In the case of a manual change
  * of points/units being required for a {@link me.zodac.folding.api.tc.User}, this object will define that offset.
+ *
+ * @param pointsOffset           the points offset
+ * @param multipliedPointsOffset the multiplied points offset
+ * @param unitsOffset            the units offset
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Accessors(fluent = true)
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class OffsetTcStats {
+public record OffsetTcStats(long pointsOffset, long multipliedPointsOffset, int unitsOffset) {
 
     private static final long DEFAULT_POINTS = 0L;
     private static final long DEFAULT_MULTIPLIED_POINTS = 0L;
     private static final int DEFAULT_UNITS = 0;
-
-    private long pointsOffset;
-    private long multipliedPointsOffset;
-    private int unitsOffset;
 
     /**
      * Creates an instance of {@link OffsetTcStats}.
@@ -72,6 +57,16 @@ public class OffsetTcStats {
             offsetTcStatsRequest.getMultipliedPointsOffset(),
             offsetTcStatsRequest.getUnitsOffset()
         );
+    }
+
+    /**
+     * Converts an instance of {@link UserTcStats} to {@link OffsetTcStats}.
+     *
+     * @param userTcStats existing {@link UserTcStats}
+     * @return the created {@link OffsetTcStats}
+     */
+    public static OffsetTcStats createFromUserTcStats(final UserTcStats userTcStats) {
+        return create(userTcStats.points(), userTcStats.multipliedPoints(), userTcStats.units());
     }
 
     /**

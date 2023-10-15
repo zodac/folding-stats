@@ -21,12 +21,6 @@ import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.util.DateTimeUtils;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
@@ -35,19 +29,17 @@ import me.zodac.folding.rest.api.tc.leaderboard.UserCategoryLeaderboardEntry;
 /**
  * POJO containing the result for all {@link me.zodac.folding.api.tc.User}s and {@link me.zodac.folding.api.tc.Team}s for a single month of the
  * {@code Team Competition}.
+ *
+ * @param teamLeaderboard         the leaderboard for {@link me.zodac.folding.api.tc.Team}s
+ * @param userCategoryLeaderboard the leaderboard for {@link me.zodac.folding.api.tc.User} {@link Category}s
+ * @param utcTimestamp            the {@link java.time.ZoneOffset#UTC} {@link LocalDateTime} for the {@link MonthlyResult}
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@Accessors(fluent = true)
-@ToString(doNotUseGetters = true, callSuper = true)
-@EqualsAndHashCode
-public final class MonthlyResult {
+public record MonthlyResult(List<TeamLeaderboardEntry> teamLeaderboard,
+                            Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard,
+                            LocalDateTime utcTimestamp
+) {
 
     private static final DateTimeUtils DATE_TIME_UTILS = DateTimeUtils.create();
-
-    private final List<TeamLeaderboardEntry> teamLeaderboard;
-    private final Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard;
-    private final LocalDateTime utcTimestamp;
 
     /**
      * Creates a {@link MonthlyResult}.

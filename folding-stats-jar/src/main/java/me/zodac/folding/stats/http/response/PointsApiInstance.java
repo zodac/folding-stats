@@ -19,12 +19,6 @@ package me.zodac.folding.stats.http.response;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.Comparator;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 /**
  * Response returned from {@link me.zodac.folding.stats.http.request.PointsUrlBuilder} for a user/passkey.
@@ -44,20 +38,11 @@ import lombok.experimental.Accessors;
  *      }
  * </pre>
  */
-@NoArgsConstructor
-@Accessors(fluent = true)
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-class PointsApiInstance implements Comparable<PointsApiInstance> {
-
-    @SerializedName("earned")
-    private long earned;
+record PointsApiInstance(@SerializedName("earned") long earned) implements Comparable<PointsApiInstance> {
 
     @Override
     public int compareTo(final PointsApiInstance o) {
-        return Comparator.comparingLong((PointsApiInstance pointsApiInstance) -> pointsApiInstance.earned())
+        return Comparator.comparingLong(PointsApiInstance::earned)
             .compare(o, this);
     }
 }

@@ -18,13 +18,6 @@
 package me.zodac.folding.api.tc.lars;
 
 import com.google.gson.annotations.SerializedName;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 /**
  * Representation of an individual GPU from the LARS DB.
@@ -50,58 +43,18 @@ import lombok.experimental.Accessors;
  *     }
  * </pre>
  *
+ * @param name              the name of the GPU
+ * @param detailedName      the detailed name of the GPU
+ * @param make              the make/manufacturer of the GPU
+ * @param rank              the rank of the GPU compared to all other GPUs
+ * @param multiplier        the multiplier applied to the GPU
+ * @param ppdAverageOverall the average PPD of the GPU on all OSs
  * @see <a href="https://folding.lar.systems/api/gpu_ppd/gpu_rank_list.json">LARS GPU PPD database API</a>
  */
-@NoArgsConstructor
-@AllArgsConstructor
-@Accessors(fluent = false) // Need #get*()
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class LarsGpu {
-
-    @SerializedName("gpu_name")
-    private String name;
-
-    @SerializedName("fah_client_description")
-    private String detailedName;
-
-    @SerializedName("make")
-    private String make;
-
-    @SerializedName("gpu_rank")
-    private int rank;
-
-    @SerializedName("gpu_handicap")
-    private double multiplier;
-
-    @SerializedName("ppd_average_overall")
-    private long ppdAverageOverall;
-
-    // Unused fields, kept for completion
-
-    @SerializedName("sub_version")
-    private String subVersion;
-
-    @SerializedName("gpu_chip")
-    private String chip;
-
-    @SerializedName("ppd_samples_overall")
-    private long ppdSamplesOverall;
-
-    @SerializedName("ppd_average_linux")
-    private long ppdAverageLinux;
-
-    @SerializedName("ppd_samples_linux")
-    private long ppdSamplesLinux;
-
-    @SerializedName("ppd_average_windows")
-    private long ppdAverageWindows;
-
-    @SerializedName("ppd_samples_windows")
-    private long ppdSamplesWindows;
-
-    @SerializedName("url_profile")
-    private String urlProfile;
+public record LarsGpu(@SerializedName("gpu_name") String name,
+                      @SerializedName("fah_client_description") String detailedName,
+                      @SerializedName("make") String make,
+                      @SerializedName("gpu_rank") int rank,
+                      @SerializedName("gpu_handicap") double multiplier,
+                      @SerializedName("ppd_average_overall") long ppdAverageOverall) {
 }

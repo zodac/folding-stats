@@ -288,15 +288,7 @@ class LarsTest {
             hardwareMake.name(),
             rank,
             multiplier,
-            averagePpd,
-            "",
-            "",
-            0L,
-            0L,
-            0L,
-            0L,
-            0L,
-            ""
+            averagePpd
         );
     }
 }

@@ -25,35 +25,24 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 /**
  * POJO defining historic {@code Team Competition} stats (hourly, daily, monthly, etc.) for a {@link me.zodac.folding.api.tc.User}.
+ *
+ * @param dateTime         the {@link LocalDateTime} of the stats
+ * @param points           the points
+ * @param multipliedPoints the multiplied points
+ * @param units            the units
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Accessors(fluent = true)
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class HistoricStats {
+public record HistoricStats(LocalDateTime dateTime,
+                            long points,
+                            long multipliedPoints,
+                            int units
+) {
 
     private static final long DEFAULT_POINTS = 0L;
     private static final long DEFAULT_MULTIPLIED_POINTS = 0L;
     private static final int DEFAULT_UNITS = 0;
-
-    private LocalDateTime dateTime;
-    private long points;
-    private long multipliedPoints;
-    private int units;
 
     /**
      * Creates an instance of {@link HistoricStats}.
@@ -83,7 +72,7 @@ public class HistoricStats {
      * @param allStats the {@link HistoricStats} for multiple {@link me.zodac.folding.api.tc.User}s and {@link LocalDateTime}s
      * @return a {@link Collection} of combined {@link HistoricStats}
      */
-    public static Collection<HistoricStats> combine(final Collection<? extends HistoricStats> allStats) {
+    public static Collection<HistoricStats> combine(final Collection<HistoricStats> allStats) {
         final Set<LocalDateTime> keys = allStats.stream()
             .map(HistoricStats::dateTime)
             .sorted()

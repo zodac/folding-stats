@@ -18,14 +18,6 @@
 package me.zodac.folding.rest.api.tc;
 
 import java.util.Collection;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.Team;
 
 /**
@@ -34,27 +26,17 @@ import me.zodac.folding.api.tc.Team;
  * <p>
  * Available at the {@code folding/stats} REST endpoint.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Accessors(fluent = true)
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public non-sealed class TeamSummary implements RankableSummary {
+public record TeamSummary(Team team,
+                          String captainName, // Can be null for cases where no captain is set for a team
+                          long teamPoints,
+                          long teamMultipliedPoints,
+                          int teamUnits,
+                          int rank, // Rank in 'division', but we only have one division so no need to be more explicit with the name
+                          Collection<UserSummary> activeUsers,
+                          Collection<RetiredUserSummary> retiredUsers
+) implements RankableSummary {
 
     private static final int DEFAULT_TEAM_RANK = 1;
-
-    private Team team;
-    private String captainName; // Can be null for cases where no captain is set for a team
-
-    private long teamPoints;
-    private long teamMultipliedPoints;
-    private int teamUnits;
-    private int rank; // Rank in 'division', but we only have one division so no need to be more explicit with the name
-
-    private Collection<UserSummary> activeUsers;
-    private Collection<RetiredUserSummary> retiredUsers;
 
     /**
      * Creates a {@link TeamSummary}, manually defining the points/units for all {@link me.zodac.folding.api.tc.User}s in a {@link Team}.
@@ -109,8 +91,8 @@ public non-sealed class TeamSummary implements RankableSummary {
      */
     public static TeamSummary createWithDefaultRank(final Team team,
                                                     final String captainName,
-                                                    final Collection<? extends UserSummary> activeUsers,
-                                                    final Collection<? extends RetiredUserSummary> retiredUsers) {
+                                                    final Collection<UserSummary> activeUsers,
+                                                    final Collection<RetiredUserSummary> retiredUsers) {
         long teamPoints = 0L;
         long teamMultipliedPoints = 0L;
         int teamUnits = 0;

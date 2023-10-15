@@ -17,38 +17,19 @@
 
 package me.zodac.folding.rest.api.tc;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.User;
 
 /**
  * Summary of the stats of an active {@link User} in the {@code Team Competition}.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Accessors(fluent = true)
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public non-sealed class UserSummary implements RankableSummary {
+public record UserSummary(User user,
+                          long points,
+                          long multipliedPoints,
+                          int units,
+                          int rankInTeam
+) implements RankableSummary {
 
     private static final int DEFAULT_RANK = 1;
-    private static final long DEFAULT_POINTS = 0L;
-    private static final long DEFAULT_MULTIPLIED_POINTS = 0L;
-    private static final int DEFAULT_UNITS = 0;
-
-    private User user;
-    private long points; // TODO: Replace with stats object?
-    private long multipliedPoints;
-    private int units;
-    private int rankInTeam;
 
     /**
      * Creates a {@link UserSummary}, summarising the stats for an active {@link User}.

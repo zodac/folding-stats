@@ -19,11 +19,6 @@ package me.zodac.folding.api.tc.lars;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.Collection;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 /**
  * Representation of the LARS GPU PPD database API response.
@@ -43,35 +38,9 @@ import lombok.experimental.Accessors;
  *     }
  * </pre>
  *
+ * @param rankedGpus the {@link Collection} of {@link LarsGpu}s included in the {@link LarsGpuResponse}
  * @see <a href="https://folding.lar.systems/api/gpu_ppd/gpu_rank_list.json">LARS GPU PPD database API</a>
  */
-@Accessors(fluent = false) // Need #get*()
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class LarsGpuResponse {
+public record LarsGpuResponse(@SerializedName("folding_at_home_gpu_ppd_rank_list") Collection<LarsGpu> rankedGpus) {
 
-    @SerializedName("folding_at_home_gpu_ppd_rank_list")
-    private Collection<LarsGpu> rankedGpus;
-
-    // Unused fields, kept for completion
-
-    @SerializedName("api_name")
-    private String apiName;
-
-    @SerializedName("api_description")
-    private String apiDescription;
-
-    @SerializedName("api_licence")
-    private String apiLicence;
-
-    @SerializedName("credit_link_website")
-    private String creditLinkWebsite;
-
-    @SerializedName("credit_link_chrome_extension")
-    private String creditLinkChromeExtension;
-
-    @SerializedName("date_last_update")
-    private String dateOfLastUpdate;
 }

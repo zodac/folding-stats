@@ -17,14 +17,6 @@
 
 package me.zodac.folding.rest.api.tc.leaderboard;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 
@@ -34,25 +26,16 @@ import me.zodac.folding.rest.api.tc.TeamSummary;
  * <p>
  * Available at the {@code folding/stats/leaderboard} REST endpoint.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Accessors(fluent = true)
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class TeamLeaderboardEntry {
+public record TeamLeaderboardEntry(Team team,
+                                   long teamPoints,
+                                   long teamMultipliedPoints,
+                                   int teamUnits,
+                                   int rank,
+                                   long diffToLeader,
+                                   long diffToNext
+) {
 
     private static final long DEFAULT_DIFF = 0L;
-
-    private Team team;
-    private long teamPoints;
-    private long teamMultipliedPoints;
-    private int teamUnits;
-    private int rank;
-
-    private long diffToLeader;
-    private long diffToNext;
 
     /**
      * Creates the {@link TeamLeaderboardEntry} for a {@link Team}.

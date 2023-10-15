@@ -19,12 +19,6 @@ package me.zodac.folding.stats.http.response;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.Comparator;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 /**
  * Response returned from {@link me.zodac.folding.stats.http.request.UnitsUrlBuilder} for a user/passkey.
@@ -46,26 +40,14 @@ import lombok.experimental.Accessors;
  *     ]
  * </pre>
  */
-@NoArgsConstructor
-@Accessors(fluent = true)
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-class UnitsApiInstance implements Comparable<UnitsApiInstance> {
-
-    @SerializedName("finished")
-    private int finished;
-
-    @SerializedName("expired")
-    private int expired;
-
-    @SerializedName("active")
-    private int active;
+record UnitsApiInstance(@SerializedName("finished") int finished,
+                        @SerializedName("expired") int expired,
+                        @SerializedName("active") int active
+) implements Comparable<UnitsApiInstance> {
 
     @Override
     public int compareTo(final UnitsApiInstance o) {
-        return Comparator.comparingInt((UnitsApiInstance unitsApiInstance) -> unitsApiInstance.finished())
+        return Comparator.comparingInt(UnitsApiInstance::finished)
             .thenComparingInt(UnitsApiInstance::active)
             .thenComparingInt(UnitsApiInstance::expired)
             .compare(o, this);

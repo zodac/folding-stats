@@ -17,14 +17,6 @@
 
 package me.zodac.folding.rest.api.tc.leaderboard;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.rest.api.tc.UserSummary;
 
@@ -32,26 +24,17 @@ import me.zodac.folding.rest.api.tc.UserSummary;
  * POJO for the {@link User} {@link me.zodac.folding.api.tc.Category} leaderboard, summarising
  * the stats for a {@link User} in a {@link me.zodac.folding.api.tc.Category}.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Accessors(fluent = true)
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class UserCategoryLeaderboardEntry {
+public record UserCategoryLeaderboardEntry(User user,
+                                           long points,
+                                           long multipliedPoints,
+                                           int units,
+                                           int rank,
+                                           long diffToLeader,
+                                           long diffToNext
+) {
 
     private static final long DEFAULT_DIFF = 0L;
     private static final int DEFAULT_RANK = 1;
-
-    private User user;
-    private long points;
-    private long multipliedPoints;
-    private int units;
-    private int rank;
-
-    private long diffToLeader;
-    private long diffToNext;
 
     /**
      * Creates the {@link UserCategoryLeaderboardEntry} for a {@link User}.

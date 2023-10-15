@@ -64,7 +64,7 @@ public class LeaderboardStatsGenerator {
         final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
         final List<TeamSummary> teamResults = allTeamsSummary.teams()
             .stream()
-            .sorted(Comparator.comparingLong((TeamSummary teamSummary) -> teamSummary.teamMultipliedPoints()).reversed())
+            .sorted(Comparator.comparingLong(TeamSummary::teamMultipliedPoints).reversed())
             .toList();
 
         if (teamResults.isEmpty()) {
@@ -106,7 +106,7 @@ public class LeaderboardStatsGenerator {
             final Category category = entry.getKey();
             final List<UserSummary> userSummaries = entry.getValue()
                 .stream()
-                .sorted(Comparator.comparingLong((UserSummary userSummary) -> userSummary.multipliedPoints()).reversed())
+                .sorted(Comparator.comparingLong(UserSummary::multipliedPoints).reversed())
                 .toList();
 
             final List<UserCategoryLeaderboardEntry> userSummariesInCategory = getUserLeaderboardForCategory(userSummaries);
@@ -116,7 +116,7 @@ public class LeaderboardStatsGenerator {
         return categoryLeaderboard;
     }
 
-    private static List<UserCategoryLeaderboardEntry> getUserLeaderboardForCategory(final List<? extends UserSummary> userResults) {
+    private static List<UserCategoryLeaderboardEntry> getUserLeaderboardForCategory(final List<UserSummary> userResults) {
         // If we have no users for the category, no need to do anything
         if (userResults.isEmpty()) {
             return List.of();

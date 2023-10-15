@@ -17,34 +17,13 @@
 
 package me.zodac.folding.rest.api.tc;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 
 /**
  * Summary of the stats of all {@link me.zodac.folding.api.tc.Team}s and their {@link me.zodac.folding.api.tc.User}s in
  * the {@code Team Competition}.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Accessors(fluent = true)
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
-public class AllTeamsSummary {
-
-    private static final int DEFAULT_TEAM_RANK = 1;
-
-    private CompetitionSummary competitionSummary;
-    private Collection<TeamSummary> teams = new ArrayList<>();
+public record AllTeamsSummary(CompetitionSummary competitionSummary, Collection<TeamSummary> teams) {
 
     /**
      * Creates a {@link AllTeamsSummary} from a {@link Collection} of {@link TeamSummary}s.
@@ -59,7 +38,7 @@ public class AllTeamsSummary {
      * @param teams the {@link TeamSummary}s taking part in the {@code Team Competition}
      * @return the created {@link AllTeamsSummary}
      */
-    public static AllTeamsSummary create(final Collection<? extends TeamSummary> teams) {
+    public static AllTeamsSummary create(final Collection<TeamSummary> teams) {
         long totalPoints = 0L;
         long totalMultipliedPoints = 0L;
         int totalUnits = 0;
@@ -75,7 +54,7 @@ public class AllTeamsSummary {
             .map(rankableSummary -> (TeamSummary) rankableSummary)
             .toList();
 
-        final CompetitionSummary competitionSummary = CompetitionSummary.create(totalPoints, totalMultipliedPoints, totalUnits);
+        final CompetitionSummary competitionSummary = new CompetitionSummary(totalPoints, totalMultipliedPoints, totalUnits);
         return new AllTeamsSummary(competitionSummary, rankedTeams);
     }
 }
