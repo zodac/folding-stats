@@ -32,6 +32,8 @@
         <exclude name="CommentDefaultAccessModifier"/>
         <!-- Plenty of scenarios where we would like to exit a method early in error cases -->
         <exclude name="OnlyOneReturn"/>
+        <!-- False positives in test code, see https://github.com/pmd/pmd/issues/4712 -->
+        <exclude name="UnnecessaryImport"/>
         <!-- I prefer to be explicit in TRY-WITH-RESOURCES blocks -->
         <!-- Would be nice to keep the check for other cases (interfaces/annotations), but not possible -->
         <!-- Caught by SonarQube analysis -->
