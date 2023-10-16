@@ -154,8 +154,8 @@ class UserTest {
         assertThat(actual)
             .as("Did not receive created object as JSON response: " + response.body())
             .extracting("foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "role")
-            .containsExactly(userToCreate.getFoldingUserName(), userToCreate.getDisplayName(), userToCreate.getPasskey(),
-                Category.get(userToCreate.getCategory()), userToCreate.getProfileLink(), userToCreate.getLiveStatsLink(), Role.MEMBER);
+            .containsExactly(userToCreate.foldingUserName(), userToCreate.displayName(), userToCreate.passkey(),
+                Category.get(userToCreate.category()), userToCreate.profileLink(), userToCreate.liveStatsLink(), Role.MEMBER);
     }
 
     @Test

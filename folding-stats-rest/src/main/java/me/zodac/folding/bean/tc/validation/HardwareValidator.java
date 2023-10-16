@@ -75,7 +75,7 @@ public class HardwareValidator {
     public Hardware create(final HardwareRequest hardwareRequest) {
         foldingRepository.getAllTeams();
         // The hardwareName must be unique
-        final Optional<Hardware> hardwareWithMatchingName = getHardwareWithName(hardwareRequest.getHardwareName());
+        final Optional<Hardware> hardwareWithMatchingName = getHardwareWithName(hardwareRequest.hardwareName());
         if (hardwareWithMatchingName.isPresent()) {
             throw new ConflictException(hardwareRequest, hardwareWithMatchingName.get(), CONFLICTING_ATTRIBUTE);
         }
@@ -108,7 +108,7 @@ public class HardwareValidator {
      */
     public Hardware update(final HardwareRequest hardwareRequest, final Hardware existingHardware) {
         // The hardwareName must be unique, unless replacing the same hardware
-        final Optional<Hardware> hardwareWithMatchingName = getHardwareWithName(hardwareRequest.getHardwareName());
+        final Optional<Hardware> hardwareWithMatchingName = getHardwareWithName(hardwareRequest.hardwareName());
         if (hardwareWithMatchingName.isPresent() && hardwareWithMatchingName.get().id() != existingHardware.id()) {
             throw new ConflictException(hardwareRequest, hardwareWithMatchingName.get(), CONFLICTING_ATTRIBUTE);
         }

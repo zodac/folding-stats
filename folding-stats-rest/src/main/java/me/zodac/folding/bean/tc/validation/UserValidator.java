@@ -170,8 +170,8 @@ public class UserValidator {
     }
 
     private void validateUpdateUserWorkUnits(final UserRequest userRequest, final User existingUser) {
-        final boolean isFoldingUserNameChange = !userRequest.getFoldingUserName().equalsIgnoreCase(existingUser.foldingUserName());
-        final boolean isPasskeyChange = !userRequest.getPasskey().equalsIgnoreCase(existingUser.passkey());
+        final boolean isFoldingUserNameChange = !userRequest.foldingUserName().equalsIgnoreCase(existingUser.foldingUserName());
+        final boolean isPasskeyChange = !userRequest.passkey().equalsIgnoreCase(existingUser.passkey());
 
         if (isFoldingUserNameChange || isPasskeyChange) {
             validateUserWorkUnits(userRequest);
@@ -184,21 +184,21 @@ public class UserValidator {
         if (statsForUserAndPasskey.units() == Stats.DEFAULT_UNITS) {
             throw new ValidationException(userRequest,
                 String.format("User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
-                    userRequest.getFoldingUserName(), userRequest.getPasskey()));
+                    userRequest.foldingUserName(), userRequest.passkey()));
         }
     }
 
     private Stats getStatsForUserAndPasskey(final UserRequest userRequest) {
         try {
-            final FoldingStatsDetails foldingStatsDetails = FoldingStatsDetails.create(userRequest.getFoldingUserName(), userRequest.getPasskey());
+            final FoldingStatsDetails foldingStatsDetails = FoldingStatsDetails.create(userRequest.foldingUserName(), userRequest.passkey());
             return foldingStatsRetriever.getStats(foldingStatsDetails);
         } catch (final ExternalConnectionException e) {
             throw new ValidationException(userRequest,
-                String.format("Unable to connect to '%s' to check stats for user '%s': %s", e.getUrl(), userRequest.getDisplayName(),
+                String.format("Unable to connect to '%s' to check stats for user '%s': %s", e.getUrl(), userRequest.displayName(),
                     e.getMessage()), e);
         } catch (final Exception e) {
             throw new ValidationException(userRequest,
-                String.format("Unable to check stats for user '%s': %s", userRequest.getDisplayName(), e.getMessage()), e);
+                String.format("Unable to check stats for user '%s': %s", userRequest.displayName(), e.getMessage()), e);
         }
     }
 
@@ -206,7 +206,7 @@ public class UserValidator {
                                                             final User existingUser,
                                                             final Team teamForUser,
                                                             final Category category) {
-        final boolean userIsChangingTeams = userRequest.getTeamId() != existingUser.team().id();
+        final boolean userIsChangingTeams = userRequest.teamId() != existingUser.team().id();
         final Collection<User> usersOnTeam = foldingRepository.getUsersOnTeam(teamForUser);
 
         if (userIsChangingTeams) {
@@ -253,8 +253,8 @@ public class UserValidator {
     }
 
     private Optional<User> getUserWithFoldingUserNameAndPasskey(final UserRequest userRequest) {
-        final String foldingUserName = userRequest.getFoldingUserName();
-        final String passkey = userRequest.getPasskey();
+        final String foldingUserName = userRequest.foldingUserName();
+        final String passkey = userRequest.passkey();
 
         if (isBlank(foldingUserName) || isBlank(passkey)) {
             return Optional.empty();
@@ -267,7 +267,7 @@ public class UserValidator {
     }
 
     private static Category validateCategoryIsValidForHardware(final UserRequest userRequest, final Hardware hardwareForUser) {
-        final Category category = Category.get(userRequest.getCategory());
+        final Category category = Category.get(userRequest.category());
 
         if (!category.isHardwareMakeSupported(hardwareForUser.hardwareMake())) {
             throw new ValidationException(userRequest,
@@ -286,7 +286,7 @@ public class UserValidator {
 
     private Hardware hardware(final UserRequest userRequest) {
         try {
-            return foldingRepository.getHardware(userRequest.getHardwareId());
+            return foldingRepository.getHardware(userRequest.hardwareId());
         } catch (final NotFoundException e) {
             final Collection<Hardware> allHardwares = foldingRepository.getAllHardware();
             if (allHardwares.isEmpty()) {
@@ -303,7 +303,7 @@ public class UserValidator {
 
     private Team team(final UserRequest userRequest) {
         try {
-            return foldingRepository.getTeam(userRequest.getTeamId());
+            return foldingRepository.getTeam(userRequest.teamId());
         } catch (final NotFoundException e) {
             final Collection<Team> allTeams = foldingRepository.getAllTeams();
             if (allTeams.isEmpty()) {

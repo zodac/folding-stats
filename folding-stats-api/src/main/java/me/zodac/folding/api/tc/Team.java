@@ -83,7 +83,7 @@ public final class Team implements ResponsePojo {
      * @return the created {@link Team}
      */
     public static Team createWithoutId(final TeamRequest teamRequest) {
-        return create(EMPTY_TEAM_ID, teamRequest.getTeamName(), teamRequest.getTeamDescription(), teamRequest.getForumLink());
+        return create(EMPTY_TEAM_ID, teamRequest.teamName(), teamRequest.teamDescription(), teamRequest.forumLink());
     }
 
     /**
@@ -112,8 +112,8 @@ public final class Team implements ResponsePojo {
      * @return {@code true} if the input{@link TeamRequest} is equal to the {@link Team}
      */
     public boolean isEqualRequest(final TeamRequest teamRequest) {
-        return Objects.equals(teamName, teamRequest.getTeamName())
-            && Objects.equals(teamDescription, teamRequest.getTeamDescription())
-            && Objects.equals(forumLink, teamRequest.getForumLink());
+        return Objects.equals(teamName, teamRequest.teamName())
+            && Objects.equals(teamDescription, teamRequest.teamDescription())
+            && Objects.equals(forumLink, teamRequest.forumLink());
     }
 }

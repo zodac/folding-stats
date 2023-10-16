@@ -406,8 +406,7 @@ class TeamCompetitionStatsTest {
         final int hardwareId = HardwareUtils.create(generateHardwareWithMultiplier(hardwareMultiplier)).id();
         final Team team = TeamUtils.create(generateTeam());
 
-        final UserRequest user = generateUserWithHardwareId(hardwareId);
-        user.setTeamId(team.id());
+        final UserRequest user = generateUserWithHardwareIdAndTeamId(hardwareId, team.id());
         final User createdUser = UserUtils.create(user);
 
         final long newPoints = 20_000L;
@@ -418,7 +417,7 @@ class TeamCompetitionStatsTest {
 
         final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.teamName());
-        final UserSummary userSummary = getActiveUserFromTeam(teamSummary, user.getDisplayName());
+        final UserSummary userSummary = getActiveUserFromTeam(teamSummary, user.displayName());
 
         assertThat(userSummary.multipliedPoints())
             .as("Expected user multiplied points to be new points * hardware multiplier: " + userSummary)
@@ -439,8 +438,7 @@ class TeamCompetitionStatsTest {
         final Hardware createdHardware = HardwareUtils.create(generateHardware());
         final Team team = TeamUtils.create(generateTeam());
 
-        final UserRequest user = generateUserWithHardwareId(createdHardware.id());
-        user.setTeamId(team.id());
+        final UserRequest user = generateUserWithHardwareIdAndTeamId(createdHardware.id(), team.id());
         final User createdUser = UserUtils.create(user);
 
         final long firstPoints = 10_000L;
@@ -449,7 +447,7 @@ class TeamCompetitionStatsTest {
 
         final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.teamName());
-        final UserSummary userSummary = getActiveUserFromTeam(teamSummary, user.getDisplayName());
+        final UserSummary userSummary = getActiveUserFromTeam(teamSummary, user.displayName());
 
         assertThat(userSummary.multipliedPoints())
             .as("Expected user multiplied points to not be multiplied: " + userSummary)
@@ -477,7 +475,7 @@ class TeamCompetitionStatsTest {
 
         final AllTeamsSummary resultAfterUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterUpdate = getTeamFromCompetition(resultAfterUpdate, team.teamName());
-        final UserSummary userSummaryAfterUpdate = getActiveUserFromTeam(teamSummaryAfterUpdate, user.getDisplayName());
+        final UserSummary userSummaryAfterUpdate = getActiveUserFromTeam(teamSummaryAfterUpdate, user.displayName());
 
         assertThat(userSummaryAfterUpdate.points())
             .as("Expected user points to not be multiplied: " + userSummaryAfterUpdate)
@@ -485,7 +483,7 @@ class TeamCompetitionStatsTest {
 
         assertThat(userSummaryAfterUpdate.multipliedPoints())
             .as("Expected user multiplied points to be multiplied only after the second update: " + userSummaryAfterUpdate)
-            .isEqualTo(firstPoints + (Math.round(secondPoints * updatedHardware.getMultiplier())));
+            .isEqualTo(firstPoints + (Math.round(secondPoints * updatedHardware.multiplier())));
     }
 
     @Test
@@ -494,8 +492,7 @@ class TeamCompetitionStatsTest {
         final int hardwareId = HardwareUtils.create(generateHardware()).id();
         final Team team = TeamUtils.create(generateTeam());
 
-        final UserRequest user = generateUserWithHardwareId(hardwareId);
-        user.setTeamId(team.id());
+        final UserRequest user = generateUserWithHardwareIdAndTeamId(hardwareId, team.id());
         final User createdUser = UserUtils.create(user);
 
         final long firstPoints = 10_000L;
@@ -504,7 +501,7 @@ class TeamCompetitionStatsTest {
 
         final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.teamName());
-        final UserSummary userSummary = getActiveUserFromTeam(teamSummary, user.getDisplayName());
+        final UserSummary userSummary = getActiveUserFromTeam(teamSummary, user.displayName());
 
         assertThat(userSummary.multipliedPoints())
             .as("Expected user multiplied points to not be multiplied: " + userSummary)
@@ -517,9 +514,16 @@ class TeamCompetitionStatsTest {
         // Update the user with a new hardware with a multiplier
         final HardwareRequest hardwareWithMultiplier = generateHardwareWithMultiplier(2.00D);
         final int hardwareWithMultiplierId = HardwareUtils.create(hardwareWithMultiplier).id();
-        user.setHardwareId(hardwareWithMultiplierId);
+        final UserRequest userUpdatedWithMultiplier = UserRequest.builder()
+            .foldingUserName(user.foldingUserName())
+            .displayName(user.displayName())
+            .passkey(user.passkey())
+            .category(user.category())
+            .hardwareId(hardwareWithMultiplierId)
+            .teamId(user.teamId())
+            .build();
 
-        USER_REQUEST_SENDER.update(createdUser.id(), user, ADMIN_USER.userName(), ADMIN_USER.password());
+        USER_REQUEST_SENDER.update(createdUser.id(), userUpdatedWithMultiplier, ADMIN_USER.userName(), ADMIN_USER.password());
 
         final long secondPoints = 5_000L;
         StubbedFoldingEndpointUtils.addPoints(createdUser, secondPoints);
@@ -527,11 +531,11 @@ class TeamCompetitionStatsTest {
 
         final AllTeamsSummary resultAfterUpdate = TeamCompetitionStatsUtils.getStats();
         final TeamSummary teamSummaryAfterUpdate = getTeamFromCompetition(resultAfterUpdate, team.teamName());
-        final UserSummary userSummaryAfterUpdate = getActiveUserFromTeam(teamSummaryAfterUpdate, user.getDisplayName());
+        final UserSummary userSummaryAfterUpdate = getActiveUserFromTeam(teamSummaryAfterUpdate, userUpdatedWithMultiplier.displayName());
 
         assertThat(userSummaryAfterUpdate.multipliedPoints())
             .as("Expected user multiplied points to be multiplied only after the second update: " + userSummaryAfterUpdate)
-            .isEqualTo(firstPoints + (Math.round(secondPoints * hardwareWithMultiplier.getMultiplier())));
+            .isEqualTo(firstPoints + (Math.round(secondPoints * hardwareWithMultiplier.multiplier())));
 
         assertThat(userSummaryAfterUpdate.points())
             .as("Expected user points to not be multiplied: " + userSummaryAfterUpdate)
@@ -590,7 +594,7 @@ class TeamCompetitionStatsTest {
             .hasSize(1);
 
         final UserSummary firstUserSummary = getActiveUserFromTeam(teamSummaryAfterRetirement, firstUser.displayName());
-        final RetiredUserSummary secondUserResult = getRetiredUserFromTeam(teamSummaryAfterRetirement, userToRetire.getDisplayName());
+        final RetiredUserSummary secondUserResult = getRetiredUserFromTeam(teamSummaryAfterRetirement, userToRetire.displayName());
 
         assertThat(firstUserSummary.multipliedPoints())
             .as("Expected user to have points from both updates: " + firstUserSummary)
@@ -623,7 +627,7 @@ class TeamCompetitionStatsTest {
             .hasSize(1);
 
         final UserSummary firstUserSummaryAfterUnretirement = getActiveUserFromTeam(teamSummaryAfterUnretirement, firstUser.displayName());
-        final UserSummary secondUserSummaryAfterUnretirement = getActiveUserFromTeam(teamSummaryAfterUnretirement, userToRetire.getDisplayName());
+        final UserSummary secondUserSummaryAfterUnretirement = getActiveUserFromTeam(teamSummaryAfterUnretirement, userToRetire.displayName());
 
         assertThat(firstUserSummaryAfterUnretirement.multipliedPoints())
             .as("Expected user to have points from all three updates: " + firstUserSummaryAfterUnretirement)
@@ -633,7 +637,7 @@ class TeamCompetitionStatsTest {
             .as("Expected user to have points from third updates only: " + secondUserSummaryAfterUnretirement)
             .isEqualTo(thirdPoints);
 
-        final RetiredUserSummary retiredUserAfterUnretirement = getRetiredUserFromTeam(teamSummaryAfterRetirement, userToRetire.getDisplayName());
+        final RetiredUserSummary retiredUserAfterUnretirement = getRetiredUserFromTeam(teamSummaryAfterRetirement, userToRetire.displayName());
 
         assertThat(retiredUserAfterUnretirement.multipliedPoints())
             .as("Expected retired user to have points from first update only: " + retiredUserAfterUnretirement)
@@ -685,8 +689,15 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(createdUserToRetire, secondPoints);
         manuallyUpdateStats();
 
-        userToRetire.setTeamId(newTeam.id());
-        UserUtils.create(userToRetire);
+        final UserRequest userToRetireWithNewTeamId = UserRequest.builder()
+            .foldingUserName(userToRetire.foldingUserName())
+            .displayName(userToRetire.displayName())
+            .passkey(userToRetire.passkey())
+            .category(userToRetire.category())
+            .hardwareId(userToRetire.hardwareId())
+            .teamId(newTeam.id())
+            .build();
+        UserUtils.create(userToRetireWithNewTeamId);
 
         final long thirdPoints = 14_000L;
         StubbedFoldingEndpointUtils.addPoints(createdUserToRetire, thirdPoints);
@@ -721,8 +732,9 @@ class TeamCompetitionStatsTest {
             .isEqualTo(thirdPoints);
 
         final RetiredUserSummary retiredUserSummaryAfterUnretirement =
-            getRetiredUserFromTeam(originalTeamSummaryAfterUnretirement, userToRetire.getDisplayName());
-        final UserSummary activeUserSummaryAfterUnretirement = getActiveUserFromTeam(newTeamSummaryAfterUnretirement, userToRetire.getDisplayName());
+            getRetiredUserFromTeam(originalTeamSummaryAfterUnretirement, userToRetireWithNewTeamId.displayName());
+        final UserSummary activeUserSummaryAfterUnretirement =
+            getActiveUserFromTeam(newTeamSummaryAfterUnretirement, userToRetireWithNewTeamId.displayName());
 
         assertThat(retiredUserSummaryAfterUnretirement.multipliedPoints())
             .as("Expected retired user to have points from before retirement only: " + retiredUserSummaryAfterUnretirement)

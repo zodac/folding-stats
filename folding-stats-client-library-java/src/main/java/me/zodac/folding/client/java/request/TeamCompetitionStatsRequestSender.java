@@ -352,11 +352,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
      */
     public HttpResponse<Void> offset(final int userId, final long pointsOffset, final long multipliedPointsOffset, final int unitsOffset,
                                      final String userName, final String password) throws FoldingRestException {
-        final OffsetTcStatsRequest offsetTcStatsRequest = OffsetTcStatsRequest.builder()
-            .pointsOffset(pointsOffset)
-            .multipliedPointsOffset(multipliedPointsOffset)
-            .unitsOffset(unitsOffset)
-            .build();
+        final OffsetTcStatsRequest offsetTcStatsRequest = new OffsetTcStatsRequest(pointsOffset, multipliedPointsOffset, unitsOffset);
 
         final HttpRequest request = HttpRequest.newBuilder()
             .method("PATCH", HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(offsetTcStatsRequest)))

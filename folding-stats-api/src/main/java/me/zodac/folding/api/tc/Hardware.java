@@ -102,12 +102,12 @@ public final class Hardware implements ResponsePojo {
     public static Hardware createWithoutId(final HardwareRequest hardwareRequest) {
         return create(
             EMPTY_HARDWARE_ID,
-            hardwareRequest.getHardwareName(),
-            hardwareRequest.getDisplayName(),
-            HardwareMake.get(hardwareRequest.getHardwareMake()),
-            HardwareType.get(hardwareRequest.getHardwareType()),
-            hardwareRequest.getMultiplier(),
-            hardwareRequest.getAveragePpd()
+            hardwareRequest.hardwareName(),
+            hardwareRequest.displayName(),
+            HardwareMake.get(hardwareRequest.hardwareMake()),
+            HardwareType.get(hardwareRequest.hardwareType()),
+            hardwareRequest.multiplier(),
+            hardwareRequest.averagePpd()
         );
     }
 
@@ -145,11 +145,11 @@ public final class Hardware implements ResponsePojo {
      * @return {@code true} if the input{@link HardwareRequest} is equal to the {@link Hardware}
      */
     public boolean isEqualRequest(final HardwareRequest hardwareRequest) {
-        return Double.compare(multiplier, hardwareRequest.getMultiplier()) == 0
-            && Objects.equals(hardwareName, hardwareRequest.getHardwareName())
-            && Objects.equals(displayName, hardwareRequest.getDisplayName())
-            && Objects.equals(hardwareMake.toString(), hardwareRequest.getHardwareMake())
-            && Objects.equals(hardwareType.toString(), hardwareRequest.getHardwareType())
-            && averagePpd == hardwareRequest.getAveragePpd();
+        return Double.compare(multiplier, hardwareRequest.multiplier()) == 0
+            && Objects.equals(hardwareName, hardwareRequest.hardwareName())
+            && Objects.equals(displayName, hardwareRequest.displayName())
+            && Objects.equals(hardwareMake.toString(), hardwareRequest.hardwareMake())
+            && Objects.equals(hardwareType.toString(), hardwareRequest.hardwareType())
+            && averagePpd == hardwareRequest.averagePpd();
     }
 }

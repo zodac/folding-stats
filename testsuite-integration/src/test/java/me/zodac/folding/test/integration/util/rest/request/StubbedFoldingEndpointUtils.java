@@ -83,7 +83,7 @@ public final class StubbedFoldingEndpointUtils {
      * @throws FoldingRestException thrown if an error occurs sending the HTTP request
      */
     public static void addPoints(final UserRequest user, final long points) throws FoldingRestException {
-        addPoints(user.getFoldingUserName(), user.getPasskey(), points);
+        addPoints(user.foldingUserName(), user.passkey(), points);
     }
 
     private static void addPoints(final String foldingUserName, final String passkey, final long points) throws FoldingRestException {
@@ -142,7 +142,7 @@ public final class StubbedFoldingEndpointUtils {
     }
 
     private static void addUnits(final UserRequest user, final int units) throws FoldingRestException {
-        addUnits(user.getFoldingUserName(), user.getPasskey(), units);
+        addUnits(user.foldingUserName(), user.passkey(), units);
     }
 
     private static void addUnits(final String foldingUserName, final String passkey, final int units) throws FoldingRestException {

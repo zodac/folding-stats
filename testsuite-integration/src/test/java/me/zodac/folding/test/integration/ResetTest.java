@@ -18,6 +18,7 @@
 package me.zodac.folding.test.integration;
 
 import static me.zodac.folding.test.integration.util.DummyAuthenticationData.ADMIN_USER;
+import static me.zodac.folding.test.integration.util.DummyDataGenerator.generateCaptainWithTeamIdAndCategory;
 import static me.zodac.folding.test.integration.util.DummyDataGenerator.generateHardwareFromCategory;
 import static me.zodac.folding.test.integration.util.DummyDataGenerator.generateTeam;
 import static me.zodac.folding.test.integration.util.DummyDataGenerator.generateUserWithTeamIdAndCategory;
@@ -176,16 +177,14 @@ class ResetTest {
     void whenResetOccurs_thenStatsAreResetForCompetitionAndTeamsAndUsers() throws FoldingRestException {
         final Team firstTeam = TeamUtils.create(generateTeam());
 
-        final UserRequest firstUser = generateUserWithTeamIdAndCategory(firstTeam.id(), Category.NVIDIA_GPU);
-        firstUser.setUserIsCaptain(true);
+        final UserRequest firstUser = generateCaptainWithTeamIdAndCategory(firstTeam.id(), Category.NVIDIA_GPU);
         create(firstUser);
 
         final UserRequest secondUser = generateUserWithTeamIdAndCategory(firstTeam.id(), Category.AMD_GPU);
         create(secondUser);
 
         final Team secondTeam = TeamUtils.create(generateTeam());
-        final UserRequest thirdUser = generateUserWithTeamIdAndCategory(secondTeam.id(), Category.AMD_GPU);
-        thirdUser.setUserIsCaptain(true);
+        final UserRequest thirdUser = generateCaptainWithTeamIdAndCategory(secondTeam.id(), Category.AMD_GPU);
         create(thirdUser);
 
         final long firstUserPoints = 10_000L;
@@ -212,9 +211,9 @@ class ResetTest {
             .as("Expected no points for team for third user only: " + secondTeamSummary)
             .isEqualTo(thirdUserPoints);
 
-        final UserSummary firstUserSummary = getActiveUserFromTeam(firstTeamSummary, firstUser.getDisplayName());
-        final UserSummary secondUserSummary = getActiveUserFromTeam(firstTeamSummary, secondUser.getDisplayName());
-        final UserSummary thirdUserSummary = getActiveUserFromTeam(secondTeamSummary, thirdUser.getDisplayName());
+        final UserSummary firstUserSummary = getActiveUserFromTeam(firstTeamSummary, firstUser.displayName());
+        final UserSummary secondUserSummary = getActiveUserFromTeam(firstTeamSummary, secondUser.displayName());
+        final UserSummary thirdUserSummary = getActiveUserFromTeam(secondTeamSummary, thirdUser.displayName());
 
         assertThat(firstUserSummary.points())
             .as("Expected points for user: " + firstUserSummary)
@@ -246,9 +245,9 @@ class ResetTest {
             .as("Expected no points for team: " + secondTeamSummaryAfterReset)
             .isZero();
 
-        final UserSummary firstUserSummaryAfterReset = getActiveUserFromTeam(firstTeamSummaryAfterReset, firstUser.getDisplayName());
-        final UserSummary secondUserSummaryAfterReset = getActiveUserFromTeam(firstTeamSummaryAfterReset, secondUser.getDisplayName());
-        final UserSummary thirdUserSummaryAfterReset = getActiveUserFromTeam(secondTeamSummaryAfterReset, thirdUser.getDisplayName());
+        final UserSummary firstUserSummaryAfterReset = getActiveUserFromTeam(firstTeamSummaryAfterReset, firstUser.displayName());
+        final UserSummary secondUserSummaryAfterReset = getActiveUserFromTeam(firstTeamSummaryAfterReset, secondUser.displayName());
+        final UserSummary thirdUserSummaryAfterReset = getActiveUserFromTeam(secondTeamSummaryAfterReset, thirdUser.displayName());
 
         assertThat(firstUserSummaryAfterReset.points())
             .as("Expected no points for user: " + firstUserSummaryAfterReset)

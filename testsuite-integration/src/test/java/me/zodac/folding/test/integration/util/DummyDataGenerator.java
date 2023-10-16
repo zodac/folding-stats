@@ -137,6 +137,18 @@ public final class DummyDataGenerator {
     }
 
     /**
+     * Generates a {@link TeamRequest}.
+     *
+     * @param teamName the name
+     * @return the generated {@link TeamRequest}
+     */
+    public static TeamRequest generateTeamWithName(final String teamName) {
+        return TeamRequest.builder()
+            .teamName(teamName)
+            .build();
+    }
+
+    /**
      * Generates a {@link UserRequest}.
      *
      * @return the generated {@link UserRequest}
@@ -264,6 +276,31 @@ public final class DummyDataGenerator {
             .category(category.toString())
             .hardwareId(hardwareId)
             .teamId(teamId)
+            .userIsCaptain(false)
+            .build();
+    }
+
+    /**
+     * Generates a {@link UserRequest} with a specified {@link me.zodac.folding.api.tc.Team} ID and {@link Category} for a captain.
+     *
+     * @param teamId   the {@link me.zodac.folding.api.tc.Team} ID
+     * @param category the {@link Category} of the {@link UserRequest}
+     * @return the generated {@link UserRequest}
+     * @throws FoldingRestException thrown if an error occurs executing {@link HardwareUtils#create(HardwareRequest)}
+     *                              or {@link TeamUtils#create(TeamRequest)}
+     */
+    public static UserRequest generateCaptainWithTeamIdAndCategory(final int teamId, final Category category) throws FoldingRestException {
+        final int hardwareId = HardwareUtils.create(generateHardwareFromCategory(category)).id();
+        final String userName = nextUserName();
+
+        return UserRequest.builder()
+            .foldingUserName(userName)
+            .displayName(userName)
+            .passkey("DummyPasskey12345678901234567890")
+            .category(category.toString())
+            .hardwareId(hardwareId)
+            .teamId(teamId)
+            .userIsCaptain(true)
             .build();
     }
 

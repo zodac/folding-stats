@@ -25,15 +25,7 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Category;
@@ -42,14 +34,6 @@ import me.zodac.folding.api.tc.HardwareMake;
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.User}.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-@Accessors(fluent = false) // Need #get*()
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
 @Schema(name = "UserRequest",
     description = "An example request to create a user, with all fields",
     example = """
@@ -65,35 +49,29 @@ import me.zodac.folding.api.tc.HardwareMake;
           "userIsCaptain": true
         }"""
 )
-public class UserRequest implements RequestPojo {
-
-    private static final Pattern FOLDING_USER_NAME_PATTERN = Pattern.compile("^[a-zA-Z\\d._-]*$");
-    private static final Pattern PASSKEY_PATTERN = Pattern.compile("[a-zA-Z\\d]{32}");
-
+@Builder
+public record UserRequest(
     @Schema(
         description = "The Folding@Home userName that the user will use for stats from the Stanford stats website",
         example = "User1",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private String foldingUserName;
-
+    String foldingUserName,
     @Schema(
         description = "The user-friendly display name of the user",
         example = "FirstUser",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private String displayName;
-
+    String displayName,
     @Schema(
         description = "The Folding@Home passkey of the user",
         example = "fc7d6837269d86784d8bfd0b386d6bca",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.WRITE_ONLY
     )
-    private String passkey;
-
+    String passkey,
     @Schema(
         description = "The category the user will compete in (case-sensitive)",
         example = "WILDCARD",
@@ -101,47 +79,46 @@ public class UserRequest implements RequestPojo {
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private String category;
-
+    String category,
     @Schema(
         description = "A link to the user's profile on the forum",
         example = "https://extremehw.net",
         requiredMode = Schema.RequiredMode.NOT_REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private String profileLink;
-
+    String profileLink,
     @Schema(
         description = "A link to the live stats for the user",
         example = "https://etf.axihub.ca",
         requiredMode = Schema.RequiredMode.NOT_REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private String liveStatsLink;
-
+    String liveStatsLink,
     @Schema(
         description = "The ID of the hardware that the user will use",
         example = "4",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private int hardwareId;
-
+    int hardwareId,
     @Schema(
         description = "The ID of the team that the user will be on",
         example = "17",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private int teamId;
-
+    int teamId,
     @Schema(
         description = "Whether the user is captain of their team",
         example = "true",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private boolean userIsCaptain;
+    boolean userIsCaptain
+) implements RequestPojo {
+
+    private static final Pattern FOLDING_USER_NAME_PATTERN = Pattern.compile("^[a-zA-Z\\d._-]*$");
+    private static final Pattern PASSKEY_PATTERN = Pattern.compile("[a-zA-Z\\d]{32}");
 
     /**
      * Simple check that validates that the REST payload is valid. Checks that:

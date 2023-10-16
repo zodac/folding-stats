@@ -102,7 +102,7 @@ class HardwareTest {
         assertThat(actual)
             .as("Did not receive created object as JSON response: " + response.body())
             .extracting("hardwareName", "displayName", "multiplier")
-            .containsExactly(hardwareToCreate.getHardwareName(), hardwareToCreate.getDisplayName(), hardwareToCreate.getMultiplier());
+            .containsExactly(hardwareToCreate.hardwareName(), hardwareToCreate.displayName(), hardwareToCreate.multiplier());
     }
 
     @Test

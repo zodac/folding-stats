@@ -26,6 +26,9 @@ import java.util.regex.Pattern;
  */
 public final class PasskeyChecker {
 
+    private static final String MASK_CHARACTER = "*";
+    private static final Pattern ALPHABET_PATTERN = Pattern.compile("[a-zA-Z]");
+
     private PasskeyChecker() {
 
     }
@@ -46,11 +49,11 @@ public final class PasskeyChecker {
 
         assertThat(firstPartOfPasskey)
             .as("Expected the first 8 characters of the passkey to be shown")
-            .doesNotContain("*");
+            .doesNotContain(MASK_CHARACTER);
 
         assertThat(secondPartOfPasskey)
             .as("Expected the remaining 24 characters of the passkey to be masked")
-            .doesNotContainPattern(Pattern.compile("[a-zA-Z]"));
+            .doesNotContainPattern(ALPHABET_PATTERN);
     }
 
     /**
@@ -64,6 +67,6 @@ public final class PasskeyChecker {
     public static void assertPasskeyIsShown(final String passkey) {
         assertThat(passkey)
             .as("Expected the passkey to not be masked")
-            .doesNotContain("*");
+            .doesNotContain(MASK_CHARACTER);
     }
 }

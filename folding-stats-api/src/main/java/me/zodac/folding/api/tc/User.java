@@ -131,15 +131,15 @@ public final class User implements ResponsePojo {
     public static User createWithoutId(final UserRequest userRequest, final Hardware hardware, final Team team) {
         return create(
             EMPTY_USER_ID,
-            userRequest.getFoldingUserName(),
-            userRequest.getDisplayName(),
-            userRequest.getPasskey(),
-            Category.get(userRequest.getCategory()),
-            userRequest.getProfileLink(),
-            userRequest.getLiveStatsLink(),
+            userRequest.foldingUserName(),
+            userRequest.displayName(),
+            userRequest.passkey(),
+            Category.get(userRequest.category()),
+            userRequest.profileLink(),
+            userRequest.liveStatsLink(),
             hardware,
             team,
-            userRequest.isUserIsCaptain() ? Role.CAPTAIN : Role.MEMBER
+            userRequest.userIsCaptain() ? Role.CAPTAIN : Role.MEMBER
         );
     }
 
@@ -244,14 +244,14 @@ public final class User implements ResponsePojo {
      * @return {@code true} if the input{@link UserRequest} is equal to the {@link User}
      */
     public boolean isEqualRequest(final UserRequest userRequest) {
-        return hardware.id() == userRequest.getHardwareId()
-            && team.id() == userRequest.getTeamId()
-            && ((userRequest.isUserIsCaptain() && role == Role.CAPTAIN) || (role == Role.MEMBER))
-            && Objects.equals(foldingUserName, userRequest.getFoldingUserName())
-            && Objects.equals(displayName, userRequest.getDisplayName())
-            && Objects.equals(passkey, userRequest.getPasskey())
-            && Objects.equals(category.toString(), userRequest.getCategory())
-            && Objects.equals(profileLink, userRequest.getProfileLink())
-            && Objects.equals(liveStatsLink, userRequest.getLiveStatsLink());
+        return hardware.id() == userRequest.hardwareId()
+            && team.id() == userRequest.teamId()
+            && ((userRequest.userIsCaptain() && role == Role.CAPTAIN) || (role == Role.MEMBER))
+            && Objects.equals(foldingUserName, userRequest.foldingUserName())
+            && Objects.equals(displayName, userRequest.displayName())
+            && Objects.equals(passkey, userRequest.passkey())
+            && Objects.equals(category.toString(), userRequest.category())
+            && Objects.equals(profileLink, userRequest.profileLink())
+            && Objects.equals(liveStatsLink, userRequest.liveStatsLink());
     }
 }

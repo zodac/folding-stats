@@ -23,15 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Stream;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.HardwareMake;
@@ -40,14 +32,6 @@ import me.zodac.folding.api.tc.HardwareType;
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.Hardware}.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-@Accessors(fluent = false) // Need #get*()
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
 @Schema(name = "HardwareRequest",
     description = "An example request to create a hardware, with all fields",
     example = """
@@ -60,28 +44,22 @@ import me.zodac.folding.api.tc.HardwareType;
           "averagePpd": 555
         }"""
 )
-public class HardwareRequest implements RequestPojo {
-
-    // The hardware with the highest PPD will have a multiplier of <b>1.00</b>, and all others will be based on that
-    private static final double MINIMUM_MULTIPLIER_VALUE = 1.00D;
-    private static final long MINIMUM_AVERAGE_PPD_VALUE = 1L;
-
+@Builder
+public record HardwareRequest(
     @Schema(
         description = "The internal, unique name of the hardware",
         example = "GA106 [GeForce RTX 3060]",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private String hardwareName;
-
+    String hardwareName,
     @Schema(
         description = "The user-friendly display name of the hardware",
         example = "GeForce RTX 3060",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private String displayName;
-
+    String displayName,
     @Schema(
         description = "The manufacturer of the hardware (case-sensitive)",
         example = "NVIDIA",
@@ -89,8 +67,7 @@ public class HardwareRequest implements RequestPojo {
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private String hardwareMake;
-
+    String hardwareMake,
     @Schema(
         description = "The type of the hardware (case-sensitive)",
         example = "GPU",
@@ -98,8 +75,7 @@ public class HardwareRequest implements RequestPojo {
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private String hardwareType;
-
+    String hardwareType,
     @Schema(
         description = "The multiplier of the hardware, compared to the best performing hardware of the same type",
         example = "10.50",
@@ -107,8 +83,7 @@ public class HardwareRequest implements RequestPojo {
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private double multiplier;
-
+    double multiplier,
     @Schema(
         description = "The average PPD of the hardware",
         example = "555",
@@ -116,7 +91,12 @@ public class HardwareRequest implements RequestPojo {
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private long averagePpd;
+    long averagePpd
+) implements RequestPojo {
+
+    // The hardware with the highest PPD will have a multiplier of <b>1.00</b>, and all others will be based on that
+    private static final double MINIMUM_MULTIPLIER_VALUE = 1.00D;
+    private static final long MINIMUM_AVERAGE_PPD_VALUE = 1L;
 
     /**
      * Simple check that validates that the REST payload is valid. Checks that:

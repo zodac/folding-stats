@@ -53,9 +53,9 @@ public record OffsetTcStats(long pointsOffset, long multipliedPointsOffset, int 
      */
     public static OffsetTcStats create(final OffsetTcStatsRequest offsetTcStatsRequest) {
         return create(
-            offsetTcStatsRequest.getPointsOffset(),
-            offsetTcStatsRequest.getMultipliedPointsOffset(),
-            offsetTcStatsRequest.getUnitsOffset()
+            offsetTcStatsRequest.pointsOffset(),
+            offsetTcStatsRequest.multipliedPointsOffset(),
+            offsetTcStatsRequest.unitsOffset()
         );
     }
 

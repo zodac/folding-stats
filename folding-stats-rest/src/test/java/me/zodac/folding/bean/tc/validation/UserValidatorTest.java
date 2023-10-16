@@ -881,7 +881,7 @@ class UserValidatorTest {
         assertThat(e.getValidationFailure().errors())
             .containsOnly(
                 String.format("User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
-                    user.getDisplayName(), user.getPasskey())
+                    user.displayName(), user.passkey())
             );
     }
 
@@ -910,7 +910,7 @@ class UserValidatorTest {
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Unable to connect to 'https://www.google.com' to check stats for user '%s': Error connecting",
-                user.getDisplayName())
+                user.displayName())
             );
     }
 
@@ -938,7 +938,7 @@ class UserValidatorTest {
         final UserValidator userValidator = new UserValidator(foldingRepository, new UnexpectedExceptionFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.create(user), ValidationException.class);
         assertThat(e.getValidationFailure().errors())
-            .containsOnly(String.format("Unable to check stats for user '%s': Error", user.getDisplayName()));
+            .containsOnly(String.format("Unable to check stats for user '%s': Error", user.displayName()));
     }
 
     @Test
@@ -2335,7 +2335,7 @@ class UserValidatorTest {
         assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format(
                 "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
-                user.getDisplayName(), user.getPasskey())
+                user.displayName(), user.passkey())
             );
     }
 
@@ -2378,7 +2378,7 @@ class UserValidatorTest {
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Unable to connect to 'https://www.google.com' to check stats for user '%s': Error connecting",
-                user.getDisplayName())
+                user.displayName())
             );
     }
 
@@ -2420,7 +2420,7 @@ class UserValidatorTest {
         final UserValidator userValidator = new UserValidator(foldingRepository, new UnexpectedExceptionFoldingStatsRetriever());
         final ValidationException e = catchThrowableOfType(() -> userValidator.update(user, existingUser), ValidationException.class);
         assertThat(e.getValidationFailure().errors())
-            .containsOnly(String.format("Unable to check stats for user '%s': Error", user.getDisplayName()));
+            .containsOnly(String.format("Unable to check stats for user '%s': Error", user.displayName()));
     }
 
     @Test

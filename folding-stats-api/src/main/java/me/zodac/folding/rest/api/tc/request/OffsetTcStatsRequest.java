@@ -18,28 +18,11 @@
 package me.zodac.folding.rest.api.tc.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import me.zodac.folding.api.RequestPojo;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.stats.OffsetTcStats}.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-@Accessors(fluent = false) // Need #get*()
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
 @Schema(name = "OffsetTcStatsRequest",
     description = "An example request to offset the stats for a user (at least one of 'pointsOffset' or 'multipliedPointsOffset' must be non-zero)",
     example = """
@@ -49,29 +32,28 @@ import me.zodac.folding.api.RequestPojo;
           "unitsOffset": 15
         }"""
 )
-public class OffsetTcStatsRequest implements RequestPojo {
-
+public record OffsetTcStatsRequest(
     @Schema(
         description = "The points offset (positive of negative) to be applied to a user's TC stats",
         example = "150",
         requiredMode = Schema.RequiredMode.NOT_REQUIRED,
         accessMode = Schema.AccessMode.WRITE_ONLY
     )
-    private long pointsOffset;
-
+    long pointsOffset,
     @Schema(
         description = "The multiplied points offset (positive of negative) to be applied to a user's TC stats",
         example = "1500",
         requiredMode = Schema.RequiredMode.NOT_REQUIRED,
         accessMode = Schema.AccessMode.WRITE_ONLY
     )
-    private long multipliedPointsOffset;
-
+    long multipliedPointsOffset,
     @Schema(
         description = "The units offset (positive of negative) to be applied to a user's TC stats",
         example = "15",
         requiredMode = Schema.RequiredMode.NOT_REQUIRED,
         accessMode = Schema.AccessMode.WRITE_ONLY
     )
-    private int unitsOffset;
+    int unitsOffset
+) implements RequestPojo {
+
 }

@@ -28,6 +28,8 @@ package me.zodac.folding.rest.response;
  *         "error": "My error message here"
  *     }
  * </pre>
+ *
+ * @param error the error message
  */
 public record ErrorResponse(String error) {
 

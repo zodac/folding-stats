@@ -25,29 +25,14 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.change.UserChange}.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@Accessors(fluent = false) // Need #get*()
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
 @Schema(name = "UserChangeRequest",
     description = "An example request to create a user change request, with all fields",
     example = """
@@ -61,66 +46,60 @@ import me.zodac.folding.api.exception.ValidationException;
           "immediate": true
         }"""
 )
-public class UserChangeRequest implements RequestPojo {
-
-    private static final Pattern FOLDING_USER_NAME_PATTERN = Pattern.compile("^[a-zA-Z\\d._-]*$");
-    private static final Pattern PASSKEY_PATTERN = Pattern.compile("[a-zA-Z\\d]{32}");
-
+public record UserChangeRequest(
     @Schema(
         description = "The ID of the user for whom a change is being requested",
         example = "1",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private int userId;
-
+    int userId,
     @Schema(
         description = "The current passkey for the user",
         example = "12345678912345678912345678912345",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.WRITE_ONLY
     )
-    private String existingPasskey;
-
+    String existingPasskey,
     @Schema(
         description = "The foldingUserName that the user will use (leave as existing value if no change is required)",
         example = "User1",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private String foldingUserName;
-
+    String foldingUserName,
     @Schema(
         description = "The passkey that the user will use (leave as existing value if no change is required)",
         example = "12345678912345678912345678912345",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.WRITE_ONLY
     )
-    private String passkey;
-
+    String passkey,
     @Schema(
         description = "A link to the live stats for the user  (leave as existing value if no change is required)",
         example = "https://www.google.com",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private String liveStatsLink;
-
+    String liveStatsLink,
     @Schema(
         description = "The ID of the hardware that the user will use (leave as existing value if no change is required)",
         example = "4",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private int hardwareId;
-
+    int hardwareId,
     @Schema(
         description = "Whether the change should be applied immediately, or for the next month's competition",
         example = "true",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private boolean immediate;
+    boolean immediate
+) implements RequestPojo {
+
+    private static final Pattern FOLDING_USER_NAME_PATTERN = Pattern.compile("^[a-zA-Z\\d._-]*$");
+    private static final Pattern PASSKEY_PATTERN = Pattern.compile("[a-zA-Z\\d]{32}");
 
     /**
      * Simple check that validates that the REST payload is valid. Checks that:

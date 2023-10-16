@@ -24,29 +24,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Stream;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.experimental.Accessors;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.Team}.
  */
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-@Accessors(fluent = false) // Need #get*()
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString(doNotUseGetters = true)
 @Schema(name = "TeamRequest",
     description = "An example request to create a team, with all fields",
     example = """
@@ -56,31 +40,30 @@ import me.zodac.folding.api.exception.ValidationException;
           "forumLink": "https://extremehw.net/forum/125-extreme-team-folding/"
         }"""
 )
-public class TeamRequest implements RequestPojo {
-
+@Builder
+public record TeamRequest(
     @Schema(
         description = "The unique name of the team",
         example = "Team1",
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private String teamName;
-
+    String teamName,
     @Schema(
         description = "A description or motto for the team",
         example = "The greatest team in the world!",
         requiredMode = Schema.RequiredMode.NOT_REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private String teamDescription;
-
+    String teamDescription,
     @Schema(
         description = "A link to the team on the forum",
         example = "https://extremehw.net/forum/125-extreme-team-folding/",
         requiredMode = Schema.RequiredMode.NOT_REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
-    private String forumLink;
+    String forumLink
+) implements RequestPojo {
 
     /**
      * Simple check that validates that the REST payload is valid. Checks that:

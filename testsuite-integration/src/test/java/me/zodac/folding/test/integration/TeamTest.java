@@ -25,6 +25,7 @@ import static me.zodac.folding.test.integration.util.DummyAuthenticationData.INV
 import static me.zodac.folding.test.integration.util.DummyAuthenticationData.INVALID_USERNAME;
 import static me.zodac.folding.test.integration.util.DummyAuthenticationData.READ_ONLY_USER;
 import static me.zodac.folding.test.integration.util.DummyDataGenerator.generateTeam;
+import static me.zodac.folding.test.integration.util.DummyDataGenerator.generateTeamWithName;
 import static me.zodac.folding.test.integration.util.DummyDataGenerator.nextTeamName;
 import static me.zodac.folding.test.integration.util.SystemCleaner.cleanSystemForSimpleTests;
 import static me.zodac.folding.test.integration.util.TestConstants.FOLDING_URL;
@@ -105,7 +106,7 @@ class TeamTest {
         assertThat(actual)
             .as("Did not receive created object as JSON response: " + response.body())
             .extracting("teamName", "teamDescription", "forumLink")
-            .containsExactly(teamToCreate.getTeamName(), teamToCreate.getTeamDescription(), teamToCreate.getForumLink());
+            .containsExactly(teamToCreate.teamName(), teamToCreate.teamDescription(), teamToCreate.forumLink());
     }
 
     @Test
@@ -160,7 +161,7 @@ class TeamTest {
         assertThat(actual)
             .as("Did not receive created object as JSON response: " + response.body())
             .extracting("id", "teamName", "teamDescription", "forumLink")
-            .containsExactly(createdTeam.id(), teamToUpdate.getTeamName(), teamToUpdate.getTeamDescription(), teamToUpdate.getForumLink());
+            .containsExactly(createdTeam.id(), teamToUpdate.teamName(), teamToUpdate.teamDescription(), teamToUpdate.forumLink());
 
         final int allTeamsAfterUpdate = TeamUtils.getNumberOfTeams();
         assertThat(allTeamsAfterUpdate)
@@ -212,8 +213,7 @@ class TeamTest {
     @Test
     void whenCreatingTeam_givenTeamWithTheNameAlreadyExists_thenA409ResponseIsReturned() throws FoldingRestException {
         final TeamRequest teamToCreate = generateTeam();
-        final TeamRequest teamWithSameName = generateTeam();
-        teamWithSameName.setTeamName(teamToCreate.getTeamName());
+        final TeamRequest teamWithSameName = generateTeamWithName(teamToCreate.teamName());
 
         TEAM_REQUEST_SENDER.create(teamToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamWithSameName, ADMIN_USER.userName(), ADMIN_USER.password());

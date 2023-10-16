@@ -585,7 +585,7 @@ class UserChangeValidatorTest {
             .containsOnly(
                 String.format(
                     "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
-                    userChange.getFoldingUserName(), userChange.getPasskey())
+                    userChange.foldingUserName(), userChange.passkey())
             );
     }
 
@@ -613,7 +613,7 @@ class UserChangeValidatorTest {
             .containsOnly(
                 String.format(
                     "User '%s' has 0 Work Units with passkey '%s', there must be at least one completed Work Unit before adding the user",
-                    userChange.getFoldingUserName(), userChange.getPasskey())
+                    userChange.foldingUserName(), userChange.passkey())
             );
     }
 
@@ -640,7 +640,7 @@ class UserChangeValidatorTest {
         assertThat(e.getValidationFailure().errors())
             .containsOnly(
                 String.format("Unable to connect to 'https://www.google.com' to check stats for user '%s': Error connecting",
-                    userChange.getFoldingUserName())
+                    userChange.foldingUserName())
             );
     }
 

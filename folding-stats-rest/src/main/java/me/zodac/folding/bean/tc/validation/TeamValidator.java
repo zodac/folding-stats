@@ -69,7 +69,7 @@ public class TeamValidator {
      */
     public Team create(final TeamRequest teamRequest) {
         // The teamName must be unique
-        final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.getTeamName());
+        final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.teamName());
         if (teamWithMatchingName.isPresent()) {
             throw new ConflictException(teamRequest, teamWithMatchingName.get(), CONFLICTING_ATTRIBUTE);
         }
@@ -97,7 +97,7 @@ public class TeamValidator {
      */
     public Team update(final TeamRequest teamRequest, final Team existingTeam) {
         // The teamName must be unique, unless replacing the same team
-        final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.getTeamName());
+        final Optional<Team> teamWithMatchingName = getTeamWithName(teamRequest.teamName());
         if (teamWithMatchingName.isPresent() && teamWithMatchingName.get().id() != existingTeam.id()) {
             throw new ConflictException(teamRequest, teamWithMatchingName.get(), CONFLICTING_ATTRIBUTE);
         }
