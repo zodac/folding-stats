@@ -124,7 +124,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
             final int hardwareId = query
                 .fetch()
-                .get(0)
+                .getFirst()
                 .getHardwareId();
             return Hardware.updateWithId(hardwareId, hardware);
         });
@@ -211,7 +211,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
             final int teamId = query
                 .fetch()
-                .get(0)
+                .getFirst()
                 .getTeamId();
             return Team.updateWithId(teamId, team);
         });
@@ -316,7 +316,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
             final int userId = query
                 .fetch()
-                .get(0)
+                .getFirst()
                 .getUserId();
             return User.updateWithId(userId, user);
         });
@@ -426,7 +426,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
             final int userChangeId = query
                 .fetch()
-                .get(0)
+                .getFirst()
                 .getUserChangeId();
             return UserChange.updateWithId(userChangeId, userChange);
         });
@@ -1097,7 +1097,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
             final int retiredUserId = query
                 .fetch()
-                .get(0)
+                .getFirst()
                 .getRetiredUserId();
             return RetiredUserTcStats.updateWithId(retiredUserId, retiredUserTcStats);
         });

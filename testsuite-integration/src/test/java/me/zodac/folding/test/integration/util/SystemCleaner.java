@@ -77,20 +77,8 @@ public final class SystemCleaner {
 
             // Captains must be unset as captains before they can be deleted
             final User userWithPasskey = UserUtils.getWithPasskey(user.id());
-            final UserRequest userNoLongerCaptain = UserRequest.builder()
-                .foldingUserName(userWithPasskey.foldingUserName())
-                .displayName(userWithPasskey.displayName())
-                .passkey(userWithPasskey.passkey())
-                .category(userWithPasskey.category().toString())
-                .profileLink(userWithPasskey.profileLink())
-                .liveStatsLink(userWithPasskey.liveStatsLink())
-                .hardwareId(userWithPasskey.hardware().id())
-                .teamId(userWithPasskey.team().id())
-                .userIsCaptain(false)
-                .build();
-
-            USER_REQUEST_SENDER.update(userWithPasskey.id(), userNoLongerCaptain, ADMIN_USER.userName(), ADMIN_USER.password());
-            USER_REQUEST_SENDER.delete(userWithPasskey.id(), ADMIN_USER.userName(), ADMIN_USER.password());
+            removeCaptaincyFromUser(userWithPasskey);
+            USER_REQUEST_SENDER.delete(user.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         }
 
         for (final Team team : TeamUtils.getAll()) {
@@ -102,6 +90,22 @@ public final class SystemCleaner {
         }
 
         DatabaseUtils.truncateTableAndResetId("hardware", "users", "teams");
+    }
+
+    private static void removeCaptaincyFromUser(final User userWithPasskey) throws FoldingRestException {
+        final UserRequest userNoLongerCaptain = new UserRequest(
+            userWithPasskey.foldingUserName(),
+            userWithPasskey.displayName(),
+            userWithPasskey.passkey(),
+            userWithPasskey.category().toString(),
+            userWithPasskey.profileLink(),
+            userWithPasskey.liveStatsLink(),
+            userWithPasskey.hardware().id(),
+            userWithPasskey.team().id(),
+            false
+        );
+
+        USER_REQUEST_SENDER.update(userWithPasskey.id(), userNoLongerCaptain, ADMIN_USER.userName(), ADMIN_USER.password());
     }
 
     /**

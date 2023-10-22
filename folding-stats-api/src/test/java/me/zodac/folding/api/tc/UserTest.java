@@ -184,17 +184,17 @@ class UserTest {
         final User user =
             User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, createHardware(), createTeam(),
                 Role.CAPTAIN);
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey(DUMMY_PASSKEY)
-            .category("AMD_GPU")
-            .profileLink(VALID_PROFILE_LINK)
-            .liveStatsLink(VALID_LIVE_STATS_LINK)
-            .hardwareId(1)
-            .teamId(1)
-            .userIsCaptain(true)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            "user",
+            "user",
+            DUMMY_PASSKEY,
+            Category.AMD_GPU.toString(),
+            VALID_PROFILE_LINK,
+            VALID_LIVE_STATS_LINK,
+            1,
+            1,
+            true
+        );
 
         assertThat(user.isEqualRequest(userRequest))
             .isTrue();
@@ -205,17 +205,17 @@ class UserTest {
         final User user =
             User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, createHardware(), createTeam(),
                 Role.CAPTAIN);
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey(DUMMY_PASSKEY)
-            .category("AMD_GPU")
-            .profileLink(VALID_PROFILE_LINK)
-            .liveStatsLink(VALID_LIVE_STATS_LINK)
-            .hardwareId(2)
-            .teamId(1)
-            .userIsCaptain(true)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            "user",
+            "user",
+            DUMMY_PASSKEY,
+            Category.AMD_GPU.toString(),
+            VALID_PROFILE_LINK,
+            VALID_LIVE_STATS_LINK,
+            2,
+            1,
+            true
+        );
 
         assertThat(user.isEqualRequest(userRequest))
             .isFalse();

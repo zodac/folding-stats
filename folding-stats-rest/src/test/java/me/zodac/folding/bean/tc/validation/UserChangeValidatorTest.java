@@ -42,7 +42,11 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link UserChangeValidator}.
  */
+// TODO: Parameterize this test, 1 positive, 1 negative
 class UserChangeValidatorTest {
+
+    private static final String DUMMY_PASSKEY = "DummyPasskey12345678901234567890";
+    private static final String VALID_LIVE_STATS_LINK = "https://www.google.ie";
 
     private static int hardwareId = 1;
     private static int teamId = 1;
@@ -53,15 +57,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey(user.passkey())
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .immediate(true)
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -90,14 +94,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey("DummyPasskey12345678901234567891")
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            DUMMY_PASSKEY,
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -116,14 +121,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName("-folding.Name_2")
-            .passkey(user.passkey())
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            "-folding.Name_2",
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -142,14 +148,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(null)
-            .passkey(user.passkey())
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            null,
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            true
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -166,14 +173,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName("folding*Name")
-            .passkey(user.passkey())
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            "folding*Name",
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -190,14 +198,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey(null)
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            null,
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -214,14 +223,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey("DummyPasskey1234567890123456789*")
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            "DummyPasskey1234567890123456789*",
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -238,14 +248,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey(user.passkey())
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink(null)
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            user.passkey(),
+            null,
+            hardware.id(),
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -264,14 +275,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey(user.passkey())
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("invalidUrl")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            user.passkey(),
+            "invalidUrl",
+            hardware.id(),
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -288,14 +300,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey(user.passkey())
-            .hardwareId(-1)
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            -1,
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -312,14 +325,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey(user.passkey())
-            .hardwareId(-1)
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            -1,
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createUser(user);
@@ -335,14 +349,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey(user.passkey())
-            .hardwareId(hardware.id())
-            .userId(-1)
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            -1,
+            user.passkey(),
+            user.foldingUserName(),
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -359,14 +374,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey(user.passkey())
-            .hardwareId(hardware.id())
-            .userId(-1)
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            -1,
+            user.passkey(),
+            user.foldingUserName(),
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -382,14 +398,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey("DummyPasskey11111111111111111111")
-            .foldingUserName(user.foldingUserName())
-            .passkey(user.passkey())
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            "DummyPasskey11111111111111111111",
+            user.foldingUserName(),
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -406,14 +423,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey(user.passkey())
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink(user.liveStatsLink())
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            user.passkey(),
+            user.liveStatsLink(),
+            hardware.id(),
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -430,14 +448,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey(user.passkey())
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            false
+        );
 
         final UserChange existingUserChange = UserChange.createNow(
             user,
@@ -448,7 +467,7 @@ class UserChangeValidatorTest {
                 user.passkey(),
                 user.category(),
                 user.profileLink(),
-                "https://www.google.ie",
+                VALID_LIVE_STATS_LINK,
                 user.hardware(),
                 user.team(),
                 user.role()
@@ -480,14 +499,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey(user.passkey())
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            false
+        );
 
         final UserChange existingUserChange = UserChange.createNow(
             user,
@@ -523,14 +543,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey(user.passkey())
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            false
+        );
 
         final UserChange existingUserChange = UserChange.createNow(
             user,
@@ -541,7 +562,7 @@ class UserChangeValidatorTest {
                 user.passkey(),
                 user.category(),
                 user.profileLink(),
-                "https://www.google.ie",
+                VALID_LIVE_STATS_LINK,
                 user.hardware(),
                 user.team(),
                 user.role()
@@ -566,14 +587,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey("DummyPasskey12345678901234567891")
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            "DummyPasskey12345678901234567891",
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -594,14 +616,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName("-folding.Name_2")
-            .passkey(user.passkey())
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            "-folding.Name_2",
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -622,14 +645,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey("DummyPasskey12345678901234567891")
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            "DummyPasskey12345678901234567891",
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -649,14 +673,15 @@ class UserChangeValidatorTest {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
 
-        final UserChangeRequest userChange = UserChangeRequest.builder()
-            .existingPasskey(user.passkey())
-            .foldingUserName(user.foldingUserName())
-            .passkey("DummyPasskey12345678901234567891")
-            .hardwareId(hardware.id())
-            .userId(user.id())
-            .liveStatsLink("https://www.google.ie")
-            .build();
+        final UserChangeRequest userChange = generateUserChangeRequest(
+            user.id(),
+            user.passkey(),
+            user.foldingUserName(),
+            "DummyPasskey12345678901234567891",
+            VALID_LIVE_STATS_LINK,
+            hardware.id(),
+            false
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
         foldingRepository.createHardware(hardware);
@@ -702,5 +727,15 @@ class UserChangeValidatorTest {
             generateTeam(),
             Role.CAPTAIN
         );
+    }
+
+    private static UserChangeRequest generateUserChangeRequest(final int userId,
+                                                               final String existingPasskey,
+                                                               final String foldingUserName,
+                                                               final String passkey,
+                                                               final String liveStatsLink,
+                                                               final int hardwareId,
+                                                               final boolean immediate) {
+        return new UserChangeRequest(userId, existingPasskey, foldingUserName, passkey, liveStatsLink, hardwareId, immediate);
     }
 }

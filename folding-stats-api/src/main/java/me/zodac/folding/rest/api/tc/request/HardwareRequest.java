@@ -21,9 +21,7 @@ import static me.zodac.folding.api.util.StringUtils.isBlank;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.stream.Stream;
-import lombok.Builder;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.HardwareMake;
@@ -44,7 +42,6 @@ import me.zodac.folding.api.tc.HardwareType;
           "averagePpd": 555
         }"""
 )
-@Builder
 public record HardwareRequest(
     @Schema(
         description = "The internal, unique name of the hardware",
@@ -120,7 +117,7 @@ public record HardwareRequest(
                 validateMultiplier(),
                 validateAveragePpd()
             )
-            .filter(Objects::nonNull)
+            .filter(s -> !s.isEmpty())
             .toList();
         if (!failureMessages.isEmpty()) {
             throw new ValidationException(this, failureMessages);
@@ -130,36 +127,36 @@ public record HardwareRequest(
     private String validateHardwareName() {
         return isBlank(hardwareName)
             ? "Field 'hardwareName' must not be empty"
-            : null;
+            : "";
     }
 
     private String validateDisplayName() {
         return isBlank(displayName)
             ? "Field 'displayName' must not be empty"
-            : null;
+            : "";
     }
 
     private String validateHardwareMake() {
         return HardwareMake.get(hardwareMake) == HardwareMake.INVALID
             ? String.format("Field 'hardwareMake' must be one of: %s", HardwareMake.getAllValues())
-            : null;
+            : "";
     }
 
     private String validateHardwareType() {
         return HardwareType.get(hardwareType) == HardwareType.INVALID
             ? String.format("Field 'hardwareType' must be one of: %s", HardwareType.getAllValues())
-            : null;
+            : "";
     }
 
     private String validateMultiplier() {
         return multiplier >= MINIMUM_MULTIPLIER_VALUE
-            ? null
+            ? ""
             : String.format("Field 'multiplier' must be %.2f or higher", MINIMUM_MULTIPLIER_VALUE);
     }
 
     private String validateAveragePpd() {
         return averagePpd >= MINIMUM_AVERAGE_PPD_VALUE
-            ? null
+            ? ""
             : String.format("Field 'averagePpd' must be %d or higher", MINIMUM_AVERAGE_PPD_VALUE);
     }
 }

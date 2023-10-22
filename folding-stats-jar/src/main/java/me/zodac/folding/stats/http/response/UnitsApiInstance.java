@@ -17,7 +17,6 @@
 
 package me.zodac.folding.stats.http.response;
 
-import com.google.gson.annotations.SerializedName;
 import java.util.Comparator;
 
 /**
@@ -40,10 +39,7 @@ import java.util.Comparator;
  *     ]
  * </pre>
  */
-record UnitsApiInstance(@SerializedName("finished") int finished,
-                        @SerializedName("expired") int expired,
-                        @SerializedName("active") int active
-) implements Comparable<UnitsApiInstance> {
+record UnitsApiInstance(int finished, int expired, int active) implements Comparable<UnitsApiInstance> {
 
     @Override
     public int compareTo(final UnitsApiInstance o) {

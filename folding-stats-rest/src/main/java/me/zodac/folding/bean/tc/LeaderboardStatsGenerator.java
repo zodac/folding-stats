@@ -72,7 +72,7 @@ public class LeaderboardStatsGenerator {
             return List.of();
         }
 
-        final TeamLeaderboardEntry leader = TeamLeaderboardEntry.createLeader(teamResults.get(0));
+        final TeamLeaderboardEntry leader = TeamLeaderboardEntry.createLeader(teamResults.getFirst());
 
         final int numberOfTeamResults = teamResults.size();
         final List<TeamLeaderboardEntry> teamSummaries = new ArrayList<>(numberOfTeamResults);
@@ -122,7 +122,7 @@ public class LeaderboardStatsGenerator {
             return List.of();
         }
 
-        final UserSummary firstResult = userResults.get(0);
+        final UserSummary firstResult = userResults.getFirst();
         final UserCategoryLeaderboardEntry categoryLeader = UserCategoryLeaderboardEntry.createLeader(firstResult);
 
         final int numberOfUserResults = userResults.size();

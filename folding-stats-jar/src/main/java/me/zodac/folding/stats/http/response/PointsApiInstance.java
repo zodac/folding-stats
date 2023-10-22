@@ -17,7 +17,6 @@
 
 package me.zodac.folding.stats.http.response;
 
-import com.google.gson.annotations.SerializedName;
 import java.util.Comparator;
 
 /**
@@ -38,7 +37,7 @@ import java.util.Comparator;
  *      }
  * </pre>
  */
-record PointsApiInstance(@SerializedName("earned") long earned) implements Comparable<PointsApiInstance> {
+record PointsApiInstance(long earned) implements Comparable<PointsApiInstance> {
 
     @Override
     public int compareTo(final PointsApiInstance o) {

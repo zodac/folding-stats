@@ -145,11 +145,7 @@ class TeamTest {
         final Team createdTeam = create(generateTeam());
         final int initialSize = TeamUtils.getNumberOfTeams();
 
-        final TeamRequest teamToUpdate = TeamRequest.builder()
-            .teamName(createdTeam.teamName())
-            .teamDescription("Updated description")
-            .forumLink(createdTeam.forumLink())
-            .build();
+        final TeamRequest teamToUpdate = new TeamRequest(createdTeam.teamName(), "Updated description", createdTeam.forumLink());
 
         final HttpResponse<String> response =
             TEAM_REQUEST_SENDER.update(createdTeam.id(), teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -195,10 +191,7 @@ class TeamTest {
 
     @Test
     void whenCreatingTeam_givenTeamWithInvalidUrl_thenJsonResponseWithErrorIsReturned_andHas400Status() throws FoldingRestException {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName(nextTeamName())
-            .forumLink("invalidLink")
-            .build();
+        final TeamRequest team = new TeamRequest(nextTeamName(), null, "invalidLink");
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
@@ -286,12 +279,7 @@ class TeamTest {
     void whenUpdatingTeam_givenInvalidTeamId_thenNoJsonResponseIsReturned_andHas400Status()
         throws IOException, InterruptedException, FoldingRestException {
         final Team createdTeam = create(generateTeam());
-
-        final TeamRequest teamToUpdate = TeamRequest.builder()
-            .teamName(createdTeam.teamName())
-            .teamDescription("Updated description")
-            .forumLink(createdTeam.forumLink())
-            .build();
+        final TeamRequest teamToUpdate = new TeamRequest(createdTeam.teamName(), "Updated description", createdTeam.forumLink());
 
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(teamToUpdate)))
@@ -337,12 +325,7 @@ class TeamTest {
     @Test
     void whenUpdatingTeam_givenValidTeamId_andPayloadHasNoChanges_thenOriginalTeamIsReturned_andHas200Status() throws FoldingRestException {
         final Team createdTeam = create(generateTeam());
-
-        final TeamRequest teamToUpdate = TeamRequest.builder()
-            .teamName(createdTeam.teamName())
-            .teamDescription(createdTeam.teamDescription())
-            .forumLink(createdTeam.forumLink())
-            .build();
+        final TeamRequest teamToUpdate = new TeamRequest(createdTeam.teamName(), createdTeam.teamDescription(), createdTeam.forumLink());
 
         final HttpResponse<String> updateResponse =
             TEAM_REQUEST_SENDER.update(createdTeam.id(), teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -433,12 +416,7 @@ class TeamTest {
     void whenUpdatingTeam_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException, IOException, InterruptedException {
         final Team createdTeam = create(generateTeam());
-
-        final TeamRequest teamToUpdate = TeamRequest.builder()
-            .teamName(createdTeam.teamName())
-            .teamDescription("Updated description")
-            .forumLink(createdTeam.forumLink())
-            .build();
+        final TeamRequest teamToUpdate = new TeamRequest(createdTeam.teamName(), "Updated description", createdTeam.forumLink());
 
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(teamToUpdate)))
@@ -538,10 +516,7 @@ class TeamTest {
 
     @Test
     void whenCreatingTeam_andOptionalFieldIsEmptyString_thenValueShouldBeNullNotEmpty() throws FoldingRestException {
-        final TeamRequest teamToCreate = TeamRequest.builder()
-            .teamName(nextTeamName())
-            .forumLink("")
-            .build();
+        final TeamRequest teamToCreate = new TeamRequest(nextTeamName(), null, "");
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
@@ -559,18 +534,10 @@ class TeamTest {
 
     @Test
     void whenUpdatingTeam_andOptionalFieldIsEmptyString_thenValueShouldBeNullNotEmpty() throws FoldingRestException {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName(nextTeamName())
-            .forumLink("http://google.com")
-            .build();
-
+        final TeamRequest team = new TeamRequest(nextTeamName(), null, "http://google.com");
         final Team createdTeam = create(team);
 
-        final TeamRequest teamToUpdate = TeamRequest.builder()
-            .teamName(createdTeam.teamName())
-            .teamDescription(createdTeam.teamDescription())
-            .forumLink("")
-            .build();
+        final TeamRequest teamToUpdate = new TeamRequest(createdTeam.teamName(), createdTeam.teamDescription(), "");
 
         final HttpResponse<String> response =
             TEAM_REQUEST_SENDER.update(createdTeam.id(), teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -587,10 +554,7 @@ class TeamTest {
 
     @Test
     void whenCreatingTeam_andContentTypeIsNotJson_thenResponse415Status() throws IOException, InterruptedException {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName(nextTeamName())
-            .forumLink("http://google.com")
-            .build();
+        final TeamRequest team = new TeamRequest(nextTeamName(), null, "http://google.com");
 
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(GSON.toJson(team)))

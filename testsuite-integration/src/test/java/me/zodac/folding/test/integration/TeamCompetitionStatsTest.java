@@ -458,14 +458,14 @@ class TeamCompetitionStatsTest {
             .isEqualTo(firstPoints);
 
         // Change the multiplier on the hardware, no need to update the user
-        final HardwareRequest updatedHardware = HardwareRequest.builder()
-            .hardwareName(createdHardware.hardwareName())
-            .displayName(createdHardware.displayName())
-            .hardwareMake(createdHardware.hardwareMake().toString())
-            .hardwareType(createdHardware.hardwareType().toString())
-            .multiplier(2.00D)
-            .averagePpd(createdHardware.averagePpd())
-            .build();
+        final HardwareRequest updatedHardware = new HardwareRequest(
+            createdHardware.hardwareName(),
+            createdHardware.displayName(),
+            createdHardware.hardwareMake().toString(),
+            createdHardware.hardwareType().toString(),
+            2.00D,
+            createdHardware.averagePpd()
+        );
 
         HARDWARE_REQUEST_SENDER.update(createdHardware.id(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
 
@@ -514,14 +514,17 @@ class TeamCompetitionStatsTest {
         // Update the user with a new hardware with a multiplier
         final HardwareRequest hardwareWithMultiplier = generateHardwareWithMultiplier(2.00D);
         final int hardwareWithMultiplierId = HardwareUtils.create(hardwareWithMultiplier).id();
-        final UserRequest userUpdatedWithMultiplier = UserRequest.builder()
-            .foldingUserName(user.foldingUserName())
-            .displayName(user.displayName())
-            .passkey(user.passkey())
-            .category(user.category())
-            .hardwareId(hardwareWithMultiplierId)
-            .teamId(user.teamId())
-            .build();
+        final UserRequest userUpdatedWithMultiplier = new UserRequest(
+            user.foldingUserName(),
+            user.displayName(),
+            user.passkey(),
+            user.category(),
+            null,
+            null,
+            hardwareWithMultiplierId,
+            user.teamId(),
+            false
+        );
 
         USER_REQUEST_SENDER.update(createdUser.id(), userUpdatedWithMultiplier, ADMIN_USER.userName(), ADMIN_USER.password());
 
@@ -689,14 +692,17 @@ class TeamCompetitionStatsTest {
         StubbedFoldingEndpointUtils.addPoints(createdUserToRetire, secondPoints);
         manuallyUpdateStats();
 
-        final UserRequest userToRetireWithNewTeamId = UserRequest.builder()
-            .foldingUserName(userToRetire.foldingUserName())
-            .displayName(userToRetire.displayName())
-            .passkey(userToRetire.passkey())
-            .category(userToRetire.category())
-            .hardwareId(userToRetire.hardwareId())
-            .teamId(newTeam.id())
-            .build();
+        final UserRequest userToRetireWithNewTeamId = new UserRequest(
+            userToRetire.foldingUserName(),
+            userToRetire.displayName(),
+            userToRetire.passkey(),
+            userToRetire.category(),
+            null,
+            null,
+            userToRetire.hardwareId(),
+            newTeam.id(),
+            false
+        );
         UserUtils.create(userToRetireWithNewTeamId);
 
         final long thirdPoints = 14_000L;
@@ -1044,14 +1050,14 @@ class TeamCompetitionStatsTest {
 
         // Update hardware, should clear all offsets from the user
         final double newMultiplier = 2.00D;
-        final HardwareRequest updatedHardware = HardwareRequest.builder()
-            .hardwareName(hardware.hardwareName())
-            .displayName(hardware.displayName())
-            .hardwareMake(hardware.hardwareMake().toString())
-            .hardwareType(hardware.hardwareType().toString())
-            .multiplier(newMultiplier)
-            .averagePpd(hardware.averagePpd())
-            .build();
+        final HardwareRequest updatedHardware = new HardwareRequest(
+            hardware.hardwareName(),
+            hardware.displayName(),
+            hardware.hardwareMake().toString(),
+            hardware.hardwareType().toString(),
+            newMultiplier,
+            hardware.averagePpd()
+        );
         final HttpResponse<String> hardwareUpdateResponse =
             HARDWARE_REQUEST_SENDER.update(hardware.id(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(hardwareUpdateResponse.statusCode())
@@ -1115,14 +1121,17 @@ class TeamCompetitionStatsTest {
             .as("Expected second team to have one active user: " + resultAfterFirstUpdate)
             .hasSize(1);
 
-        final UserRequest updatedFirstUserRequest = UserRequest.builder()
-            .foldingUserName(firstUser.foldingUserName())
-            .displayName(firstUser.displayName())
-            .passkey(firstUser.passkey())
-            .category(firstUser.category().toString())
-            .hardwareId(firstUser.hardware().id())
-            .teamId(secondTeam.id())
-            .build();
+        final UserRequest updatedFirstUserRequest = new UserRequest(
+            firstUser.foldingUserName(),
+            firstUser.displayName(),
+            firstUser.passkey(),
+            firstUser.category().toString(),
+            null,
+            null,
+            firstUser.hardware().id(),
+            secondTeam.id(),
+            false
+        );
 
         final User updatedFirstUser = UserUtils.update(firstUser.id(), updatedFirstUserRequest);
 

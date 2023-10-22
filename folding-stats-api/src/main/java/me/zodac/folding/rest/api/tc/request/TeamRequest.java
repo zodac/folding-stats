@@ -22,9 +22,7 @@ import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.stream.Stream;
-import lombok.Builder;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
 
@@ -40,7 +38,6 @@ import me.zodac.folding.api.exception.ValidationException;
           "forumLink": "https://extremehw.net/forum/125-extreme-team-folding/"
         }"""
 )
-@Builder
 public record TeamRequest(
     @Schema(
         description = "The unique name of the team",
@@ -79,7 +76,7 @@ public record TeamRequest(
                 validateTeamName(),
                 validateForumLink()
             )
-            .filter(Objects::nonNull)
+            .filter(s -> !s.isEmpty())
             .toList();
         if (!failureMessages.isEmpty()) {
             throw new ValidationException(this, failureMessages);
@@ -89,12 +86,12 @@ public record TeamRequest(
     private String validateTeamName() {
         return isBlank(teamName)
             ? "Field 'teamName' must not be empty"
-            : null;
+            : "";
     }
 
     private String validateForumLink() {
         return isBlankOrValidUrl(forumLink)
-            ? null
+            ? ""
             : String.format("Field 'forumLink' is not a valid link: '%s'", forumLink);
     }
 }

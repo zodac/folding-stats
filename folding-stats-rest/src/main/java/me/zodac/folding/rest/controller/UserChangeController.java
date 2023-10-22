@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
@@ -63,6 +64,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserChangeController implements UserChangeEndpoint {
 
     private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
+    private static final Pattern SINGLE_COMMA_PATTERN = Pattern.compile(",");
 
     private final FoldingRepository foldingRepository;
     private final UserChangeApplier userChangeApplier;
@@ -140,12 +142,12 @@ public class UserChangeController implements UserChangeEndpoint {
         return ok(userChanges);
     }
 
-    private static Collection<UserChangeState> getStatesBasedOnInput(final String state) {
-        if (UserChangeState.ALL_STATES.equals(state)) {
+    private static Collection<UserChangeState> getStatesBasedOnInput(final CharSequence state) {
+        if (UserChangeState.ALL_STATES.contentEquals(state)) {
             return UserChangeState.getAllValues();
         }
 
-        return Arrays.stream(state.split(","))
+        return Arrays.stream(SINGLE_COMMA_PATTERN.split(state))
             .map(UserChangeState::get)
             .filter(userChangeState -> userChangeState != UserChangeState.INVALID)
             .collect(Collectors.toSet());

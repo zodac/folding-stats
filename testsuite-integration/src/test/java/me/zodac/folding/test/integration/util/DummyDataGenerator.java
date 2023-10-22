@@ -76,14 +76,15 @@ public final class DummyDataGenerator {
      */
     public static HardwareRequest generateHardware() {
         final String hardwareName = nextHardwareName();
-        return HardwareRequest.builder()
-            .hardwareName(hardwareName)
-            .displayName(hardwareName)
-            .hardwareMake(HardwareMake.NVIDIA.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+
+        return new HardwareRequest(
+            hardwareName,
+            hardwareName,
+            HardwareMake.NVIDIA.toString(),
+            HardwareType.GPU.toString(),
+            1.00D,
+            1L
+        );
     }
 
     /**
@@ -94,17 +95,17 @@ public final class DummyDataGenerator {
      */
     public static HardwareRequest generateHardwareFromCategory(final Category category) {
         final String hardwareName = nextHardwareName();
-        final HardwareMake hardwareMake = new ArrayList<>(category.supportedHardwareMakes()).get(0);
-        final HardwareType hardwareType = new ArrayList<>(category.supportedHardwareTypes()).get(0);
+        final HardwareMake hardwareMake = new ArrayList<>(category.supportedHardwareMakes()).getFirst();
+        final HardwareType hardwareType = new ArrayList<>(category.supportedHardwareTypes()).getFirst();
 
-        return HardwareRequest.builder()
-            .hardwareName(hardwareName)
-            .displayName(hardwareName)
-            .hardwareMake(hardwareMake.toString())
-            .hardwareType(hardwareType.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        return new HardwareRequest(
+            hardwareName,
+            hardwareName,
+            hardwareMake.toString(),
+            hardwareType.toString(),
+            1.00D,
+            1L
+        );
     }
 
     /**
@@ -115,14 +116,14 @@ public final class DummyDataGenerator {
      */
     public static HardwareRequest generateHardwareWithMultiplier(final double multiplier) {
         final String hardwareName = nextHardwareName();
-        return HardwareRequest.builder()
-            .hardwareName(hardwareName)
-            .displayName(hardwareName)
-            .hardwareMake(HardwareMake.NVIDIA.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(multiplier)
-            .averagePpd(1L)
-            .build();
+        return new HardwareRequest(
+            hardwareName,
+            hardwareName,
+            HardwareMake.NVIDIA.toString(),
+            HardwareType.GPU.toString(),
+            multiplier,
+            1L
+        );
     }
 
     /**
@@ -131,9 +132,7 @@ public final class DummyDataGenerator {
      * @return the generated {@link TeamRequest}
      */
     public static TeamRequest generateTeam() {
-        return TeamRequest.builder()
-            .teamName(nextTeamName())
-            .build();
+        return generateTeamWithName(nextTeamName());
     }
 
     /**
@@ -143,9 +142,7 @@ public final class DummyDataGenerator {
      * @return the generated {@link TeamRequest}
      */
     public static TeamRequest generateTeamWithName(final String teamName) {
-        return TeamRequest.builder()
-            .teamName(teamName)
-            .build();
+        return new TeamRequest(teamName, null, null);
     }
 
     /**
@@ -160,14 +157,14 @@ public final class DummyDataGenerator {
         final int teamId = TeamUtils.create(generateTeam()).id();
         final String userName = nextUserName();
 
-        return UserRequest.builder()
-            .foldingUserName(userName)
-            .displayName(userName)
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU.toString())
-            .hardwareId(hardwareId)
-            .teamId(teamId)
-            .build();
+        return generateUserRequest(
+            userName,
+            Category.NVIDIA_GPU,
+            null,
+            hardwareId,
+            teamId,
+            false
+        );
     }
 
     /**
@@ -177,20 +174,19 @@ public final class DummyDataGenerator {
      * @throws FoldingRestException thrown if an error occurs executing {@link HardwareUtils#create(HardwareRequest)}
      *                              or {@link TeamUtils#create(TeamRequest)}
      */
-    public static UserRequest generateCaptainUser() throws FoldingRestException {
+    public static UserRequest generateCaptain() throws FoldingRestException {
         final int hardwareId = HardwareUtils.create(generateHardware()).id();
         final int teamId = TeamUtils.create(generateTeam()).id();
         final String userName = nextUserName();
 
-        return UserRequest.builder()
-            .foldingUserName(userName)
-            .displayName(userName)
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU.toString())
-            .hardwareId(hardwareId)
-            .teamId(teamId)
-            .userIsCaptain(true)
-            .build();
+        return generateUserRequest(
+            userName,
+            Category.NVIDIA_GPU,
+            null,
+            hardwareId,
+            teamId,
+            true
+        );
     }
 
     /**
@@ -205,14 +201,14 @@ public final class DummyDataGenerator {
         final int teamId = TeamUtils.create(generateTeam()).id();
         final String userName = nextUserName();
 
-        return UserRequest.builder()
-            .foldingUserName(userName)
-            .displayName(userName)
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU.toString())
-            .hardwareId(hardwareId)
-            .teamId(teamId)
-            .build();
+        return generateUserRequest(
+            userName,
+            Category.NVIDIA_GPU,
+            null,
+            hardwareId,
+            teamId,
+            false
+        );
     }
 
     /**
@@ -226,14 +222,14 @@ public final class DummyDataGenerator {
         final int hardwareId = HardwareUtils.create(generateHardware()).id();
         final String userName = nextUserName();
 
-        return UserRequest.builder()
-            .foldingUserName(userName)
-            .displayName(userName)
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU.toString())
-            .hardwareId(hardwareId)
-            .teamId(teamId)
-            .build();
+        return generateUserRequest(
+            userName,
+            Category.NVIDIA_GPU,
+            null,
+            hardwareId,
+            teamId,
+            false
+        );
     }
 
     /**
@@ -246,14 +242,14 @@ public final class DummyDataGenerator {
     public static UserRequest generateUserWithHardwareIdAndTeamId(final int hardwareId, final int teamId) {
         final String userName = nextUserName();
 
-        return UserRequest.builder()
-            .foldingUserName(userName)
-            .displayName(userName)
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU.toString())
-            .hardwareId(hardwareId)
-            .teamId(teamId)
-            .build();
+        return generateUserRequest(
+            userName,
+            Category.NVIDIA_GPU,
+            null,
+            hardwareId,
+            teamId,
+            false
+        );
     }
 
     /**
@@ -269,15 +265,14 @@ public final class DummyDataGenerator {
         final int hardwareId = HardwareUtils.create(generateHardwareFromCategory(category)).id();
         final String userName = nextUserName();
 
-        return UserRequest.builder()
-            .foldingUserName(userName)
-            .displayName(userName)
-            .passkey("DummyPasskey12345678901234567890")
-            .category(category.toString())
-            .hardwareId(hardwareId)
-            .teamId(teamId)
-            .userIsCaptain(false)
-            .build();
+        return generateUserRequest(
+            userName,
+            category,
+            null,
+            hardwareId,
+            teamId,
+            false
+        );
     }
 
     /**
@@ -293,15 +288,14 @@ public final class DummyDataGenerator {
         final int hardwareId = HardwareUtils.create(generateHardwareFromCategory(category)).id();
         final String userName = nextUserName();
 
-        return UserRequest.builder()
-            .foldingUserName(userName)
-            .displayName(userName)
-            .passkey("DummyPasskey12345678901234567890")
-            .category(category.toString())
-            .hardwareId(hardwareId)
-            .teamId(teamId)
-            .userIsCaptain(true)
-            .build();
+        return generateUserRequest(
+            userName,
+            category,
+            null,
+            hardwareId,
+            teamId,
+            true
+        );
     }
 
     /**
@@ -317,14 +311,32 @@ public final class DummyDataGenerator {
         final int teamId = TeamUtils.create(generateTeam()).id();
         final String userName = nextUserName();
 
-        return UserRequest.builder()
-            .foldingUserName(userName)
-            .displayName(userName)
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU.toString())
-            .liveStatsLink(liveStatsLink)
-            .hardwareId(hardwareId)
-            .teamId(teamId)
-            .build();
+        return generateUserRequest(
+            userName,
+            Category.NVIDIA_GPU,
+            liveStatsLink,
+            hardwareId,
+            teamId,
+            false
+        );
+    }
+
+    private static UserRequest generateUserRequest(final String userName,
+                                                   final Category category,
+                                                   final String liveStatsLink,
+                                                   final int hardwareId,
+                                                   final int teamId,
+                                                   final boolean isCaptain) {
+        return new UserRequest(
+            userName,
+            userName,
+            "DummyPasskey12345678901234567890",
+            category.toString(),
+            null,
+            liveStatsLink,
+            hardwareId,
+            teamId,
+            isCaptain
+        );
     }
 }

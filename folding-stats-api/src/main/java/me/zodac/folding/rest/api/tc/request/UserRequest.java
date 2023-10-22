@@ -22,10 +22,8 @@ import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import lombok.Builder;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Category;
@@ -49,7 +47,6 @@ import me.zodac.folding.api.tc.HardwareMake;
           "userIsCaptain": true
         }"""
 )
-@Builder
 public record UserRequest(
     @Schema(
         description = "The Folding@Home userName that the user will use for stats from the Stanford stats website",
@@ -143,7 +140,7 @@ public record UserRequest(
                 validateProfileLink(),
                 validateLiveStatsLink()
             )
-            .filter(Objects::nonNull)
+            .filter(s -> !s.isEmpty())
             .toList();
         if (!failureMessages.isEmpty()) {
             throw new ValidationException(this, failureMessages);
@@ -153,36 +150,36 @@ public record UserRequest(
     private String validateFoldingUserName() {
         return isBlank(foldingUserName) || !FOLDING_USER_NAME_PATTERN.matcher(foldingUserName).find()
             ? "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen"
-            : null;
+            : "";
     }
 
     private String validateDisplayName() {
         return isBlank(displayName)
             ? "Field 'displayName' must not be empty"
-            : null;
+            : "";
     }
 
     private String validatePasskey() {
         return isBlank(passkey) || !PASSKEY_PATTERN.matcher(passkey).find()
             ? "Field 'passkey' must be 32 characters long and include only alphanumeric characters"
-            : null;
+            : "";
     }
 
     private String validateCategory() {
         return Category.get(category) == Category.INVALID
             ? String.format("Field 'category' must be one of: %s", Category.getAllValues())
-            : null;
+            : "";
     }
 
     private String validateProfileLink() {
         return isBlankOrValidUrl(profileLink)
-            ? null
+            ? ""
             : String.format("Field 'profileLink' is not a valid link: '%s'", profileLink);
     }
 
     private String validateLiveStatsLink() {
         return isBlankOrValidUrl(liveStatsLink)
-            ? null
+            ? ""
             : String.format("Field 'liveStatsLink' is not a valid link: '%s'", liveStatsLink);
     }
 }

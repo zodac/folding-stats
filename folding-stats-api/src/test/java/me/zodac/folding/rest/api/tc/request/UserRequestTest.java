@@ -29,19 +29,23 @@ import org.junit.jupiter.api.Test;
  */
 class UserRequestTest {
 
+    private static final String VALID_PROFILE_LINK = "https://google.com";
+    private static final String VALID_LIVE_STATS_LINK = "https://google.ie";
+    private static final String DUMMY_PASSKEY = "DummyPasskey01234567890123456789";
+
     @Test
     void testCreate_captain() {
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey01234567890123456789")
-            .category(Category.AMD_GPU.toString())
-            .profileLink("https://google.com")
-            .liveStatsLink("https://google.ie")
-            .hardwareId(1)
-            .teamId(1)
-            .userIsCaptain(true)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            "user",
+            "user",
+            DUMMY_PASSKEY,
+            Category.AMD_GPU.toString(),
+            VALID_PROFILE_LINK,
+            VALID_LIVE_STATS_LINK,
+            1,
+            1,
+            true
+        );
 
         // Expecting no exception
         userRequest.validate();
@@ -55,17 +59,17 @@ class UserRequestTest {
 
     @Test
     void testCreate_teamMember() {
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey01234567890123456789")
-            .category(Category.AMD_GPU.toString())
-            .profileLink("https://google.com")
-            .liveStatsLink("https://google.ie")
-            .hardwareId(1)
-            .teamId(1)
-            .userIsCaptain(false)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            "user",
+            "user",
+            DUMMY_PASSKEY,
+            Category.AMD_GPU.toString(),
+            VALID_PROFILE_LINK,
+            VALID_LIVE_STATS_LINK,
+            1,
+            1,
+            false
+        );
 
         // Expecting no exception
         userRequest.validate();
@@ -79,17 +83,17 @@ class UserRequestTest {
 
     @Test
     void testCreate_foldingUserNameNull() {
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName(null)
-            .displayName("user")
-            .passkey("DummyPasskey01234567890123456789")
-            .category(Category.AMD_GPU.toString())
-            .profileLink("https://google.com")
-            .liveStatsLink("https://google.ie")
-            .hardwareId(1)
-            .teamId(1)
-            .userIsCaptain(true)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            null,
+            "user",
+            DUMMY_PASSKEY,
+            Category.AMD_GPU.toString(),
+            VALID_PROFILE_LINK,
+            VALID_LIVE_STATS_LINK,
+            1,
+            1,
+            true
+        );
 
         assertThatThrownBy(userRequest::validate)
             .isInstanceOf(ValidationException.class);
@@ -97,17 +101,17 @@ class UserRequestTest {
 
     @Test
     void testCreate_foldingUserNameBlank() {
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("")
-            .displayName("user")
-            .passkey("DummyPasskey01234567890123456789")
-            .category(Category.AMD_GPU.toString())
-            .profileLink("https://google.com")
-            .liveStatsLink("https://google.ie")
-            .hardwareId(1)
-            .teamId(1)
-            .userIsCaptain(true)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            "",
+            "user",
+            DUMMY_PASSKEY,
+            Category.AMD_GPU.toString(),
+            VALID_PROFILE_LINK,
+            VALID_LIVE_STATS_LINK,
+            1,
+            1,
+            true
+        );
 
         assertThatThrownBy(userRequest::validate)
             .isInstanceOf(ValidationException.class);
@@ -115,17 +119,17 @@ class UserRequestTest {
 
     @Test
     void testCreate_foldingUserNameInvalidCharacter() {
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("*")
-            .displayName("user")
-            .passkey("DummyPasskey01234567890123456789")
-            .category(Category.AMD_GPU.toString())
-            .profileLink("https://google.com")
-            .liveStatsLink("https://google.ie")
-            .hardwareId(1)
-            .teamId(1)
-            .userIsCaptain(true)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            "*",
+            "user",
+            DUMMY_PASSKEY,
+            Category.AMD_GPU.toString(),
+            VALID_PROFILE_LINK,
+            VALID_LIVE_STATS_LINK,
+            1,
+            1,
+            true
+        );
 
         assertThatThrownBy(userRequest::validate)
             .isInstanceOf(ValidationException.class);
@@ -133,17 +137,17 @@ class UserRequestTest {
 
     @Test
     void testCreate_displayNameNull() {
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName(null)
-            .passkey("DummyPasskey01234567890123456789")
-            .category(Category.AMD_GPU.toString())
-            .profileLink("https://google.com")
-            .liveStatsLink("https://google.ie")
-            .hardwareId(1)
-            .teamId(1)
-            .userIsCaptain(true)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            "user",
+            null,
+            DUMMY_PASSKEY,
+            Category.AMD_GPU.toString(),
+            VALID_PROFILE_LINK,
+            VALID_LIVE_STATS_LINK,
+            1,
+            1,
+            true
+        );
 
         assertThatThrownBy(userRequest::validate)
             .isInstanceOf(ValidationException.class);
@@ -151,17 +155,17 @@ class UserRequestTest {
 
     @Test
     void testCreate_displayBlank() {
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("")
-            .passkey("DummyPasskey01234567890123456789")
-            .category(Category.AMD_GPU.toString())
-            .profileLink("https://google.com")
-            .liveStatsLink("https://google.ie")
-            .hardwareId(1)
-            .teamId(1)
-            .userIsCaptain(true)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            "user",
+            "",
+            DUMMY_PASSKEY,
+            Category.AMD_GPU.toString(),
+            VALID_PROFILE_LINK,
+            VALID_LIVE_STATS_LINK,
+            1,
+            1,
+            true
+        );
 
         assertThatThrownBy(userRequest::validate)
             .isInstanceOf(ValidationException.class);
@@ -169,17 +173,17 @@ class UserRequestTest {
 
     @Test
     void testCreate_passkeyNull() {
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey(null)
-            .category(Category.AMD_GPU.toString())
-            .profileLink("https://google.com")
-            .liveStatsLink("https://google.ie")
-            .hardwareId(1)
-            .teamId(1)
-            .userIsCaptain(true)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            "user",
+            "user",
+            null,
+            Category.AMD_GPU.toString(),
+            VALID_PROFILE_LINK,
+            VALID_LIVE_STATS_LINK,
+            1,
+            1,
+            true
+        );
 
         assertThatThrownBy(userRequest::validate)
             .isInstanceOf(ValidationException.class);
@@ -187,17 +191,17 @@ class UserRequestTest {
 
     @Test
     void testCreate_passkeyBlank() {
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("")
-            .category(Category.AMD_GPU.toString())
-            .profileLink("https://google.com")
-            .liveStatsLink("https://google.ie")
-            .hardwareId(1)
-            .teamId(1)
-            .userIsCaptain(true)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            "user",
+            "user",
+            "",
+            Category.AMD_GPU.toString(),
+            VALID_PROFILE_LINK,
+            VALID_LIVE_STATS_LINK,
+            1,
+            1,
+            true
+        );
 
         assertThatThrownBy(userRequest::validate)
             .isInstanceOf(ValidationException.class);
@@ -205,17 +209,17 @@ class UserRequestTest {
 
     @Test
     void testCreate_passkeyInvalidLength() {
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("ShortPasskey")
-            .category(Category.AMD_GPU.toString())
-            .profileLink("https://google.com")
-            .liveStatsLink("https://google.ie")
-            .hardwareId(1)
-            .teamId(1)
-            .userIsCaptain(true)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            "user",
+            "user",
+            "ShortPasskey",
+            Category.AMD_GPU.toString(),
+            VALID_PROFILE_LINK,
+            VALID_LIVE_STATS_LINK,
+            1,
+            1,
+            true
+        );
 
         assertThatThrownBy(userRequest::validate)
             .isInstanceOf(ValidationException.class);
@@ -223,17 +227,17 @@ class UserRequestTest {
 
     @Test
     void testCreate_categoryInvalid() {
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey01234567890123456789")
-            .category(Category.INVALID.toString())
-            .profileLink("https://google.com")
-            .liveStatsLink("https://google.ie")
-            .hardwareId(1)
-            .teamId(1)
-            .userIsCaptain(true)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            "user",
+            "user",
+            DUMMY_PASSKEY,
+            Category.INVALID.toString(),
+            VALID_PROFILE_LINK,
+            VALID_LIVE_STATS_LINK,
+            1,
+            1,
+            true
+        );
 
         assertThatThrownBy(userRequest::validate)
             .isInstanceOf(ValidationException.class);
@@ -241,17 +245,17 @@ class UserRequestTest {
 
     @Test
     void testCreate_profileLinkInvalidUrl() {
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey01234567890123456789")
-            .category(Category.AMD_GPU.toString())
-            .profileLink("invalidUrl")
-            .liveStatsLink("https://google.ie")
-            .hardwareId(1)
-            .teamId(1)
-            .userIsCaptain(true)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            "user",
+            "user",
+            DUMMY_PASSKEY,
+            Category.AMD_GPU.toString(),
+            "invalidUrl",
+            VALID_LIVE_STATS_LINK,
+            1,
+            1,
+            true
+        );
 
         assertThatThrownBy(userRequest::validate)
             .isInstanceOf(ValidationException.class);
@@ -259,17 +263,17 @@ class UserRequestTest {
 
     @Test
     void testCreate_liveStatsLinkInvalid() {
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName("user")
-            .displayName("user")
-            .passkey("DummyPasskey01234567890123456789")
-            .category(Category.AMD_GPU.toString())
-            .profileLink("https://google.com")
-            .liveStatsLink("invalidUrl")
-            .hardwareId(1)
-            .teamId(1)
-            .userIsCaptain(true)
-            .build();
+        final UserRequest userRequest = new UserRequest(
+            "user",
+            "user",
+            DUMMY_PASSKEY,
+            Category.AMD_GPU.toString(),
+            VALID_PROFILE_LINK,
+            "invalidUrl",
+            1,
+            1,
+            true
+        );
 
         assertThatThrownBy(userRequest::validate)
             .isInstanceOf(ValidationException.class);

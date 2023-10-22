@@ -22,17 +22,14 @@ import static me.zodac.folding.api.util.StringUtils.isBlankOrValidUrl;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import lombok.Builder;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.change.UserChange}.
  */
-@Builder
 @Schema(name = "UserChangeRequest",
     description = "An example request to create a user change request, with all fields",
     example = """
@@ -117,7 +114,7 @@ public record UserChangeRequest(
                 validatePasskey(),
                 validateLiveStatsLink()
             )
-            .filter(Objects::nonNull)
+            .filter(s -> !s.isEmpty())
             .toList();
         if (!failureMessages.isEmpty()) {
             throw new ValidationException(this, failureMessages);
@@ -127,18 +124,18 @@ public record UserChangeRequest(
     private String validateFoldingUserName() {
         return isBlank(foldingUserName) || !FOLDING_USER_NAME_PATTERN.matcher(foldingUserName).find()
             ? "Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen"
-            : null;
+            : "";
     }
 
     private String validatePasskey() {
         return isBlank(passkey) || !PASSKEY_PATTERN.matcher(passkey).find()
             ? "Field 'passkey' must be 32 characters long and include only alphanumeric characters"
-            : null;
+            : "";
     }
 
     private String validateLiveStatsLink() {
         return isBlankOrValidUrl(liveStatsLink)
-            ? null
+            ? ""
             : String.format("Field 'liveStatsLink' is not a valid link: '%s'", liveStatsLink);
     }
 }

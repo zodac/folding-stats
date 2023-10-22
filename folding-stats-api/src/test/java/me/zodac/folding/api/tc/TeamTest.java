@@ -86,11 +86,7 @@ class TeamTest {
     @Test
     void testIsEqualRequest_valid() {
         final Team team = Team.create(1, "teamName", "teamDescription", VALID_FORUM_LINK);
-        final TeamRequest teamRequest = TeamRequest.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink(VALID_FORUM_LINK)
-            .build();
+        final TeamRequest teamRequest = new TeamRequest("teamName", "teamDescription", VALID_FORUM_LINK);
 
         assertThat(team.isEqualRequest(teamRequest))
             .isTrue();
@@ -99,11 +95,7 @@ class TeamTest {
     @Test
     void testIsEqualRequest_invalid() {
         final Team team = Team.create(1, "teamName", "teamDescription", VALID_FORUM_LINK);
-        final TeamRequest teamRequest = TeamRequest.builder()
-            .teamName("teamName2")
-            .teamDescription("teamDescription")
-            .forumLink(VALID_FORUM_LINK)
-            .build();
+        final TeamRequest teamRequest = new TeamRequest("teamName2", "teamDescription", VALID_FORUM_LINK);
 
         assertThat(team.isEqualRequest(teamRequest))
             .isFalse();

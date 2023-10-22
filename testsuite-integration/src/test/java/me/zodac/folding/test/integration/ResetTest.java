@@ -106,25 +106,30 @@ class ResetTest {
         final Hardware hardware = HardwareUtils.create(generateHardwareFromCategory(Category.AMD_GPU));
         final Team team = TeamUtils.create(generateTeam());
 
-        final UserRequest captainUser = UserRequest.builder()
-            .foldingUserName(nextUserName())
-            .displayName("displayName")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.NVIDIA_GPU.toString())
-            .hardwareId(captainHardware.id())
-            .teamId(team.id())
-            .userIsCaptain(true)
-            .build();
+        final UserRequest captainUser = new UserRequest(
+            nextUserName(),
+            "displayName",
+            "DummyPasskey12345678901234567890",
+            Category.NVIDIA_GPU.toString(),
+            null,
+            null,
+            captainHardware.id(),
+            team.id(),
+            true
+        );
         create(captainUser);
 
-        final UserRequest userToRetire = UserRequest.builder()
-            .foldingUserName(nextUserName())
-            .displayName("displayName")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.AMD_GPU.toString())
-            .hardwareId(hardware.id())
-            .teamId(team.id())
-            .build();
+        final UserRequest userToRetire = new UserRequest(
+            nextUserName(),
+            "displayName",
+            "DummyPasskey12345678901234567890",
+            Category.AMD_GPU.toString(),
+            null,
+            null,
+            hardware.id(),
+            team.id(),
+            false
+        );
 
         final int userToRetireId = create(userToRetire).id();
 

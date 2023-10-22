@@ -197,17 +197,17 @@ class UserTest {
         final int initialSize = UserUtils.getNumberOfUsers();
 
         final String updatedPasskey = "updatedPasskey123456789012345678";
-        final UserRequest userToUpdate = UserRequest.builder()
-            .foldingUserName(createdUser.foldingUserName())
-            .displayName(createdUser.displayName())
-            .passkey(updatedPasskey)
-            .category(createdUser.category().toString())
-            .profileLink(createdUser.profileLink())
-            .liveStatsLink(createdUser.liveStatsLink())
-            .hardwareId(createdUser.hardware().id())
-            .teamId(createdUser.team().id())
-            .userIsCaptain(createdUser.role().isCaptain())
-            .build();
+        final UserRequest userToUpdate = generateUserRequest(
+            createdUser.foldingUserName(),
+            createdUser.displayName(),
+            updatedPasskey,
+            createdUser.category(),
+            createdUser.profileLink(),
+            createdUser.liveStatsLink(),
+            createdUser.hardware().id(),
+            createdUser.team().id(),
+            createdUser.role().isCaptain()
+        );
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
 
         final HttpResponse<String> response =
@@ -344,17 +344,17 @@ class UserTest {
         final User createdUser = UserUtils.create(DummyDataGenerator.generateUser());
 
         final String updatedPasskey = "updatedPasskey123456789012345678";
-        final UserRequest userToUpdate = UserRequest.builder()
-            .foldingUserName(createdUser.foldingUserName())
-            .displayName(createdUser.displayName())
-            .passkey(updatedPasskey)
-            .category(createdUser.category().toString())
-            .profileLink(createdUser.profileLink())
-            .liveStatsLink(createdUser.liveStatsLink())
-            .hardwareId(createdUser.hardware().id())
-            .teamId(createdUser.team().id())
-            .userIsCaptain(createdUser.role().isCaptain())
-            .build();
+        final UserRequest userToUpdate = generateUserRequest(
+            createdUser.foldingUserName(),
+            createdUser.displayName(),
+            updatedPasskey,
+            createdUser.category(),
+            createdUser.profileLink(),
+            createdUser.liveStatsLink(),
+            createdUser.hardware().id(),
+            createdUser.team().id(),
+            createdUser.role().isCaptain()
+        );
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
 
         final HttpRequest request = HttpRequest.newBuilder()
@@ -376,7 +376,7 @@ class UserTest {
 
     @Test
     void whenDeletingUser_givenUserIsTeamCaptain_thenResponseHas400Status() throws FoldingRestException {
-        final User captainUser = UserUtils.create(DummyDataGenerator.generateCaptainUser());
+        final User captainUser = UserUtils.create(DummyDataGenerator.generateCaptain());
         final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(captainUser.id(), ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
@@ -415,17 +415,17 @@ class UserTest {
     @Test
     void whenUpdatingUser_givenValidUserId_andPayloadHasNoChanges_thenOriginalUserIsReturned_andHas200Status() throws FoldingRestException {
         final User createdUser = UserUtils.create(DummyDataGenerator.generateUser());
-        final UserRequest userToUpdate = UserRequest.builder()
-            .foldingUserName(createdUser.foldingUserName())
-            .displayName(createdUser.displayName())
-            .passkey(createdUser.passkey())
-            .category(createdUser.category().toString())
-            .profileLink(createdUser.profileLink())
-            .liveStatsLink(createdUser.liveStatsLink())
-            .hardwareId(createdUser.hardware().id())
-            .teamId(createdUser.team().id())
-            .userIsCaptain(createdUser.role().isCaptain())
-            .build();
+        final UserRequest userToUpdate = generateUserRequest(
+            createdUser.foldingUserName(),
+            createdUser.displayName(),
+            createdUser.passkey(),
+            createdUser.category(),
+            createdUser.profileLink(),
+            createdUser.liveStatsLink(),
+            createdUser.hardware().id(),
+            createdUser.team().id(),
+            createdUser.role().isCaptain()
+        );
 
         final HttpResponse<String> updateResponse =
             USER_REQUEST_SENDER.update(createdUser.id(), userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -531,18 +531,17 @@ class UserTest {
     void whenUpdatingUser_givenNoAuthentication_thenRequestFails_andResponseHas401Status()
         throws FoldingRestException, IOException, InterruptedException {
         final User createdUser = UserUtils.create(DummyDataGenerator.generateUser());
-
-        final UserRequest userToUpdate = UserRequest.builder()
-            .foldingUserName(createdUser.foldingUserName())
-            .displayName(createdUser.displayName())
-            .passkey("updatedPasskey123456789012345678")
-            .category(createdUser.category().toString())
-            .profileLink(createdUser.profileLink())
-            .liveStatsLink(createdUser.liveStatsLink())
-            .hardwareId(createdUser.hardware().id())
-            .teamId(createdUser.team().id())
-            .userIsCaptain(createdUser.role().isCaptain())
-            .build();
+        final UserRequest userToUpdate = generateUserRequest(
+            createdUser.foldingUserName(),
+            createdUser.displayName(),
+            "updatedPasskey123456789012345678",
+            createdUser.category(),
+            createdUser.profileLink(),
+            createdUser.liveStatsLink(),
+            createdUser.hardware().id(),
+            createdUser.team().id(),
+            createdUser.role().isCaptain()
+        );
         StubbedFoldingEndpointUtils.enableUser(userToUpdate);
 
         final HttpRequest request = HttpRequest.newBuilder()
@@ -662,17 +661,17 @@ class UserTest {
     void whenUpdatingUser_andOptionalFieldIsEmptyString_thenValueShouldBeNullNotEmpty() throws FoldingRestException {
         final User createdUser = UserUtils.create(DummyDataGenerator.generateUserWithLiveStatsLink("http://google.com"));
 
-        final UserRequest userToUpdate = UserRequest.builder()
-            .foldingUserName(createdUser.foldingUserName())
-            .displayName(createdUser.displayName())
-            .passkey(createdUser.passkey())
-            .category(createdUser.category().toString())
-            .profileLink(createdUser.profileLink())
-            .liveStatsLink("")
-            .hardwareId(createdUser.hardware().id())
-            .teamId(createdUser.team().id())
-            .userIsCaptain(createdUser.role().isCaptain())
-            .build();
+        final UserRequest userToUpdate = generateUserRequest(
+            createdUser.foldingUserName(),
+            createdUser.displayName(),
+            createdUser.passkey(),
+            createdUser.category(),
+            createdUser.profileLink(),
+            "",
+            createdUser.hardware().id(),
+            createdUser.team().id(),
+            createdUser.role().isCaptain()
+        );
 
         final HttpResponse<String> response =
             USER_REQUEST_SENDER.update(createdUser.id(), userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -698,14 +697,14 @@ class UserTest {
             .as("Expected user to contain initial hardware")
             .isEqualTo(hardware);
 
-        final HardwareRequest hardwareUpdateRequest = HardwareRequest.builder()
-            .hardwareName("updatedHardwareName")
-            .displayName(hardware.displayName())
-            .hardwareMake(hardware.hardwareMake().toString())
-            .hardwareType(hardware.hardwareType().toString())
-            .multiplier(hardware.multiplier())
-            .averagePpd(hardware.averagePpd())
-            .build();
+        final HardwareRequest hardwareUpdateRequest = new HardwareRequest(
+            "updatedHardwareName",
+            hardware.displayName(),
+            hardware.hardwareMake().toString(),
+            hardware.hardwareType().toString(),
+            hardware.multiplier(),
+            hardware.averagePpd()
+        );
 
         final HttpResponse<String> response =
             HardwareUtils.HARDWARE_REQUEST_SENDER.update(hardware.id(), hardwareUpdateRequest, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -748,11 +747,7 @@ class UserTest {
             .as("Expected user to contain initial team")
             .isEqualTo(team);
 
-        final TeamRequest teamUpdateRequest = TeamRequest.builder()
-            .teamName("updatedTeamName")
-            .teamDescription(team.teamDescription())
-            .forumLink(team.forumLink())
-            .build();
+        final TeamRequest teamUpdateRequest = new TeamRequest("updatedTeamName", team.teamDescription(), team.forumLink());
 
         final HttpResponse<String> response =
             TeamUtils.TEAM_REQUEST_SENDER.update(team.id(), teamUpdateRequest, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -781,7 +776,7 @@ class UserTest {
     @Test
     void whenCreatingUser_givenUserIsCaptain_andCaptainAlreadyExistsInTeam_thenUserBecomesCaptain_andOldUserIsRemovedAsCaptain()
         throws FoldingRestException {
-        final User existingCaptain = UserUtils.create(DummyDataGenerator.generateCaptainUser());
+        final User existingCaptain = UserUtils.create(DummyDataGenerator.generateCaptain());
 
         final User retrievedExistingCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.id()));
         assertThat(retrievedExistingCaptain.role().isCaptain())
@@ -789,17 +784,17 @@ class UserTest {
             .isTrue();
 
         final Hardware newHardware = HardwareUtils.create(DummyDataGenerator.generateHardwareFromCategory(Category.AMD_GPU));
-        final UserRequest userRequest = UserRequest.builder()
-            .foldingUserName(DummyDataGenerator.nextUserName())
-            .displayName("newUser")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.AMD_GPU.toString())
-            .hardwareId(newHardware.id())
-            .teamId(existingCaptain.team().id())
-            .userIsCaptain(true)
-            .build();
-
-        final User newCaptain = UserUtils.create(userRequest);
+        final User newCaptain = UserUtils.create(generateUserRequest(
+            DummyDataGenerator.nextUserName(),
+            "newUser",
+            "DummyPasskey12345678901234567890",
+            Category.AMD_GPU,
+            null,
+            null,
+            newHardware.id(),
+            existingCaptain.team().id(),
+            true
+        ));
 
         final User retrievedOldCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.id()));
         assertThat(retrievedOldCaptain.role().isCaptain())
@@ -817,15 +812,18 @@ class UserTest {
         throws FoldingRestException {
         final Hardware newHardware = HardwareUtils.create(DummyDataGenerator.generateHardwareFromCategory(Category.AMD_GPU));
 
-        final User existingCaptain = UserUtils.create(DummyDataGenerator.generateCaptainUser());
-        final User nonCaptain = UserUtils.create(UserRequest.builder()
-            .foldingUserName(DummyDataGenerator.nextUserName())
-            .displayName("newUser")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.AMD_GPU.toString())
-            .hardwareId(newHardware.id())
-            .teamId(existingCaptain.team().id())
-            .build());
+        final User existingCaptain = UserUtils.create(DummyDataGenerator.generateCaptain());
+        final User nonCaptain = UserUtils.create(generateUserRequest(
+            DummyDataGenerator.nextUserName(),
+            "newUser",
+            "DummyPasskey12345678901234567890",
+            Category.AMD_GPU,
+            null,
+            null,
+            newHardware.id(),
+            existingCaptain.team().id(),
+            false
+        ));
 
         final User retrievedExistingCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.id()));
         assertThat(retrievedExistingCaptain.role().isCaptain())
@@ -836,15 +834,17 @@ class UserTest {
             .as("Expected other user to not be captain")
             .isFalse();
 
-        final User newCaptain = UserUtils.update(nonCaptain.id(), UserRequest.builder()
-            .foldingUserName(DummyDataGenerator.nextUserName())
-            .displayName("newUser")
-            .passkey("DummyPasskey12345678901234567890")
-            .category(Category.AMD_GPU.toString())
-            .hardwareId(newHardware.id())
-            .teamId(existingCaptain.team().id())
-            .userIsCaptain(true)
-            .build());
+        final User newCaptain = UserUtils.update(nonCaptain.id(), generateUserRequest(
+            DummyDataGenerator.nextUserName(),
+            "newUser",
+            "DummyPasskey12345678901234567890",
+            Category.AMD_GPU,
+            null,
+            null,
+            newHardware.id(),
+            existingCaptain.team().id(),
+            true
+        ));
 
         final User retrievedOldCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(existingCaptain.id()));
         assertThat(retrievedOldCaptain.role().isCaptain())
@@ -860,8 +860,8 @@ class UserTest {
     void whenUpdatingUser_givenUserIsCaptain_andUserIsChangingTeams_andCaptainAlreadyExistsInTeam_thenUserReplacesOldUserAsCaptain()
         throws FoldingRestException {
 
-        final User firstTeamCaptain = UserUtils.create(DummyDataGenerator.generateCaptainUser());
-        final User secondTeamCaptain = UserUtils.create(DummyDataGenerator.generateCaptainUser());
+        final User firstTeamCaptain = UserUtils.create(DummyDataGenerator.generateCaptain());
+        final User secondTeamCaptain = UserUtils.create(DummyDataGenerator.generateCaptain());
 
         final User retrievedFirstTeamCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(firstTeamCaptain.id()));
         assertThat(retrievedFirstTeamCaptain.role().isCaptain())
@@ -872,15 +872,17 @@ class UserTest {
             .as("Expected user of second team to be captain")
             .isTrue();
 
-        final User firstUserMovingToSecondTeam = UserUtils.update(firstTeamCaptain.id(), UserRequest.builder()
-            .foldingUserName(firstTeamCaptain.foldingUserName())
-            .displayName(firstTeamCaptain.displayName())
-            .passkey(firstTeamCaptain.passkey())
-            .category(Category.WILDCARD.toString())
-            .hardwareId(firstTeamCaptain.hardware().id())
-            .teamId(secondTeamCaptain.team().id())
-            .userIsCaptain(firstTeamCaptain.role().isCaptain())
-            .build());
+        final User firstUserMovingToSecondTeam = UserUtils.update(firstTeamCaptain.id(), generateUserRequest(
+            firstTeamCaptain.foldingUserName(),
+            firstTeamCaptain.displayName(),
+            firstTeamCaptain.passkey(),
+            Category.WILDCARD,
+            null,
+            null,
+            firstTeamCaptain.hardware().id(),
+            secondTeamCaptain.team().id(),
+            firstTeamCaptain.role().isCaptain()
+        ));
 
         final User retrievedSecondTeamNewCaptain = UserResponseParser.get(USER_REQUEST_SENDER.get(firstUserMovingToSecondTeam.id()));
         assertThat(retrievedSecondTeamNewCaptain.role().isCaptain())
@@ -917,5 +919,27 @@ class UserTest {
             }
         }
         return null;
+    }
+
+    private static UserRequest generateUserRequest(final String foldingUserName,
+                                                   final String displayName,
+                                                   final String passkey,
+                                                   final Category category,
+                                                   final String profileLink,
+                                                   final String liveStatsLink,
+                                                   final int hardwareId,
+                                                   final int teamId,
+                                                   final boolean isCaptain) {
+        return new UserRequest(
+            foldingUserName,
+            displayName,
+            passkey,
+            category.toString(),
+            profileLink,
+            liveStatsLink,
+            hardwareId,
+            teamId,
+            isCaptain
+        );
     }
 }

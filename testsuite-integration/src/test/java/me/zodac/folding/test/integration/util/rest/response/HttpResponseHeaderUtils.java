@@ -61,6 +61,6 @@ public final class HttpResponseHeaderUtils {
         assertThat(headersByName)
             .containsKey(headerName);
 
-        return headersByName.get(headerName).get(0);
+        return headersByName.get(headerName).getFirst();
     }
 }

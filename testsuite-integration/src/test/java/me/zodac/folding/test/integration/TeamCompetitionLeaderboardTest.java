@@ -104,7 +104,7 @@ class TeamCompetitionLeaderboardTest {
             .as("Incorrect number of team summaries returned: " + response.body())
             .hasSize(3);
 
-        final TeamLeaderboardEntry firstResult = results.get(0);
+        final TeamLeaderboardEntry firstResult = results.getFirst();
         assertThat(firstResult)
             .as("Did not receive the expected result for rank 1: " + response.body())
             .extracting("rank", "team", "teamMultipliedPoints", "diffToLeader", "diffToNext")
@@ -193,7 +193,7 @@ class TeamCompetitionLeaderboardTest {
             .as("Incorrect number of " + Category.WILDCARD + " user summaries returned: " + response.body())
             .isEmpty();
 
-        final UserCategoryLeaderboardEntry firstResult = firstCategoryUsers.get(0);
+        final UserCategoryLeaderboardEntry firstResult = firstCategoryUsers.getFirst();
         assertThat(firstResult.user().displayName())
             .as("Did not receive the expected user for rank 1, " + Category.AMD_GPU + ": " + response.body())
             .isEqualTo(secondUser.displayName());
@@ -220,7 +220,7 @@ class TeamCompetitionLeaderboardTest {
             .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
             .containsExactly(3, 1_000L, 14_000L, 9_000L);
 
-        final UserCategoryLeaderboardEntry fourthResult = secondCategoryUsers.get(0);
+        final UserCategoryLeaderboardEntry fourthResult = secondCategoryUsers.getFirst();
         assertThat(fourthResult.user().displayName())
             .as("Did not receive the expected user for rank 1, " + Category.NVIDIA_GPU + ": " + response.body())
             .isEqualTo(fourthUser.displayName());

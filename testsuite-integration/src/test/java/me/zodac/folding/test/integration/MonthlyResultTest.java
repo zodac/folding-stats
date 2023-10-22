@@ -141,7 +141,7 @@ class MonthlyResultTest {
             .as("Expected one result in team leaderboard")
             .hasSize(1);
 
-        final TeamLeaderboardEntry teamLeaderboardEntry = monthlyResult.teamLeaderboard().get(0);
+        final TeamLeaderboardEntry teamLeaderboardEntry = monthlyResult.teamLeaderboard().getFirst();
         assertThat(teamLeaderboardEntry.team().teamName())
             .as("Expected result team to have same name as input team")
             .isEqualTo(team.teamName());
@@ -161,7 +161,7 @@ class MonthlyResultTest {
             .as("Expected one result in " + Category.NVIDIA_GPU + " category leaderboard")
             .hasSize(1);
 
-        final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU).get(0);
+        final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU).getFirst();
         assertThat(userCategoryLeaderboardEntry.user().team().teamName())
             .as("Expected result user to have same team name as input team")
             .isEqualTo(team.teamName());
@@ -204,7 +204,7 @@ class MonthlyResultTest {
             .as("Expected three results in team leaderboard")
             .hasSize(3);
 
-        final TeamLeaderboardEntry firstTeamLeaderboardEntry = monthlyResult.teamLeaderboard().get(0);
+        final TeamLeaderboardEntry firstTeamLeaderboardEntry = monthlyResult.teamLeaderboard().getFirst();
         final TeamLeaderboardEntry secondTeamLeaderboardEntry = monthlyResult.teamLeaderboard().get(1);
         final TeamLeaderboardEntry thirdTeamLeaderboardEntry = monthlyResult.teamLeaderboard().get(2);
 
@@ -235,28 +235,28 @@ class MonthlyResultTest {
 
         assertThat(amdLeaderboard)
             .hasSize(1);
-        assertThat(amdLeaderboard.get(0).user().foldingUserName())
+        assertThat(amdLeaderboard.getFirst().user().foldingUserName())
             .as("Expected user in first to be the third created user")
             .isEqualTo(thirdUser.foldingUserName());
-        assertThat(amdLeaderboard.get(0).multipliedPoints())
+        assertThat(amdLeaderboard.getFirst().multipliedPoints())
             .as("Expected user in first have the same points as third created user")
             .isEqualTo(11_000L);
 
         assertThat(wildcardLeaderboard)
             .hasSize(1);
-        assertThat(wildcardLeaderboard.get(0).user().foldingUserName())
+        assertThat(wildcardLeaderboard.getFirst().user().foldingUserName())
             .as("Expected user in first to be the fourth created user")
             .isEqualTo(fourthUser.foldingUserName());
-        assertThat(wildcardLeaderboard.get(0).multipliedPoints())
+        assertThat(wildcardLeaderboard.getFirst().multipliedPoints())
             .as("Expected user in first have the same points as fourth created user")
             .isEqualTo(30_000L);
 
         assertThat(nvidiaLeaderboard)
             .hasSize(2);
-        assertThat(nvidiaLeaderboard.get(0).user().foldingUserName())
+        assertThat(nvidiaLeaderboard.getFirst().user().foldingUserName())
             .as("Expected user in first to be the first created user")
             .isEqualTo(firstUser.foldingUserName());
-        assertThat(nvidiaLeaderboard.get(0).multipliedPoints())
+        assertThat(nvidiaLeaderboard.getFirst().multipliedPoints())
             .as("Expected user in first have the same points as first created user")
             .isEqualTo(10_000L);
         assertThat(nvidiaLeaderboard.get(1).user().foldingUserName())
@@ -292,7 +292,7 @@ class MonthlyResultTest {
             .as("Expected one result in team leaderboard")
             .hasSize(1);
 
-        final TeamLeaderboardEntry teamLeaderboardEntry = monthlyResult.teamLeaderboard().get(0);
+        final TeamLeaderboardEntry teamLeaderboardEntry = monthlyResult.teamLeaderboard().getFirst();
         assertThat(teamLeaderboardEntry.team().teamName())
             .as("Expected result team to have same name as input team")
             .isEqualTo(team.teamName());
@@ -312,7 +312,7 @@ class MonthlyResultTest {
             .as("Expected one result in " + Category.NVIDIA_GPU + " category leaderboard")
             .hasSize(1);
 
-        final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU).get(0);
+        final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU).getFirst();
         assertThat(userCategoryLeaderboardEntry.user().team().teamName())
             .as("Expected result user to have same team name as input team")
             .isEqualTo(team.teamName());

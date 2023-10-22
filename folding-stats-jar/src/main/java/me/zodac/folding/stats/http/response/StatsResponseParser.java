@@ -91,7 +91,7 @@ public final class StatsResponseParser {
             .stream()
             .sorted(Collections.reverseOrder())
             .toList()
-            .get(0);
+            .getFirst();
 
         if (unitsApiInstances.size() > EXPECTED_NUMBER_OF_UNIT_RESPONSES) {
             LOGGER.warn("Too many unit responses returned for user, using {} from response: {}", firstEntry, httpResponse.body());

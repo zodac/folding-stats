@@ -60,7 +60,7 @@ import org.junit.jupiter.api.Test;
 class UserChangeTest {
 
     private static final UserChangeRequestSender USER_CHANGE_REQUEST_SENDER = UserChangeRequestSender.createWithUrl(FOLDING_URL);
-    private static final String DUMMY_LIVE_STATS_LINK = "https://www.google.com";
+    private static final String VALID_LIVE_STATS_LINK = "https://www.google.com";
 
     @BeforeEach
     void setUp() throws FoldingRestException {
@@ -145,15 +145,7 @@ class UserChangeTest {
         throws FoldingRestException {
         final User user = UserUtils.create(generateUser());
 
-        final UserChangeRequest userChangeRequest = UserChangeRequest.builder()
-            .userId(user.id())
-            .foldingUserName(user.foldingUserName())
-            .existingPasskey(user.passkey())
-            .passkey(user.passkey())
-            .liveStatsLink(DUMMY_LIVE_STATS_LINK)
-            .hardwareId(user.hardware().id())
-            .immediate(true)
-            .build();
+        final UserChangeRequest userChangeRequest = generateUserChange(user, VALID_LIVE_STATS_LINK);
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
         assertThat(response.statusCode())
@@ -166,7 +158,7 @@ class UserChangeTest {
             .isNotZero();
         assertThat(userChange.newUser().liveStatsLink())
             .as("Expected user change to list user with the updated liveStatsLink")
-            .isEqualTo(DUMMY_LIVE_STATS_LINK);
+            .isEqualTo(VALID_LIVE_STATS_LINK);
     }
 
     @Test
@@ -223,7 +215,7 @@ class UserChangeTest {
         final User userBeforeChange = UserUtils.get(userChange.newUser().id());
         assertThat(userBeforeChange.liveStatsLink())
             .as("Expected user's initial liveStatsLink to not be dummy value")
-            .isNotEqualTo(DUMMY_LIVE_STATS_LINK);
+            .isNotEqualTo(VALID_LIVE_STATS_LINK);
 
         final HttpResponse<String> response =
             USER_CHANGE_REQUEST_SENDER.approveImmediately(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
@@ -239,7 +231,7 @@ class UserChangeTest {
         final User userAfterChange = UserUtils.get(userChange.newUser().id());
         assertThat(userAfterChange.liveStatsLink())
             .as("Expected user's liveStatsLink to be updated to dummy value")
-            .isEqualTo(DUMMY_LIVE_STATS_LINK);
+            .isEqualTo(VALID_LIVE_STATS_LINK);
     }
 
     @Test
@@ -249,7 +241,7 @@ class UserChangeTest {
         final User userBeforeChange = UserUtils.get(userChange.newUser().id());
         assertThat(userBeforeChange.liveStatsLink())
             .as("Expected user's initial liveStatsLink to not be dummy value")
-            .isNotEqualTo(DUMMY_LIVE_STATS_LINK);
+            .isNotEqualTo(VALID_LIVE_STATS_LINK);
 
         final HttpResponse<Void> deleteUserResponse =
             USER_REQUEST_SENDER.delete(userChange.previousUser().id(), ADMIN_USER.userName(), ADMIN_USER.password());
@@ -442,15 +434,15 @@ class UserChangeTest {
         throws FoldingRestException {
         final User user = UserUtils.create(generateUser());
 
-        final UserChangeRequest userChangeRequest = UserChangeRequest.builder()
-            .userId(user.id())
-            .foldingUserName(user.foldingUserName())
-            .existingPasskey("dummyPasskey")
-            .passkey(user.passkey())
-            .liveStatsLink(DUMMY_LIVE_STATS_LINK)
-            .hardwareId(user.hardware().id())
-            .immediate(true)
-            .build();
+        final UserChangeRequest userChangeRequest = new UserChangeRequest(
+            user.id(),
+            "dummyPasskey",
+            user.foldingUserName(),
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            user.hardware().id(),
+            true
+        );
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
         assertThat(response.statusCode())
@@ -462,7 +454,7 @@ class UserChangeTest {
     void whenCreatingUserChange_givenUserChangeAlreadyExists_thenRequestFails_andResponseHas400Status()
         throws FoldingRestException {
         final User user = UserUtils.create(generateUser());
-        final UserChangeRequest userChangeRequest = generateUserChange(user);
+        final UserChangeRequest userChangeRequest = generateUserChange(user, VALID_LIVE_STATS_LINK);
 
         USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
@@ -475,16 +467,7 @@ class UserChangeTest {
     void whenCreatingUserChange_givenUserAlreadyHasSuppliedValues_thenRequestFails_andResponseHas400Status()
         throws FoldingRestException {
         final User user = UserUtils.create(generateUser());
-
-        final UserChangeRequest userChangeRequest = UserChangeRequest.builder()
-            .userId(user.id())
-            .foldingUserName(user.foldingUserName())
-            .existingPasskey(user.passkey())
-            .passkey(user.passkey())
-            .liveStatsLink(user.liveStatsLink())
-            .hardwareId(user.hardware().id())
-            .immediate(true)
-            .build();
+        final UserChangeRequest userChangeRequest = generateUserChange(user, user.liveStatsLink());
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
         assertThat(response.statusCode())
@@ -546,15 +529,15 @@ class UserChangeTest {
         final UserRequest userRequest = generateUser();
         final User user = UserUtils.create(userRequest);
 
-        final UserChangeRequest userChangeRequest = UserChangeRequest.builder()
-            .userId(user.id())
-            .foldingUserName(user.foldingUserName())
-            .existingPasskey("DummyPasskey12345678901234567891")
-            .passkey(user.passkey())
-            .liveStatsLink(DUMMY_LIVE_STATS_LINK)
-            .hardwareId(user.hardware().id())
-            .immediate(true)
-            .build();
+        final UserChangeRequest userChangeRequest = new UserChangeRequest(
+            user.id(),
+            "DummyPasskey12345678901234567891",
+            user.foldingUserName(),
+            user.passkey(),
+            VALID_LIVE_STATS_LINK,
+            user.hardware().id(),
+            true
+        );
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
         assertThat(response.statusCode())
@@ -566,15 +549,7 @@ class UserChangeTest {
     void whenCreatingUserChange_andContentTypeIsNotJson_thenResponse415Status() throws IOException, InterruptedException, FoldingRestException {
         final User user = UserUtils.create(generateUser());
 
-        final UserChangeRequest userChangeRequest = UserChangeRequest.builder()
-            .userId(user.id())
-            .foldingUserName(user.foldingUserName())
-            .existingPasskey(user.passkey())
-            .passkey(user.passkey())
-            .liveStatsLink(DUMMY_LIVE_STATS_LINK)
-            .hardwareId(user.hardware().id())
-            .immediate(true)
-            .build();
+        final UserChangeRequest userChangeRequest = generateUserChange(user, VALID_LIVE_STATS_LINK);
 
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(userChangeRequest)))
@@ -590,7 +565,7 @@ class UserChangeTest {
 
     private static UserChange createUserChange() throws FoldingRestException {
         final User user = UserUtils.create(generateUser());
-        final UserChangeRequest userChangeRequest = generateUserChange(user);
+        final UserChangeRequest userChangeRequest = generateUserChange(user, VALID_LIVE_STATS_LINK);
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
         assertThat(response.statusCode())
@@ -600,15 +575,8 @@ class UserChangeTest {
         return UserChangeResponseParser.create(response);
     }
 
-    private static UserChangeRequest generateUserChange(final User user) {
-        return UserChangeRequest.builder()
-            .userId(user.id())
-            .foldingUserName(user.foldingUserName())
-            .existingPasskey(user.passkey())
-            .passkey(user.passkey())
-            .liveStatsLink(DUMMY_LIVE_STATS_LINK)
-            .hardwareId(user.hardware().id())
-            .immediate(true)
-            .build();
+    private static UserChangeRequest generateUserChange(final User user, final String liveStatsLink) {
+        return new UserChangeRequest(user.id(), user.passkey(), user.foldingUserName(), user.passkey(), liveStatsLink, user.hardware().id(),
+            true);
     }
 }

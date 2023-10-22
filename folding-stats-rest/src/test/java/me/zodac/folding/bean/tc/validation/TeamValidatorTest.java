@@ -46,12 +46,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingCreate_givenValidTeam_thenSuccessResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
-
+        final TeamRequest team = generateTeamRequest("teamName", "teamDescription", "https://www.google.com");
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
         final TeamValidator teamValidator = new TeamValidator(foldingRepository);
@@ -64,12 +59,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingCreate_givenTeamWithNullName_thenFailureResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName(null)
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
-
+        final TeamRequest team = generateTeamRequest(null, "teamDescription", "https://www.google.com");
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
         final TeamValidator teamValidator = new TeamValidator(foldingRepository);
@@ -80,11 +70,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingCreate_givenOtherTeamAlreadyExists_thenSuccessResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName("existingName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final TeamRequest team = generateTeamRequest("existingName", "teamDescription", "https://www.google.com");
 
         final Team existingTeam = Team.create(
             teamId++,
@@ -106,11 +92,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingCreate_givenTeamWithNameAlreadyExists_thenFailureResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName("existingName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final TeamRequest team = generateTeamRequest("existingName", "teamDescription", "https://www.google.com");
 
         final Team existingTeam = Team.create(
             teamId++,
@@ -133,11 +115,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingCreate_givenTeamWithNullDescription_thenSuccessResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName("teamName")
-            .teamDescription(null)
-            .forumLink("https://www.google.com")
-            .build();
+        final TeamRequest team = generateTeamRequest("teamName", null, "https://www.google.com");
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -151,11 +129,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingCreate_givenTeamWithNullForumLink_thenSuccessResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink(null)
-            .build();
+        final TeamRequest team = generateTeamRequest("teamName", "teamDescription", null);
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -169,12 +143,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingCreate_givenTeamWithForumLinkThatIsNotValidUrl_thenFailureResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("invalidUrl")
-            .build();
-
+        final TeamRequest team = generateTeamRequest("teamName", "teamDescription", "invalidUrl");
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
         final TeamValidator teamValidator = new TeamValidator(foldingRepository);
@@ -185,12 +154,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenValidTeam_thenSuccessResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
-
+        final TeamRequest team = generateTeamRequest("teamName", "teamDescription", "https://www.google.com");
         final Team existingTeam = Team.create(
             teamId++,
             "teamName",
@@ -210,11 +174,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenTeamWithNullName_thenFailureResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName(null)
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final TeamRequest team = generateTeamRequest(null, "teamDescription", "https://www.google.com");
 
         final Team existingTeam = generateTeam();
 
@@ -229,11 +189,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenTeamWithNameAlreadyExists_thenFailureResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final TeamRequest team = generateTeamRequest("teamName", "teamDescription", "https://www.google.com");
 
         final Team existingTeam = Team.create(
             1,
@@ -263,11 +219,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenTeamWithNameAlreadyExists_andExistingTeamIsTheOneBeingUpdated_thenSuccessResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("https://www.google.com")
-            .build();
+        final TeamRequest team = generateTeamRequest("teamName", "teamDescription", "https://www.google.com");
 
         final Team existingTeam = Team.create(
             1,
@@ -296,12 +248,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenTeamWithNullDescription_thenSuccessResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink(null)
-            .build();
-
+        final TeamRequest team = generateTeamRequest("teamName", null, "https://www.google.com");
         final Team existingTeam = generateTeam();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -316,12 +263,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenTeamWithNullForumLink_thenSuccessResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName("teamName")
-            .teamDescription(null)
-            .forumLink("https://www.google.com")
-            .build();
-
+        final TeamRequest team = generateTeamRequest("teamName", "teamDescription", null);
         final Team existingTeam = generateTeam();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -336,12 +278,7 @@ class TeamValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenTeamWithForumLinkThatIsNotValidUrl_thenFailureResponseIsReturned() {
-        final TeamRequest team = TeamRequest.builder()
-            .teamName("teamName")
-            .teamDescription("teamDescription")
-            .forumLink("invalidUrl")
-            .build();
-
+        final TeamRequest team = generateTeamRequest("teamName", "teamDescription", "invalidUrl");
         final Team existingTeam = generateTeam();
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
@@ -398,7 +335,7 @@ class TeamValidatorTest {
         assertThat(usedBy)
             .hasSize(1);
 
-        assertThat(usedBy.get(0).toString())
+        assertThat(usedBy.getFirst().toString())
             .contains("DummyPas************************")
             .doesNotContain("DummyPasskey12345678901234567890");
     }
@@ -462,5 +399,9 @@ class TeamValidatorTest {
             1.00D,
             1L
         );
+    }
+
+    private static TeamRequest generateTeamRequest(final String teamName, final String teamDescription, final String forumLink) {
+        return new TeamRequest(teamName, teamDescription, forumLink);
     }
 }

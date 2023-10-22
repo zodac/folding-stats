@@ -236,7 +236,7 @@ class LarsTest {
             .as("Expected three hardwares to have been added to the system after first update")
             .hasSize(3);
 
-        assertThat(allHardwareAfterFirstUpdate.get(0))
+        assertThat(allHardwareAfterFirstUpdate.getFirst())
             .as("Expected first hardware to have correct multiplier after first update: " + allHardwareAfterFirstUpdate)
             .extracting("hardwareName", "multiplier")
             .containsExactly("Hardware #1", 1.0D);
@@ -262,7 +262,7 @@ class LarsTest {
             .as("Expected no hardware to have been added to the system after second update")
             .hasSize(3);
 
-        assertThat(allHardwareAfterSecondUpdate.get(0))
+        assertThat(allHardwareAfterSecondUpdate.getFirst())
             .as("Expected first hardware to have an unchanged multiplier after second update")
             .extracting("hardwareName", "multiplier")
             .containsExactly("Hardware #1", 1.0D);

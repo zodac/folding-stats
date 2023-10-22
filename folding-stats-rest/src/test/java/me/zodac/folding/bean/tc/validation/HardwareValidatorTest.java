@@ -46,14 +46,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingCreate_givenValidHardware_thenSuccessResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -67,14 +67,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingCreate_givenHardwareWithNullName_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName(null)
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            null,
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -86,14 +86,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingCreate_givenOtherHardwareAlreadyExists_thenSuccessResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("existingName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "existingName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
 
         final Hardware existingHardware = Hardware.create(
             hardwareId++,
@@ -118,14 +118,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingCreate_givenHardwareWithNameAlreadyExists_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("existingName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "existingName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
 
         final Hardware existingHardware = Hardware.create(
             hardwareId++,
@@ -151,14 +151,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingCreate_givenHardwareWithNullDisplayName_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName(null)
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            null,
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -170,14 +170,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingCreate_givenHardwareWithInvalidMake_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.INVALID.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            "displayName",
+            HardwareMake.INVALID,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -189,14 +189,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingCreate_givenHardwareWithInvalidType_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.INVALID.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.INVALID,
+            1.00D,
+            1L
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -208,14 +208,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingCreate_givenHardwareWithNegativeMultiplier_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(-1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            -1.00D,
+            1L
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -227,14 +227,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingCreate_givenHardwareWithNegativeAveragePpd_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(-1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            1.00D,
+            -1L
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -246,14 +246,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingCreate_givenHardwareWithMultipleErrors_thenAllErrorsAreReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName(null)
-            .displayName(null)
-            .hardwareMake(HardwareMake.INVALID.toString())
-            .hardwareType(HardwareType.INVALID.toString())
-            .multiplier(-1.00D)
-            .averagePpd(-1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            null,
+            null,
+            HardwareMake.INVALID,
+            HardwareType.INVALID,
+            -1.00D,
+            -1L
+        );
 
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
@@ -272,14 +272,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenValidHardware_thenSuccessResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(2.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            2.00D,
+            1L
+        );
 
         final Hardware existingHardware = generateHardware();
 
@@ -295,14 +295,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenHardwareWithNullName_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName(null)
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            null,
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
 
         final Hardware existingHardware = generateHardware();
 
@@ -317,14 +317,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenHardwareWithNameAlreadyExists_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
 
         final Hardware existingHardware = Hardware.create(
             1,
@@ -361,14 +361,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenHardwareWithNameAlreadyExists_andExistingHardwareIsHasSameId_thenSuccessResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
 
         final Hardware existingHardware = Hardware.create(
             1,
@@ -403,14 +403,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenHardwareWithNullDisplayName_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName(null)
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            null,
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
 
         final Hardware existingHardware = generateHardware();
 
@@ -425,14 +425,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenHardwareWithInvalidMake_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.INVALID.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            "displayName",
+            HardwareMake.INVALID,
+            HardwareType.GPU,
+            1.00D,
+            1L
+        );
 
         final Hardware existingHardware = generateHardware();
 
@@ -447,14 +447,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenHardwareWithInvalidType_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.INVALID.toString())
-            .multiplier(1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.INVALID,
+            1.00D,
+            1L
+        );
 
         final Hardware existingHardware = generateHardware();
 
@@ -469,14 +469,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenHardwareWithNegativeMultiplier_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(-1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            -1.00D,
+            1L
+        );
 
         final Hardware existingHardware = generateHardware();
 
@@ -491,14 +491,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenHardwareWithNegativeAveragePpd_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName("displayName")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.00D)
-            .averagePpd(-1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            "displayName",
+            HardwareMake.AMD,
+            HardwareType.GPU,
+            1.00D,
+            -1L
+        );
 
         final Hardware existingHardware = generateHardware();
 
@@ -513,14 +513,14 @@ class HardwareValidatorTest {
 
     @Test
     void whenValidatingUpdate_givenHardwareWithMultipleErrors_thenAllErrorsReturned() {
-        final HardwareRequest hardware = HardwareRequest.builder()
-            .hardwareName("hardwareName")
-            .displayName(null)
-            .hardwareMake(HardwareMake.INVALID.toString())
-            .hardwareType(HardwareType.INVALID.toString())
-            .multiplier(-1.00D)
-            .averagePpd(-1L)
-            .build();
+        final HardwareRequest hardware = generateHardwareRequest(
+            "hardwareName",
+            null,
+            HardwareMake.INVALID,
+            HardwareType.INVALID,
+            -1.00D,
+            -1L
+        );
 
         final Hardware existingHardware = generateHardware();
 
@@ -542,7 +542,6 @@ class HardwareValidatorTest {
     @Test
     void whenValidatingDelete_givenHardwareThatIsNotBeingUsed_thenSuccessResponseIsReturned() {
         final Hardware existingHardware = generateHardware();
-
         final FoldingRepository foldingRepository = new MockFoldingRepository();
 
         final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
@@ -579,7 +578,7 @@ class HardwareValidatorTest {
         assertThat(usedBy)
             .hasSize(1);
 
-        assertThat(usedBy.get(0).toString())
+        assertThat(usedBy.getFirst().toString())
             .contains("DummyPas************************")
             .doesNotContain("DummyPasskey12345678901234567890");
     }
@@ -640,5 +639,14 @@ class HardwareValidatorTest {
             "teamDescription",
             null
         );
+    }
+
+    private static HardwareRequest generateHardwareRequest(final String hardwareName,
+                                                           final String displayName,
+                                                           final HardwareMake hardwareMake,
+                                                           final HardwareType hardwareType,
+                                                           final double multiplier,
+                                                           final long averagePpd) {
+        return new HardwareRequest(hardwareName, displayName, hardwareMake.toString(), hardwareType.toString(), multiplier, averagePpd);
     }
 }

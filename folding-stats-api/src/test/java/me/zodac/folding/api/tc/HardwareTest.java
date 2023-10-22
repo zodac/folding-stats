@@ -58,14 +58,14 @@ class HardwareTest {
     @Test
     void testIsEqualRequest_valid() {
         final Hardware hardware = Hardware.create(1, "hardware", "hardware", HardwareMake.AMD, HardwareType.GPU, 1.0D, 1L);
-        final HardwareRequest hardwareRequest = HardwareRequest.builder()
-            .hardwareName("hardware")
-            .displayName("hardware")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.0D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardwareRequest = new HardwareRequest(
+            "hardware",
+            "hardware",
+            HardwareMake.AMD.toString(),
+            HardwareType.GPU.toString(),
+            1.0D,
+            1L
+        );
 
         assertThat(hardware.isEqualRequest(hardwareRequest))
             .isTrue();
@@ -74,14 +74,14 @@ class HardwareTest {
     @Test
     void testIsEqualRequest_invalid() {
         final Hardware hardware = Hardware.create(1, "hardware", "hardware", HardwareMake.AMD, HardwareType.GPU, 1.0D, 1L);
-        final HardwareRequest hardwareRequest = HardwareRequest.builder()
-            .hardwareName("hardware2")
-            .displayName("hardware")
-            .hardwareMake(HardwareMake.AMD.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(1.0D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardwareRequest = new HardwareRequest(
+            "hardware2",
+            "hardware",
+            HardwareMake.AMD.toString(),
+            HardwareType.GPU.toString(),
+            1.0D,
+            1L
+        );
 
         assertThat(hardware.isEqualRequest(hardwareRequest))
             .isFalse();

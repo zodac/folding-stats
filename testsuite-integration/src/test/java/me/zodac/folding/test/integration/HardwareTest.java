@@ -141,14 +141,13 @@ class HardwareTest {
         final Hardware createdHardware = HardwareUtils.create(DummyDataGenerator.generateHardware());
         final int initialSize = HardwareUtils.getNumberOfHardware();
 
-        final HardwareRequest updatedHardware = HardwareRequest.builder()
-            .hardwareName(createdHardware.hardwareName())
-            .displayName(createdHardware.displayName())
-            .hardwareMake(createdHardware.hardwareMake().toString())
-            .hardwareType(createdHardware.hardwareType().toString())
-            .multiplier(createdHardware.multiplier())
-            .averagePpd(createdHardware.averagePpd())
-            .build();
+        final HardwareRequest updatedHardware = generateHardwareRequest(
+            createdHardware.hardwareName(),
+            createdHardware.hardwareMake(),
+            createdHardware.hardwareType(),
+            createdHardware.multiplier(),
+            createdHardware.averagePpd()
+        );
 
         final HttpResponse<String> response =
             HARDWARE_REQUEST_SENDER.update(createdHardware.id(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -228,14 +227,13 @@ class HardwareTest {
     @Test
     void whenCreatingHardware_givenTeamWithInvalidMultiplier_thenJsonResponseWithErrorIsReturned_andHas400Status() throws FoldingRestException {
         final String hardwareName = DummyDataGenerator.nextHardwareName();
-        final HardwareRequest hardwareRequest = HardwareRequest.builder()
-            .hardwareName(hardwareName)
-            .displayName(hardwareName)
-            .hardwareMake(HardwareMake.NVIDIA.toString())
-            .hardwareType(HardwareType.GPU.toString())
-            .multiplier(-1.00D)
-            .averagePpd(1L)
-            .build();
+        final HardwareRequest hardwareRequest = generateHardwareRequest(
+            hardwareName,
+            HardwareMake.NVIDIA,
+            HardwareType.GPU,
+            -1.00D,
+            1L
+        );
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareRequest, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
@@ -265,11 +263,13 @@ class HardwareTest {
     void whenUpdatingHardware_givenInvalidHardwareId_thenResponseHas400Status() throws IOException, InterruptedException, FoldingRestException {
         final Hardware createdHardware = HardwareUtils.create(DummyDataGenerator.generateHardware());
 
-        final HardwareRequest updatedHardware = HardwareRequest.builder()
-            .hardwareName(createdHardware.hardwareName())
-            .displayName(createdHardware.displayName())
-            .multiplier(createdHardware.multiplier())
-            .build();
+        final HardwareRequest updatedHardware = generateHardwareRequest(
+            createdHardware.hardwareName(),
+            createdHardware.hardwareMake(),
+            createdHardware.hardwareType(),
+            createdHardware.multiplier(),
+            createdHardware.averagePpd()
+        );
 
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(updatedHardware)))
@@ -322,14 +322,13 @@ class HardwareTest {
         throws FoldingRestException {
         final Hardware createdHardware = HardwareUtils.create(DummyDataGenerator.generateHardware());
 
-        final HardwareRequest updatedHardware = HardwareRequest.builder()
-            .hardwareName(createdHardware.hardwareName())
-            .displayName(createdHardware.displayName())
-            .hardwareMake(createdHardware.hardwareMake().toString())
-            .hardwareType(createdHardware.hardwareType().toString())
-            .multiplier(createdHardware.multiplier())
-            .averagePpd(createdHardware.averagePpd())
-            .build();
+        final HardwareRequest updatedHardware = generateHardwareRequest(
+            createdHardware.hardwareName(),
+            createdHardware.hardwareMake(),
+            createdHardware.hardwareType(),
+            createdHardware.multiplier(),
+            createdHardware.averagePpd()
+        );
 
         final HttpResponse<String> updateResponse =
             HARDWARE_REQUEST_SENDER.update(createdHardware.id(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -421,11 +420,13 @@ class HardwareTest {
         throws FoldingRestException, IOException, InterruptedException {
         final Hardware createdHardware = HardwareUtils.create(DummyDataGenerator.generateHardware());
 
-        final HardwareRequest updatedHardware = HardwareRequest.builder()
-            .hardwareName(createdHardware.hardwareName())
-            .displayName(createdHardware.displayName())
-            .multiplier(createdHardware.multiplier())
-            .build();
+        final HardwareRequest updatedHardware = generateHardwareRequest(
+            createdHardware.hardwareName(),
+            createdHardware.hardwareMake(),
+            createdHardware.hardwareType(),
+            createdHardware.multiplier(),
+            createdHardware.averagePpd()
+        );
 
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(GSON.toJson(updatedHardware)))
@@ -536,5 +537,21 @@ class HardwareTest {
         assertThat(response.statusCode())
             .as("Did not receive a 415_UNSUPPORTED_MEDIA_TYPE HTTP response: " + response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNSUPPORTED_TYPE);
+    }
+
+    private static HardwareRequest generateHardwareRequest(final String hardwareName,
+                                                           final HardwareMake hardwareMake,
+                                                           final HardwareType hardwareType,
+                                                           final double multiplier,
+                                                           final long averagePpd
+    ) {
+        return new HardwareRequest(
+            hardwareName,
+            hardwareName,
+            hardwareMake.toString(),
+            hardwareType.toString(),
+            multiplier,
+            averagePpd
+        );
     }
 }

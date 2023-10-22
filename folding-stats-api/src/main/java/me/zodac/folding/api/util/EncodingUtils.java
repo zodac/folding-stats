@@ -41,9 +41,10 @@ public final class EncodingUtils {
      * Prefix defining the <b>Basic</b> authentication scheme.
      */
     public static final String BASIC_AUTHENTICATION_SCHEME = "Basic ";
+    private static final Pattern BASIC_AUTHENTICATION_PATTERN = Pattern.compile(BASIC_AUTHENTICATION_SCHEME);
 
     private static final String DECODED_USERNAME_PASSWORD_DELIMITER = ":";
-    private static final Pattern BASIC_AUTHENTICATION_PATTERN = Pattern.compile(BASIC_AUTHENTICATION_SCHEME);
+    private static final Pattern DECODED_USERNAME_PASSWORD_DELIMITER_PATTERN = Pattern.compile(DECODED_USERNAME_PASSWORD_DELIMITER);
 
     private EncodingUtils() {
 
@@ -91,7 +92,7 @@ public final class EncodingUtils {
             throw new IllegalArgumentException(String.format("Cannot decode input that does not start with: '%s'", BASIC_AUTHENTICATION_SCHEME));
         }
 
-        final String encodedUserNameAndPassword = BASIC_AUTHENTICATION_PATTERN.split(authorizationPayload)[1];
+        final String encodedUserNameAndPassword = BASIC_AUTHENTICATION_PATTERN.split(authorizationPayload, 2)[1];
         return decodeAuthentication(encodedUserNameAndPassword);
     }
 
@@ -102,7 +103,7 @@ public final class EncodingUtils {
             throw new IllegalArgumentException(String.format("Decoded input does not contain: '%s'", DECODED_USERNAME_PASSWORD_DELIMITER));
         }
 
-        final String[] userNameAndPasswordTokens = decodedUserNameAndPassword.split(DECODED_USERNAME_PASSWORD_DELIMITER, 2);
+        final String[] userNameAndPasswordTokens = DECODED_USERNAME_PASSWORD_DELIMITER_PATTERN.split(decodedUserNameAndPassword, 2);
 
         return Map.of(
             DECODED_USERNAME_KEY, userNameAndPasswordTokens[0],
