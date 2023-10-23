@@ -28,6 +28,7 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.util.RestUtilConstants;
+import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
 
 /**
  * Convenience class to send HTTP requests to the {@link me.zodac.folding.rest.api.tc.historic.HistoricStats} REST endpoint.
@@ -143,7 +144,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
     }
 
     private HttpResponse<String> getHourlyStats(final HistoricStatsType historicStatsType, final int id, final Year year, final Month month,
-                                                final int day, final String entityTag) throws FoldingRestException {
+                                                final int day, final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(
@@ -265,7 +266,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
     }
 
     private HttpResponse<String> getDailyStats(final HistoricStatsType historicStatsType, final int id, final Year year, final Month month,
-                                               final String entityTag) throws FoldingRestException {
+                                               final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(historicStatsUrl + '/' + historicStatsType.endpointUrl + '/' + id + '/' + year.getValue() + '/' + month.getValue()))
@@ -380,8 +381,8 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
         return getMonthlyStats(HistoricStatsType.TEAM, teamId, year, entityTag);
     }
 
-    private HttpResponse<String> getMonthlyStats(final HistoricStatsType historicStatsType, final int id, final Year year, final String entityTag)
-        throws FoldingRestException {
+    private HttpResponse<String> getMonthlyStats(final HistoricStatsType historicStatsType, final int id, final Year year,
+                                                 final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(historicStatsUrl + '/' + historicStatsType.endpointUrl + '/' + id + '/' + year.getValue()))

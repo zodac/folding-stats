@@ -37,13 +37,6 @@ class RetiredUserTcStatsTest {
     }
 
     @Test
-    void testCreate_nullDisplayName() {
-        assertThatThrownBy(() -> RetiredUserTcStats.create(1, 1, null, UserTcStats.createNow(1, 5L, 500L, 1)))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("displayName");
-    }
-
-    @Test
     void testCreate_blankDisplayName() {
         assertThatThrownBy(() -> RetiredUserTcStats.create(1, 1, "", UserTcStats.createNow(1, 5L, 500L, 1)))
             .isInstanceOf(IllegalArgumentException.class)

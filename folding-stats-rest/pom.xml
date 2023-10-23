@@ -53,6 +53,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.uber.nullaway</groupId>
+            <artifactId>nullaway</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>

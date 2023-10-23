@@ -31,8 +31,8 @@ public class PointsUrlBuilder {
     private static final String STATS_URL_ROOT = EnvironmentVariableUtils.getOrDefault("STATS_URL_ROOT", "https://api2.foldingathome.org");
     private static final String POINTS_URL_ROOT_FORMAT = STATS_URL_ROOT + "/user/%s/stats";
 
-    private String user;
-    private String passkey;
+    private String user = "";
+    private String passkey = "";
 
     /**
      * Update the {@link PointsUrlBuilder} with the 'user' for the URL.

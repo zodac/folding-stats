@@ -27,9 +27,10 @@ import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.bean.tc.user.UserStatsStorer;
 import me.zodac.folding.rest.controller.api.MonthlyResultEndpoint;
-import me.zodac.folding.rest.util.DateDetails;
 import me.zodac.folding.rest.util.ReadRequired;
 import me.zodac.folding.rest.util.WriteRequired;
+import me.zodac.folding.rest.util.date.DateParser;
+import me.zodac.folding.rest.util.date.MonthDetails;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +75,7 @@ public class MonthlyResultController implements MonthlyResultEndpoint {
                                                           final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received to retrieve monthly TC result at '{}'", request::getRequestURI);
 
-        final DateDetails date = DateDetails.of(year, month);
+        final MonthDetails date = DateParser.of(year, month);
         final MonthlyResult monthlyResult = statsRepository.getMonthlyResult(date.month(), date.year());
         return ok(monthlyResult);
     }

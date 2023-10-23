@@ -28,6 +28,7 @@ import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.integration.util.rest.request.HardwareUtils;
 import me.zodac.folding.test.integration.util.rest.request.TeamUtils;
+import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
 
 /**
  * Utility class used to generate {@link HardwareRequest}, {@link TeamRequest} and {@link UserRequest} instances for test cases.
@@ -323,7 +324,7 @@ public final class DummyDataGenerator {
 
     private static UserRequest generateUserRequest(final String userName,
                                                    final Category category,
-                                                   final String liveStatsLink,
+                                                   final @Nullable String liveStatsLink,
                                                    final int hardwareId,
                                                    final int teamId,
                                                    final boolean isCaptain) {

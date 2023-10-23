@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,13 +41,6 @@ class EncodingUtilsTest {
     }
 
     @Test
-    void whenCheckingIfNotBasicAuthentication_givenInputIsNull_thenTrueIsReturned() {
-        final boolean result = EncodingUtils.isInvalidBasicAuthentication(null);
-        assertThat(result)
-            .isTrue();
-    }
-
-    @Test
     void whenCheckingIfNotBasicAuthentication_givenInputIsNotBasicAuthentication_thenTrueIsReturned() {
         final boolean result = EncodingUtils.isInvalidBasicAuthentication("invalid");
         assertThat(result)
@@ -60,13 +52,6 @@ class EncodingUtilsTest {
         final boolean result = EncodingUtils.isInvalidBasicAuthentication("Basic dXNlck5hbWU6cGFzc3dvcmQ=");
         assertThat(result)
             .isFalse();
-    }
-
-    @Test
-    void whenDecodingBasicAuthentication_givenInputIsNull_thenExceptionIsThrown() {
-        assertThatThrownBy(() -> EncodingUtils.decodeBasicAuthentication(null))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("Cannot decode null");
     }
 
     @Test
@@ -87,21 +72,12 @@ class EncodingUtilsTest {
     @Test
     void whenDecodingBasicAuthentication_givenInputIsValid_thenDecodedUsernameAndPasswordIsReturned() {
         final String encodedInput = encode("Basic", "userName:password");
-        final Map<String, String> result = EncodingUtils.decodeBasicAuthentication(encodedInput);
+        final DecodedLoginCredentials result = EncodingUtils.decodeBasicAuthentication(encodedInput);
 
-        assertThat(result)
-            .containsExactlyEntriesOf(
-                Map.of(
-                    EncodingUtils.DECODED_PASSWORD_KEY, "password",
-                    EncodingUtils.DECODED_USERNAME_KEY, "userName"
-                )
-            );
-    }
-
-    @Test
-    void whenDecodingAuthentication_givenInputIsNull_thenExceptionIsThrown() {
-        assertThatThrownBy(() -> EncodingUtils.decodeBasicAuthentication(null))
-            .isInstanceOf(IllegalArgumentException.class);
+        assertThat(result.username())
+            .isEqualTo("userName");
+        assertThat(result.password())
+            .isEqualTo("password");
     }
 
     @Test

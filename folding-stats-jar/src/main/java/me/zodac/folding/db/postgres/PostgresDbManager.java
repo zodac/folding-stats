@@ -66,6 +66,7 @@ import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.util.DateTimeConverterUtils;
 import me.zodac.folding.api.util.DateTimeUtils;
+import me.zodac.folding.api.util.DecodedLoginCredentials;
 import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.apache.logging.log4j.LogManager;
@@ -1179,17 +1180,17 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
     }
 
     @Override
-    public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
-        SQL_LOGGER.debug("Checking if supplied username '{}' and password is valid user, then returning roles", userName);
+    public UserAuthenticationResult authenticateSystemUser(final DecodedLoginCredentials decodedLoginCredentials) {
+        SQL_LOGGER.debug("Checking if supplied username '{}' and password is valid user, then returning roles", decodedLoginCredentials.username());
 
         return executeQuery(queryContext -> {
             final var query = queryContext
                 .select(
-                    field(crypt(password, SYSTEM_USERS.USER_PASSWORD_HASH.getValue(
+                    field(crypt(decodedLoginCredentials.password(), SYSTEM_USERS.USER_PASSWORD_HASH.getValue(
                             queryContext
                                 .select()
                                 .from(SYSTEM_USERS)
-                                .where(SYSTEM_USERS.USER_NAME.equalIgnoreCase(userName))
+                                .where(SYSTEM_USERS.USER_NAME.equalIgnoreCase(decodedLoginCredentials.username()))
                                 .fetch()
                                 .into(SYSTEM_USERS)
                                 .stream()
@@ -1201,7 +1202,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                     SYSTEM_USERS.ROLES
                 )
                 .from(SYSTEM_USERS)
-                .where(SYSTEM_USERS.USER_NAME.equal(userName));
+                .where(SYSTEM_USERS.USER_NAME.equal(decodedLoginCredentials.username()));
             SQL_LOGGER.debug("Executing SQL: '{}'", query);
 
             return query

@@ -82,24 +82,6 @@ class UserRequestTest {
     }
 
     @Test
-    void testCreate_foldingUserNameNull() {
-        final UserRequest userRequest = new UserRequest(
-            null,
-            "user",
-            DUMMY_PASSKEY,
-            Category.AMD_GPU.toString(),
-            VALID_PROFILE_LINK,
-            VALID_LIVE_STATS_LINK,
-            1,
-            1,
-            true
-        );
-
-        assertThatThrownBy(userRequest::validate)
-            .isInstanceOf(ValidationException.class);
-    }
-
-    @Test
     void testCreate_foldingUserNameBlank() {
         final UserRequest userRequest = new UserRequest(
             "",
@@ -136,47 +118,11 @@ class UserRequestTest {
     }
 
     @Test
-    void testCreate_displayNameNull() {
-        final UserRequest userRequest = new UserRequest(
-            "user",
-            null,
-            DUMMY_PASSKEY,
-            Category.AMD_GPU.toString(),
-            VALID_PROFILE_LINK,
-            VALID_LIVE_STATS_LINK,
-            1,
-            1,
-            true
-        );
-
-        assertThatThrownBy(userRequest::validate)
-            .isInstanceOf(ValidationException.class);
-    }
-
-    @Test
     void testCreate_displayBlank() {
         final UserRequest userRequest = new UserRequest(
             "user",
             "",
             DUMMY_PASSKEY,
-            Category.AMD_GPU.toString(),
-            VALID_PROFILE_LINK,
-            VALID_LIVE_STATS_LINK,
-            1,
-            1,
-            true
-        );
-
-        assertThatThrownBy(userRequest::validate)
-            .isInstanceOf(ValidationException.class);
-    }
-
-    @Test
-    void testCreate_passkeyNull() {
-        final UserRequest userRequest = new UserRequest(
-            "user",
-            "user",
-            null,
             Category.AMD_GPU.toString(),
             VALID_PROFILE_LINK,
             VALID_LIVE_STATS_LINK,

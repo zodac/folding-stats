@@ -22,8 +22,8 @@ import static me.zodac.folding.rest.response.Responses.ok;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.security.PermitAll;
-import java.util.Map;
 import me.zodac.folding.api.UserAuthenticationResult;
+import me.zodac.folding.api.util.DecodedLoginCredentials;
 import me.zodac.folding.api.util.EncodingUtils;
 import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.api.FoldingRepository;
@@ -94,13 +94,11 @@ public class LoginController implements LoginEndpoint {
         }
 
         try {
-            final Map<String, String> decodedUserNameAndPassword =
+            final DecodedLoginCredentials decodedLoginCredentials =
                 EncodingUtils.decodeBasicAuthentication(loginCredentials.encodedUserNameAndPassword());
-            final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
-            final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
-            AUDIT_LOGGER.debug("Login request received for user: '{}'", userName);
+            AUDIT_LOGGER.debug("Login request received for user: '{}'", decodedLoginCredentials.username());
 
-            final UserAuthenticationResult userAuthenticationResult = foldingRepository.authenticateSystemUser(userName, password);
+            final UserAuthenticationResult userAuthenticationResult = foldingRepository.authenticateSystemUser(decodedLoginCredentials);
 
             if (!userAuthenticationResult.userExists() || !userAuthenticationResult.passwordMatch()) {
                 AUDIT_LOGGER.warn("Invalid user credentials supplied: {}", loginCredentials);
@@ -109,12 +107,12 @@ public class LoginController implements LoginEndpoint {
             }
 
             if (!userAuthenticationResult.isAdmin()) {
-                AUDIT_LOGGER.warn("User '{}' is not an admin", userName);
+                AUDIT_LOGGER.warn("User '{}' is not an admin", decodedLoginCredentials.username());
                 failedLogins.increment();
                 throw new ForbiddenException();
             }
 
-            AUDIT_LOGGER.info("Admin user '{}' logged in", userName);
+            AUDIT_LOGGER.info("Admin user '{}' logged in", decodedLoginCredentials.username());
             successfulLogins.increment();
             return ok();
         } catch (final IllegalArgumentException e) {

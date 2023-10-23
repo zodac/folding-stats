@@ -45,6 +45,7 @@ import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.util.DateTimeConverterUtils;
+import me.zodac.folding.api.util.DecodedLoginCredentials;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.leaderboard.TeamLeaderboardEntry;
@@ -496,7 +497,8 @@ class PostgresDbManagerTest {
 
     @Test
     void systemUserTest() {
-        final UserAuthenticationResult invalidUserName = POSTGRES_DB_MANAGER.authenticateSystemUser("invalidUserName", "ADMIN_PASSWORD");
+        final UserAuthenticationResult invalidUserName =
+            POSTGRES_DB_MANAGER.authenticateSystemUser(new DecodedLoginCredentials("invalidUserName", "ADMIN_PASSWORD"));
         assertThat(invalidUserName.userExists())
             .isFalse();
         assertThat(invalidUserName.passwordMatch())
@@ -504,7 +506,8 @@ class PostgresDbManagerTest {
         assertThat(invalidUserName.userRoles())
             .isEmpty();
 
-        final UserAuthenticationResult invalidPassword = POSTGRES_DB_MANAGER.authenticateSystemUser("ADMIN_USERNAME", "invalidPassword");
+        final UserAuthenticationResult invalidPassword =
+            POSTGRES_DB_MANAGER.authenticateSystemUser(new DecodedLoginCredentials("ADMIN_USERNAME", "invalidPassword"));
         assertThat(invalidPassword.userExists())
             .isTrue();
         assertThat(invalidPassword.passwordMatch())
@@ -512,7 +515,8 @@ class PostgresDbManagerTest {
         assertThat(invalidPassword.userRoles())
             .isEmpty();
 
-        final UserAuthenticationResult admin = POSTGRES_DB_MANAGER.authenticateSystemUser("ADMIN_USERNAME", "ADMIN_PASSWORD");
+        final UserAuthenticationResult admin =
+            POSTGRES_DB_MANAGER.authenticateSystemUser(new DecodedLoginCredentials("ADMIN_USERNAME", "ADMIN_PASSWORD"));
         assertThat(admin.userExists())
             .isTrue();
         assertThat(admin.passwordMatch())
@@ -520,7 +524,8 @@ class PostgresDbManagerTest {
         assertThat(admin.userRoles())
             .contains("admin");
 
-        final UserAuthenticationResult readOnly = POSTGRES_DB_MANAGER.authenticateSystemUser("READ_ONLY_USERNAME", "READ_ONLY_PASSWORD");
+        final UserAuthenticationResult readOnly =
+            POSTGRES_DB_MANAGER.authenticateSystemUser(new DecodedLoginCredentials("READ_ONLY_USERNAME", "READ_ONLY_PASSWORD"));
         assertThat(readOnly.userExists())
             .isTrue();
         assertThat(readOnly.passwordMatch())

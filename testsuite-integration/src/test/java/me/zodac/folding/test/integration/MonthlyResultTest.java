@@ -149,19 +149,21 @@ class MonthlyResultTest {
             .as("Expected result team to have same points as user")
             .isEqualTo(10_000L);
 
-        assertThat(monthlyResult.userCategoryLeaderboard().get(Category.AMD_GPU))
+        assertThat(monthlyResult.userCategoryLeaderboard().getOrDefault(Category.AMD_GPU, List.of()))
             .as("Expected no results in " + Category.AMD_GPU + " category leaderboard")
             .isEmpty();
 
-        assertThat(monthlyResult.userCategoryLeaderboard().get(Category.WILDCARD))
+        assertThat(monthlyResult.userCategoryLeaderboard().getOrDefault(Category.WILDCARD, List.of()))
             .as("Expected no results in " + Category.WILDCARD + " category leaderboard")
             .isEmpty();
 
-        assertThat(monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU))
+        assertThat(monthlyResult.userCategoryLeaderboard().getOrDefault(Category.NVIDIA_GPU, List.of()))
             .as("Expected one result in " + Category.NVIDIA_GPU + " category leaderboard")
             .hasSize(1);
 
-        final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU).getFirst();
+        final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard()
+            .getOrDefault(Category.NVIDIA_GPU, List.of())
+            .getFirst();
         assertThat(userCategoryLeaderboardEntry.user().team().teamName())
             .as("Expected result user to have same team name as input team")
             .isEqualTo(team.teamName());
@@ -229,9 +231,10 @@ class MonthlyResultTest {
             .as("Expected team in third to have the same points as first created user")
             .isEqualTo(10_000L);
 
-        final List<UserCategoryLeaderboardEntry> amdLeaderboard = monthlyResult.userCategoryLeaderboard().get(Category.AMD_GPU);
-        final List<UserCategoryLeaderboardEntry> wildcardLeaderboard = monthlyResult.userCategoryLeaderboard().get(Category.WILDCARD);
-        final List<UserCategoryLeaderboardEntry> nvidiaLeaderboard = monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU);
+        final Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard = monthlyResult.userCategoryLeaderboard();
+        final List<UserCategoryLeaderboardEntry> amdLeaderboard = userCategoryLeaderboard.getOrDefault(Category.AMD_GPU, List.of());
+        final List<UserCategoryLeaderboardEntry> wildcardLeaderboard = userCategoryLeaderboard.getOrDefault(Category.WILDCARD, List.of());
+        final List<UserCategoryLeaderboardEntry> nvidiaLeaderboard = userCategoryLeaderboard.getOrDefault(Category.NVIDIA_GPU, List.of());
 
         assertThat(amdLeaderboard)
             .hasSize(1);
@@ -312,7 +315,9 @@ class MonthlyResultTest {
             .as("Expected one result in " + Category.NVIDIA_GPU + " category leaderboard")
             .hasSize(1);
 
-        final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU).getFirst();
+        final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard()
+            .getOrDefault(Category.NVIDIA_GPU, List.of())
+            .getFirst();
         assertThat(userCategoryLeaderboardEntry.user().team().teamName())
             .as("Expected result user to have same team name as input team")
             .isEqualTo(team.teamName());

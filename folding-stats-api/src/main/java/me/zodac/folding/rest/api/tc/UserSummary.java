@@ -40,13 +40,9 @@ public record UserSummary(User user,
      * @param units            the units of the {@link User}
      * @param rankInTeam       the rank of the {@link User} in this {@link me.zodac.folding.api.tc.Team}
      * @return the created {@link UserSummary}
-     * @throws IllegalArgumentException thrown if {@code user} is null
+     * @throws IllegalArgumentException thrown if {@code user} is {@code null}
      */
     public static UserSummary create(final User user, final long points, final long multipliedPoints, final int units, final int rankInTeam) {
-        if (user == null) {
-            throw new IllegalArgumentException("'user' must not be null");
-        }
-
         return new UserSummary(user, points, multipliedPoints, units, rankInTeam);
     }
 
@@ -62,7 +58,7 @@ public record UserSummary(User user,
      * @param multipliedPoints the multiplied points of the {@link User}
      * @param units            the units of the {@link User}
      * @return the created {@link UserSummary}
-     * @throws IllegalArgumentException thrown if {@code user} is null
+     * @throws IllegalArgumentException thrown if {@code user} is {@code null}
      */
     public static UserSummary createWithDefaultRank(final User user, final long points, final long multipliedPoints, final int units) {
         return create(user, points, multipliedPoints, units, DEFAULT_RANK);

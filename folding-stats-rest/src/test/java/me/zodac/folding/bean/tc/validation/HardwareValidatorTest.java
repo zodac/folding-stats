@@ -48,7 +48,6 @@ class HardwareValidatorTest {
     void whenValidatingCreate_givenValidHardware_thenSuccessResponseIsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "hardwareName",
-            "displayName",
             HardwareMake.AMD,
             HardwareType.GPU,
             1.00D,
@@ -66,29 +65,9 @@ class HardwareValidatorTest {
     }
 
     @Test
-    void whenValidatingCreate_givenHardwareWithNullName_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = generateHardwareRequest(
-            null,
-            "displayName",
-            HardwareMake.AMD,
-            HardwareType.GPU,
-            1.00D,
-            1L
-        );
-
-        final FoldingRepository foldingRepository = new MockFoldingRepository();
-
-        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
-        final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
-        assertThat(e.getValidationFailure().errors())
-            .containsOnly("Field 'hardwareName' must not be empty");
-    }
-
-    @Test
     void whenValidatingCreate_givenOtherHardwareAlreadyExists_thenSuccessResponseIsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "existingName",
-            "displayName",
             HardwareMake.AMD,
             HardwareType.GPU,
             1.00D,
@@ -120,7 +99,6 @@ class HardwareValidatorTest {
     void whenValidatingCreate_givenHardwareWithNameAlreadyExists_thenFailureResponseIsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "existingName",
-            "displayName",
             HardwareMake.AMD,
             HardwareType.GPU,
             1.00D,
@@ -150,29 +128,9 @@ class HardwareValidatorTest {
     }
 
     @Test
-    void whenValidatingCreate_givenHardwareWithNullDisplayName_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = generateHardwareRequest(
-            "hardwareName",
-            null,
-            HardwareMake.AMD,
-            HardwareType.GPU,
-            1.00D,
-            1L
-        );
-
-        final FoldingRepository foldingRepository = new MockFoldingRepository();
-
-        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
-        final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
-        assertThat(e.getValidationFailure().errors())
-            .containsOnly("Field 'displayName' must not be empty");
-    }
-
-    @Test
     void whenValidatingCreate_givenHardwareWithInvalidMake_thenFailureResponseIsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "hardwareName",
-            "displayName",
             HardwareMake.INVALID,
             HardwareType.GPU,
             1.00D,
@@ -191,7 +149,6 @@ class HardwareValidatorTest {
     void whenValidatingCreate_givenHardwareWithInvalidType_thenFailureResponseIsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "hardwareName",
-            "displayName",
             HardwareMake.AMD,
             HardwareType.INVALID,
             1.00D,
@@ -210,7 +167,6 @@ class HardwareValidatorTest {
     void whenValidatingCreate_givenHardwareWithNegativeMultiplier_thenFailureResponseIsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "hardwareName",
-            "displayName",
             HardwareMake.AMD,
             HardwareType.GPU,
             -1.00D,
@@ -229,7 +185,6 @@ class HardwareValidatorTest {
     void whenValidatingCreate_givenHardwareWithNegativeAveragePpd_thenFailureResponseIsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "hardwareName",
-            "displayName",
             HardwareMake.AMD,
             HardwareType.GPU,
             1.00D,
@@ -247,8 +202,7 @@ class HardwareValidatorTest {
     @Test
     void whenValidatingCreate_givenHardwareWithMultipleErrors_thenAllErrorsAreReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
-            null,
-            null,
+            "hardwareName",
             HardwareMake.INVALID,
             HardwareType.INVALID,
             -1.00D,
@@ -261,8 +215,6 @@ class HardwareValidatorTest {
         final ValidationException e = catchThrowableOfType(() -> hardwareValidator.create(hardware), ValidationException.class);
         assertThat(e.getValidationFailure().errors())
             .containsOnly(
-                "Field 'hardwareName' must not be empty",
-                "Field 'displayName' must not be empty",
                 "Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]",
                 "Field 'hardwareType' must be one of: [CPU, GPU]",
                 "Field 'multiplier' must be 1.00 or higher",
@@ -274,7 +226,6 @@ class HardwareValidatorTest {
     void whenValidatingUpdate_givenValidHardware_thenSuccessResponseIsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "hardwareName",
-            "displayName",
             HardwareMake.AMD,
             HardwareType.GPU,
             2.00D,
@@ -294,32 +245,9 @@ class HardwareValidatorTest {
     }
 
     @Test
-    void whenValidatingUpdate_givenHardwareWithNullName_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = generateHardwareRequest(
-            null,
-            "displayName",
-            HardwareMake.AMD,
-            HardwareType.GPU,
-            1.00D,
-            1L
-        );
-
-        final Hardware existingHardware = generateHardware();
-
-        final FoldingRepository foldingRepository = new MockFoldingRepository();
-
-        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
-        final ValidationException e =
-            catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
-        assertThat(e.getValidationFailure().errors())
-            .containsOnly("Field 'hardwareName' must not be empty");
-    }
-
-    @Test
     void whenValidatingUpdate_givenHardwareWithNameAlreadyExists_thenFailureResponseIsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "hardwareName",
-            "displayName",
             HardwareMake.AMD,
             HardwareType.GPU,
             1.00D,
@@ -363,7 +291,6 @@ class HardwareValidatorTest {
     void whenValidatingUpdate_givenHardwareWithNameAlreadyExists_andExistingHardwareIsHasSameId_thenSuccessResponseIsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "hardwareName",
-            "displayName",
             HardwareMake.AMD,
             HardwareType.GPU,
             1.00D,
@@ -402,32 +329,9 @@ class HardwareValidatorTest {
     }
 
     @Test
-    void whenValidatingUpdate_givenHardwareWithNullDisplayName_thenFailureResponseIsReturned() {
-        final HardwareRequest hardware = generateHardwareRequest(
-            "hardwareName",
-            null,
-            HardwareMake.AMD,
-            HardwareType.GPU,
-            1.00D,
-            1L
-        );
-
-        final Hardware existingHardware = generateHardware();
-
-        final FoldingRepository foldingRepository = new MockFoldingRepository();
-
-        final HardwareValidator hardwareValidator = new HardwareValidator(foldingRepository);
-        final ValidationException e =
-            catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
-        assertThat(e.getValidationFailure().errors())
-            .containsOnly("Field 'displayName' must not be empty");
-    }
-
-    @Test
     void whenValidatingUpdate_givenHardwareWithInvalidMake_thenFailureResponseIsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "hardwareName",
-            "displayName",
             HardwareMake.INVALID,
             HardwareType.GPU,
             1.00D,
@@ -449,7 +353,6 @@ class HardwareValidatorTest {
     void whenValidatingUpdate_givenHardwareWithInvalidType_thenFailureResponseIsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "hardwareName",
-            "displayName",
             HardwareMake.AMD,
             HardwareType.INVALID,
             1.00D,
@@ -471,7 +374,6 @@ class HardwareValidatorTest {
     void whenValidatingUpdate_givenHardwareWithNegativeMultiplier_thenFailureResponseIsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "hardwareName",
-            "displayName",
             HardwareMake.AMD,
             HardwareType.GPU,
             -1.00D,
@@ -493,7 +395,6 @@ class HardwareValidatorTest {
     void whenValidatingUpdate_givenHardwareWithNegativeAveragePpd_thenFailureResponseIsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "hardwareName",
-            "displayName",
             HardwareMake.AMD,
             HardwareType.GPU,
             1.00D,
@@ -515,7 +416,6 @@ class HardwareValidatorTest {
     void whenValidatingUpdate_givenHardwareWithMultipleErrors_thenAllErrorsReturned() {
         final HardwareRequest hardware = generateHardwareRequest(
             "hardwareName",
-            null,
             HardwareMake.INVALID,
             HardwareType.INVALID,
             -1.00D,
@@ -531,7 +431,6 @@ class HardwareValidatorTest {
             catchThrowableOfType(() -> hardwareValidator.update(hardware, existingHardware), ValidationException.class);
         assertThat(e.getValidationFailure().errors())
             .containsOnly(
-                "Field 'displayName' must not be empty",
                 "Field 'hardwareMake' must be one of: [AMD, INTEL, NVIDIA]",
                 "Field 'hardwareType' must be one of: [CPU, GPU]",
                 "Field 'multiplier' must be 1.00 or higher",
@@ -642,11 +541,10 @@ class HardwareValidatorTest {
     }
 
     private static HardwareRequest generateHardwareRequest(final String hardwareName,
-                                                           final String displayName,
                                                            final HardwareMake hardwareMake,
                                                            final HardwareType hardwareType,
                                                            final double multiplier,
                                                            final long averagePpd) {
-        return new HardwareRequest(hardwareName, displayName, hardwareMake.toString(), hardwareType.toString(), multiplier, averagePpd);
+        return new HardwareRequest(hardwareName, "displayName", hardwareMake.toString(), hardwareType.toString(), multiplier, averagePpd);
     }
 }

@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.stream.Stream;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
+import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.Team}.
@@ -52,6 +53,7 @@ public record TeamRequest(
         requiredMode = Schema.RequiredMode.NOT_REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
+    @Nullable
     String teamDescription,
     @Schema(
         description = "A link to the team on the forum",
@@ -59,6 +61,7 @@ public record TeamRequest(
         requiredMode = Schema.RequiredMode.NOT_REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
+    @Nullable
     String forumLink
 ) implements RequestPojo {
 

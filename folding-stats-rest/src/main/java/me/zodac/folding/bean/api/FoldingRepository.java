@@ -28,6 +28,7 @@ import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.api.util.DecodedLoginCredentials;
 import me.zodac.folding.bean.tc.user.UserStatsParser;
 import me.zodac.folding.rest.exception.NotFoundException;
 import me.zodac.folding.state.ParsingStateManager;
@@ -220,11 +221,10 @@ public interface FoldingRepository {
      *     <li>The user exists, and the password is correct</li>
      * </ul>
      *
-     * @param userName the system user username
-     * @param password the system user password
+     * @param decodedLoginCredentials the system user credentials
      * @return the {@link UserAuthenticationResult}
      */
-    UserAuthenticationResult authenticateSystemUser(String userName, String password);
+    UserAuthenticationResult authenticateSystemUser(DecodedLoginCredentials decodedLoginCredentials);
 
     /**
      * Creates a {@link UserChange}.

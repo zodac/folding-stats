@@ -23,6 +23,7 @@ import me.zodac.folding.api.exception.ConflictException;
 import me.zodac.folding.api.exception.UsedByException;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.change.UserChangeState;
+import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.exception.ForbiddenException;
 import me.zodac.folding.rest.exception.InvalidDayException;
 import me.zodac.folding.rest.exception.InvalidLoginCredentialsException;
@@ -164,8 +165,9 @@ public class PropagatedExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public String missingParameter(final MissingServletRequestParameterException e) {
-        LOGGER.error("Missing parameter", e);
-        return GSON.toJson(ErrorResponse.create(e.getMessage()));
+        final String errorMessage = String.format("Missing parameter '%s' of type '%s'", e.getParameterName(), e.getParameterType());
+        LOGGER.error(errorMessage, e);
+        return GSON.toJson(ErrorResponse.create(errorMessage));
     }
 
     /**
@@ -340,8 +342,9 @@ public class PropagatedExceptionHandler {
     @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public String invalidContentType(final HttpMediaTypeNotSupportedException e) {
-        LOGGER.error(e.getMessage());
-        return GSON.toJson(ErrorResponse.create(e.getMessage()));
+        final String errorMessage = String.format("%s '%s' not supported for this URL", RestHeader.CONTENT_TYPE.headerName(), e.getContentType());
+        LOGGER.error(errorMessage);
+        return GSON.toJson(ErrorResponse.create(errorMessage));
     }
 
     /**

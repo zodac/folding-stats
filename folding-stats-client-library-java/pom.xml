@@ -25,6 +25,11 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.uber.nullaway</groupId>
+            <artifactId>nullaway</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>

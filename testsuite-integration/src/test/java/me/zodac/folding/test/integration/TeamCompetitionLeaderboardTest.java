@@ -178,17 +178,17 @@ class TeamCompetitionLeaderboardTest {
             .as("Incorrect number of user summaries returned: " + response.body())
             .hasSize(4);
 
-        final List<UserCategoryLeaderboardEntry> firstCategoryUsers = results.get(Category.AMD_GPU.toString());
+        final List<UserCategoryLeaderboardEntry> firstCategoryUsers = results.getOrDefault(Category.AMD_GPU.toString(), List.of());
         assertThat(firstCategoryUsers)
             .as("Incorrect number of " + Category.AMD_GPU + " user summaries returned: " + response.body())
             .hasSize(3);
 
-        final List<UserCategoryLeaderboardEntry> secondCategoryUsers = results.get(Category.NVIDIA_GPU.toString());
+        final List<UserCategoryLeaderboardEntry> secondCategoryUsers = results.getOrDefault(Category.NVIDIA_GPU.toString(), List.of());
         assertThat(secondCategoryUsers)
             .as("Incorrect number of " + Category.NVIDIA_GPU + " user summaries returned: " + response.body())
             .hasSize(1);
 
-        final List<UserCategoryLeaderboardEntry> thirdCategoryUsers = results.get(Category.WILDCARD.toString());
+        final List<UserCategoryLeaderboardEntry> thirdCategoryUsers = results.getOrDefault(Category.WILDCARD.toString(), List.of());
         assertThat(thirdCategoryUsers)
             .as("Incorrect number of " + Category.WILDCARD + " user summaries returned: " + response.body())
             .isEmpty();
@@ -222,6 +222,7 @@ class TeamCompetitionLeaderboardTest {
 
         final UserCategoryLeaderboardEntry fourthResult = secondCategoryUsers.getFirst();
         assertThat(fourthResult.user().displayName())
+            // TODO: .as() can use String.format() format for args
             .as("Did not receive the expected user for rank 1, " + Category.NVIDIA_GPU + ": " + response.body())
             .isEqualTo(fourthUser.displayName());
         assertThat(fourthResult)

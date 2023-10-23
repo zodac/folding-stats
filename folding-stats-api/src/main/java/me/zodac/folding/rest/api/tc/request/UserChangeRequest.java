@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
+import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.change.UserChange}.
@@ -78,6 +79,7 @@ public record UserChangeRequest(
         requiredMode = Schema.RequiredMode.REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
+    @Nullable
     String liveStatsLink,
     @Schema(
         description = "The ID of the hardware that the user will use (leave as existing value if no change is required)",

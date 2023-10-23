@@ -28,6 +28,7 @@ import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.HardwareMake;
+import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.User}.
@@ -83,6 +84,7 @@ public record UserRequest(
         requiredMode = Schema.RequiredMode.NOT_REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
+    @Nullable
     String profileLink,
     @Schema(
         description = "A link to the live stats for the user",
@@ -90,6 +92,7 @@ public record UserRequest(
         requiredMode = Schema.RequiredMode.NOT_REQUIRED,
         accessMode = Schema.AccessMode.READ_WRITE
     )
+    @Nullable
     String liveStatsLink,
     @Schema(
         description = "The ID of the hardware that the user will use",

@@ -30,6 +30,7 @@ import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.request.OffsetTcStatsRequest;
 import me.zodac.folding.rest.api.util.RestUtilConstants;
+import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
 
 /**
  * Convenience class to send HTTP requests to the {@code Team Competition} stats REST endpoint.
@@ -74,7 +75,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getStats()
      */
-    public HttpResponse<String> getStats(final String entityTag) throws FoldingRestException {
+    public HttpResponse<String> getStats(final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(statsUrl))
@@ -120,7 +121,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getSummaryStats()
      */
-    public HttpResponse<String> getSummaryStats(final String entityTag) throws FoldingRestException {
+    public HttpResponse<String> getSummaryStats(final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(statsUrl + "/summary"))
@@ -170,7 +171,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getStats()
      */
-    public HttpResponse<String> getStatsForUser(final int userId, final String entityTag) throws FoldingRestException {
+    public HttpResponse<String> getStatsForUser(final int userId, final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(statsUrl + "/users/" + userId))
@@ -214,7 +215,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getTeamLeaderboard()
      */
-    public HttpResponse<String> getTeamLeaderboard(final String entityTag) throws FoldingRestException {
+    public HttpResponse<String> getTeamLeaderboard(final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(statsUrl + "/leaderboard"))
@@ -258,7 +259,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getCategoryLeaderboard()
      */
-    public HttpResponse<String> getCategoryLeaderboard(final String entityTag) throws FoldingRestException {
+    public HttpResponse<String> getCategoryLeaderboard(final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(statsUrl + "/category"))

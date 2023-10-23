@@ -18,7 +18,6 @@
 package me.zodac.folding.rest.interceptor;
 
 import static java.util.stream.Collectors.toSet;
-import static me.zodac.folding.api.util.CollectionUtils.containsNoMatches;
 
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.PermitAll;
@@ -28,9 +27,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import me.zodac.folding.api.UserAuthenticationResult;
+import me.zodac.folding.api.util.CollectionUtils;
+import me.zodac.folding.api.util.DecodedLoginCredentials;
 import me.zodac.folding.api.util.EncodingUtils;
 import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.api.FoldingRepository;
@@ -63,7 +63,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
  *         should be encoded using {@link java.util.Base64}. We decode and then authenticate against the DB.
  *         <ul>
  *             <li>
- *                 If unsuccessful, or invalid authentication headers have been provided, a {@link UnauthorizedException} is thrown.
+ *                 If unsuccessful, or invalid authentication headers have been provided, an {@link UnauthorizedException} is thrown.
  *             </li>
  *             <li>
  *                 If successful, we retrieve the user's roles, and compare them to {@link RolesAllowed#value()}. If there is a match, we accept the
@@ -73,7 +73,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
  *     </li>
  * </ul>
  *
- * @see FoldingRepository#authenticateSystemUser(String, String)
+ * @see FoldingRepository#authenticateSystemUser(DecodedLoginCredentials)
  */
 @Component
 public final class SecurityInterceptor implements HandlerInterceptor {
@@ -128,16 +128,25 @@ public final class SecurityInterceptor implements HandlerInterceptor {
         final Method method = handlerMethod.getMethod();
         SECURITY_LOGGER.debug("Security access requested to: #{}()", method.getName());
 
-        if (method.isAnnotationPresent(DenyAll.class)) {
-            SECURITY_LOGGER.warn("All access to '#{}()' at '{}' is denied", method.getName(), request.getRequestURI());
-            throw new ForbiddenException();
-        }
-
         if (method.isAnnotationPresent(PermitAll.class) || !method.isAnnotationPresent(RolesAllowed.class)) {
             SECURITY_LOGGER.debug("All access to '#{}()' at '{}' is permitted", method.getName(), request.getRequestURI());
             return;
         }
 
+        if (method.isAnnotationPresent(DenyAll.class)) {
+            SECURITY_LOGGER.warn("All access to '#{}()' at '{}' is denied", method.getName(), request.getRequestURI());
+            throw new ForbiddenException();
+        }
+
+        final DecodedLoginCredentials decodedLoginCredentials = extractDecodedCredentials(request);
+
+        final UserAuthenticationResult userAuthenticationResult = foldingRepository.authenticateSystemUser(decodedLoginCredentials);
+        validateUserAuthentication(userAuthenticationResult, decodedLoginCredentials.username());
+        validateRoles(userAuthenticationResult, method, decodedLoginCredentials.username());
+        SECURITY_LOGGER.debug("Request permitted");
+    }
+
+    private static DecodedLoginCredentials extractDecodedCredentials(final HttpServletRequest request) {
         final String authorizationProperty = request.getHeader(RestHeader.AUTHORIZATION.headerName());
         if (EncodingUtils.isInvalidBasicAuthentication(authorizationProperty)) {
             SECURITY_LOGGER.warn("Invalid {} value provided at '{}': '{}'", RestHeader.AUTHORIZATION.headerName(),
@@ -145,12 +154,10 @@ public final class SecurityInterceptor implements HandlerInterceptor {
             throw new UnauthorizedException();
         }
 
-        final Map<String, String> decodedUserNameAndPassword = EncodingUtils.decodeBasicAuthentication(authorizationProperty);
-        final String userName = decodedUserNameAndPassword.get(EncodingUtils.DECODED_USERNAME_KEY);
-        final String password = decodedUserNameAndPassword.get(EncodingUtils.DECODED_PASSWORD_KEY);
+        return EncodingUtils.decodeBasicAuthentication(authorizationProperty);
+    }
 
-        final UserAuthenticationResult userAuthenticationResult = foldingRepository.authenticateSystemUser(userName, password);
-
+    private static void validateUserAuthentication(final UserAuthenticationResult userAuthenticationResult, final String userName) {
         if (!userAuthenticationResult.userExists()) {
             SECURITY_LOGGER.warn("User '{}' does not exist", userName);
             throw new UnauthorizedException();
@@ -160,7 +167,9 @@ public final class SecurityInterceptor implements HandlerInterceptor {
             SECURITY_LOGGER.warn("Invalid password supplied for user '{}'", userName);
             throw new UnauthorizedException();
         }
+    }
 
+    private static void validateRoles(final UserAuthenticationResult userAuthenticationResult, final Method method, final String userName) {
         final Set<String> userRoles = userAuthenticationResult.userRoles()
             .stream()
             .map(s -> s.toLowerCase(Locale.UK))
@@ -172,11 +181,9 @@ public final class SecurityInterceptor implements HandlerInterceptor {
             .collect(toSet());
         SECURITY_LOGGER.debug("Permitted roles: {}", permittedRoles);
 
-        if (containsNoMatches(userRoles, permittedRoles)) {
+        if (CollectionUtils.containsNoMatches(userRoles, permittedRoles)) {
             SECURITY_LOGGER.warn("User '{}' has roles {}, must be one of: {}", userName, userRoles, permittedRoles);
             throw new ForbiddenException();
         }
-
-        SECURITY_LOGGER.debug("Request permitted");
     }
 }

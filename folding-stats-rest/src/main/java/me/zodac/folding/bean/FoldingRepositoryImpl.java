@@ -34,6 +34,7 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.api.util.DecodedLoginCredentials;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.user.UserStatsParser;
 import me.zodac.folding.rest.exception.NotFoundException;
@@ -407,13 +408,13 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     }
 
     @Override
-    public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
-        final UserAuthenticationResult userAuthenticationResult = storage.authenticateSystemUser(userName, password);
+    public UserAuthenticationResult authenticateSystemUser(final DecodedLoginCredentials decodedLoginCredentials) {
+        final UserAuthenticationResult userAuthenticationResult = storage.authenticateSystemUser(decodedLoginCredentials);
 
         if (userAuthenticationResult.userExists() && userAuthenticationResult.passwordMatch()) {
-            LOGGER.debug("System user '{}' successfully logged in", userName);
+            LOGGER.debug("System user '{}' successfully logged in", decodedLoginCredentials.username());
         } else {
-            LOGGER.debug("Error authenticating system user '{}': {}", userName, userAuthenticationResult);
+            LOGGER.debug("Error authenticating system user '{}': {}", decodedLoginCredentials.username(), userAuthenticationResult);
         }
 
         return userAuthenticationResult;

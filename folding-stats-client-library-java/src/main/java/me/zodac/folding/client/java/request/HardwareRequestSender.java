@@ -29,6 +29,7 @@ import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 import me.zodac.folding.rest.api.util.RestUtilConstants;
+import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
 
 /**
  * Convenience class to send HTTP requests to the {@link me.zodac.folding.api.tc.Hardware} REST endpoint.
@@ -71,7 +72,7 @@ public record HardwareRequestSender(String hardwareUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getAll()
      */
-    public HttpResponse<String> getAll(final String entityTag) throws FoldingRestException {
+    public HttpResponse<String> getAll(final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(hardwareUrl))
@@ -118,7 +119,7 @@ public record HardwareRequestSender(String hardwareUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(int)
      */
-    public HttpResponse<String> get(final int hardwareId, final String entityTag) throws FoldingRestException {
+    public HttpResponse<String> get(final int hardwareId, final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(hardwareUrl + '/' + hardwareId))
@@ -165,7 +166,7 @@ public record HardwareRequestSender(String hardwareUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(String)
      */
-    public HttpResponse<String> get(final String hardwareName, final String entityTag) throws FoldingRestException {
+    public HttpResponse<String> get(final String hardwareName, final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(hardwareUrl + "/fields?hardwareName=" + hardwareName))

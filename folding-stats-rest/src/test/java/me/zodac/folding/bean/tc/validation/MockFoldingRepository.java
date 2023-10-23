@@ -28,6 +28,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
+import me.zodac.folding.api.util.DecodedLoginCredentials;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.rest.exception.NotFoundException;
 
@@ -156,7 +157,7 @@ class MockFoldingRepository implements FoldingRepository {
     }
 
     @Override
-    public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
+    public UserAuthenticationResult authenticateSystemUser(final DecodedLoginCredentials decodedLoginCredentials) {
         return UserAuthenticationResult.success(Set.of("admin"));
     }
 

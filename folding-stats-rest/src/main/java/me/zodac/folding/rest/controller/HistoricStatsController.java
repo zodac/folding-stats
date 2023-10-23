@@ -31,8 +31,11 @@ import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.rest.controller.api.HistoricStatsEndpoint;
-import me.zodac.folding.rest.util.DateDetails;
 import me.zodac.folding.rest.util.ReadRequired;
+import me.zodac.folding.rest.util.date.DateDetails;
+import me.zodac.folding.rest.util.date.DateParser;
+import me.zodac.folding.rest.util.date.MonthDetails;
+import me.zodac.folding.rest.util.date.YearDetails;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,7 +84,7 @@ public class HistoricStatsController implements HistoricStatsEndpoint {
                                                         final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received to show hourly TC user stats at '{}'", request::getRequestURI);
 
-        final DateDetails date = DateDetails.of(year, month, day);
+        final DateDetails date = DateParser.of(year, month, day);
         final User user = foldingRepository.getUserWithPasskey(userId);
         final Collection<HistoricStats> historicStats = statsRepository.getHistoricStats(user, date.year(), date.month(), date.day());
         return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
@@ -97,7 +100,7 @@ public class HistoricStatsController implements HistoricStatsEndpoint {
                                                        final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received to show daily TC user stats at '{}'", request::getRequestURI);
 
-        final DateDetails date = DateDetails.of(year, month);
+        final MonthDetails date = DateParser.of(year, month);
         final User user = foldingRepository.getUserWithPasskey(userId);
         final Collection<HistoricStats> historicStats = statsRepository.getHistoricStats(user, date.year(), date.month());
         return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
@@ -112,7 +115,7 @@ public class HistoricStatsController implements HistoricStatsEndpoint {
                                                          final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received to show monthly TC user stats at '{}'", request::getRequestURI);
 
-        final DateDetails date = DateDetails.of(year);
+        final YearDetails date = DateParser.of(year);
         final User user = foldingRepository.getUserWithPasskey(userId);
         final Collection<HistoricStats> historicStats = statsRepository.getHistoricStats(user, date.year());
         return cachedOk(historicStats, CACHE_EXPIRATION_TIME);
@@ -129,7 +132,7 @@ public class HistoricStatsController implements HistoricStatsEndpoint {
                                                         final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received to show hourly TC user stats at '{}'", request::getRequestURI);
 
-        final DateDetails date = DateDetails.of(year, month, day);
+        final DateDetails date = DateParser.of(year, month, day);
         final Team team = foldingRepository.getTeam(teamId);
 
         final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
@@ -155,7 +158,7 @@ public class HistoricStatsController implements HistoricStatsEndpoint {
                                                        final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received to show daily TC user stats at '{}'", request::getRequestURI);
 
-        final DateDetails date = DateDetails.of(year, month);
+        final MonthDetails date = DateParser.of(year, month);
         final Team team = foldingRepository.getTeam(teamId);
 
         final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);
@@ -180,7 +183,7 @@ public class HistoricStatsController implements HistoricStatsEndpoint {
                                                          final HttpServletRequest request) {
         AUDIT_LOGGER.debug("GET request received to show monthly TC team stats at '{}'", request::getRequestURI);
 
-        final DateDetails date = DateDetails.of(year);
+        final YearDetails date = DateParser.of(year);
         final Team team = foldingRepository.getTeam(teamId);
 
         final Collection<User> teamUsers = foldingRepository.getUsersOnTeam(team);

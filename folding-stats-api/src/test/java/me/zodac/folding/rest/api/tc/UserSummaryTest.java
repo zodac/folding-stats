@@ -18,7 +18,6 @@
 package me.zodac.folding.rest.api.tc;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
@@ -64,14 +63,6 @@ class UserSummaryTest {
         assertThat(userSummary)
             .extracting("points", "multipliedPoints", "units")
             .containsExactly(5L, 500L, 1);
-    }
-
-    @Test
-    void testCreate_nullUser() {
-        assertThatThrownBy(
-            () -> UserSummary.createWithDefaultRank(null, 5L, 500L, 1))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("user");
     }
 
     @Test

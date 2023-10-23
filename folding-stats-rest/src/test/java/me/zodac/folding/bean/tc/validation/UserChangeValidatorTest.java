@@ -37,6 +37,7 @@ import me.zodac.folding.bean.tc.validation.retriever.NoUnitsFoldingStatsRetrieve
 import me.zodac.folding.bean.tc.validation.retriever.UnexpectedExceptionFoldingStatsRetriever;
 import me.zodac.folding.bean.tc.validation.retriever.ValidFoldingStatsRetriever;
 import me.zodac.folding.rest.api.tc.request.UserChangeRequest;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -144,31 +145,6 @@ class UserChangeValidatorTest {
     }
 
     @Test
-    void whenValidating_givenNullFoldingUserName_thenFailureResponseIsReturned() {
-        final Hardware hardware = generateHardware();
-        final User user = generateUser(hardware);
-
-        final UserChangeRequest userChange = generateUserChangeRequest(
-            user.id(),
-            user.passkey(),
-            null,
-            user.passkey(),
-            VALID_LIVE_STATS_LINK,
-            hardware.id(),
-            true
-        );
-
-        final FoldingRepository foldingRepository = new MockFoldingRepository();
-        foldingRepository.createHardware(hardware);
-        foldingRepository.createUser(user);
-
-        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
-        assertThat(e.getValidationFailure().errors())
-            .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
-    }
-
-    @Test
     void whenValidating_givenInvalidFoldingUserName_thenFailureResponseIsReturned() {
         final Hardware hardware = generateHardware();
         final User user = generateUser(hardware);
@@ -191,31 +167,6 @@ class UserChangeValidatorTest {
         final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
         assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
-    }
-
-    @Test
-    void whenValidating_givenNullPasskey_thenFailureResponseIsReturned() {
-        final Hardware hardware = generateHardware();
-        final User user = generateUser(hardware);
-
-        final UserChangeRequest userChange = generateUserChangeRequest(
-            user.id(),
-            user.passkey(),
-            user.foldingUserName(),
-            null,
-            VALID_LIVE_STATS_LINK,
-            hardware.id(),
-            false
-        );
-
-        final FoldingRepository foldingRepository = new MockFoldingRepository();
-        foldingRepository.createHardware(hardware);
-        foldingRepository.createUser(user);
-
-        final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
-        assertThat(e.getValidationFailure().errors())
-            .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
 
     @Test
@@ -733,7 +684,7 @@ class UserChangeValidatorTest {
                                                                final String existingPasskey,
                                                                final String foldingUserName,
                                                                final String passkey,
-                                                               final String liveStatsLink,
+                                                               final @Nullable String liveStatsLink,
                                                                final int hardwareId,
                                                                final boolean immediate) {
         return new UserChangeRequest(userId, existingPasskey, foldingUserName, passkey, liveStatsLink, hardwareId, immediate);

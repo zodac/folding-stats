@@ -18,7 +18,6 @@
 package me.zodac.folding.api.tc;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import org.junit.jupiter.api.Test;
@@ -62,26 +61,6 @@ class UserTest {
 
         assertThat(user.team())
             .isEqualTo(team);
-    }
-
-    @Test
-    void testCreate_nullHardware() {
-        final Team team = createTeam();
-        assertThatThrownBy(
-            () -> User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, null, team,
-                Role.CAPTAIN))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("hardware");
-    }
-
-    @Test
-    void testCreate_nullTeam() {
-        final Hardware hardware = createHardware();
-        assertThatThrownBy(
-            () -> User.create(1, "user", "user", DUMMY_PASSKEY, Category.AMD_GPU, VALID_PROFILE_LINK, VALID_LIVE_STATS_LINK, hardware, null,
-                Role.CAPTAIN))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("team");
     }
 
     @Test

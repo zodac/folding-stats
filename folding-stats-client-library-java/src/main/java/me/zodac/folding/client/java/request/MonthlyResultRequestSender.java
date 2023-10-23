@@ -31,6 +31,7 @@ import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.util.RestUtilConstants;
+import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
 
 /**
  * Convenience class to send HTTP requests to the {@link me.zodac.folding.api.tc.result.MonthlyResult} REST endpoint.
@@ -81,9 +82,9 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
      *                  {@link me.zodac.folding.api.tc.result.MonthlyResult}
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
-     * @see #getMonthlyResult(Year, Month, String)
+     * @see #getMonthlyResult(Year, Month)
      */
-    public HttpResponse<String> getCurrentMonthlyResult(final String entityTag) throws FoldingRestException {
+    public HttpResponse<String> getCurrentMonthlyResult(final @Nullable String entityTag) throws FoldingRestException {
         return getMonthlyResult(DATE_TIME_UTILS.currentUtcYear(), DATE_TIME_UTILS.currentUtcMonth(), entityTag);
     }
 
@@ -121,7 +122,7 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getMonthlyResult(Year, Month)
      */
-    public HttpResponse<String> getMonthlyResult(final Year year, final Month month, final String entityTag) throws FoldingRestException {
+    public HttpResponse<String> getMonthlyResult(final Year year, final Month month, final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(monthlyResultUrl + "/result/" + year.getValue() + '/' + month.getValue()))

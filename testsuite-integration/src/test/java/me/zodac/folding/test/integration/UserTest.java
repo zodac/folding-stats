@@ -33,6 +33,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collection;
+import java.util.Optional;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.Role;
@@ -56,6 +57,7 @@ import me.zodac.folding.test.integration.util.rest.request.StubbedFoldingEndpoin
 import me.zodac.folding.test.integration.util.rest.request.TeamUtils;
 import me.zodac.folding.test.integration.util.rest.request.UserUtils;
 import me.zodac.folding.test.integration.util.rest.response.HttpResponseHeaderUtils;
+import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -763,12 +765,9 @@ class UserTest {
             .isEqualTo(updatedTeam);
 
         final Collection<User> usersAfterUpdate = UserUtils.getAll();
-        final User userWithId = findUserById(usersAfterUpdate, user.id());
+        final Optional<User> userWithId = findUserById(usersAfterUpdate, user.id());
 
-        assertThat(userWithId)
-            .as("Could not find updated user after team was updated: " + usersAfterUpdate)
-            .isNotNull();
-        assertThat(userWithId.team())
+        assertThat(userWithId.orElseThrow(() -> new AssertionError("Couldn't find updated user after team was updated: " + usersAfterUpdate)).team())
             .as("Expected user to contain updated team")
             .isEqualTo(updatedTeam);
     }
@@ -912,21 +911,21 @@ class UserTest {
             .isEqualTo(HttpURLConnection.HTTP_UNSUPPORTED_TYPE);
     }
 
-    private static User findUserById(final Collection<User> users, final int id) {
+    private static Optional<User> findUserById(final Collection<User> users, final int id) {
         for (final User user : users) {
             if (user.id() == id) {
-                return user;
+                return Optional.of(user);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     private static UserRequest generateUserRequest(final String foldingUserName,
                                                    final String displayName,
                                                    final String passkey,
                                                    final Category category,
-                                                   final String profileLink,
-                                                   final String liveStatsLink,
+                                                   final @Nullable String profileLink,
+                                                   final @Nullable String liveStatsLink,
                                                    final int hardwareId,
                                                    final int teamId,
                                                    final boolean isCaptain) {

@@ -19,23 +19,12 @@ package me.zodac.folding.api.util;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
  * Utility class to assist with encoding or decoding {@link String}s for authentication.
  */
 public final class EncodingUtils {
-
-    /**
-     * Key for the {@code username} value returned by {@link #decodeAuthentication(String)} and {@link #decodeBasicAuthentication(String)}.
-     */
-    public static final String DECODED_USERNAME_KEY = "userName";
-
-    /**
-     * Key for the {@code password} value returned by {@link #decodeAuthentication(String)} and {@link #decodeBasicAuthentication(String)}.
-     */
-    public static final String DECODED_PASSWORD_KEY = "password";
 
     /**
      * Prefix defining the <b>Basic</b> authentication scheme.
@@ -73,21 +62,17 @@ public final class EncodingUtils {
      * @return {@code true} if the value is <b>not</b> a basic authentication payload
      */
     public static boolean isInvalidBasicAuthentication(final String authorizationPayload) {
-        return authorizationPayload == null || !authorizationPayload.contains(BASIC_AUTHENTICATION_SCHEME);
+        return !authorizationPayload.contains(BASIC_AUTHENTICATION_SCHEME);
     }
 
     /**
      * Decodes the authorization payload for the {@value #BASIC_AUTHENTICATION_SCHEME} authentication scheme.
      *
      * @param authorizationPayload the authorization value to decode
-     * @return a {@link Map} with two keys, the {@link #DECODED_USERNAME_KEY} and {@link #DECODED_PASSWORD_KEY}
+     * @return the {@link DecodedLoginCredentials}
      * @throws IllegalArgumentException thrown if the input is not a valid {@link Base64} {@link String}
      */
-    public static Map<String, String> decodeBasicAuthentication(final String authorizationPayload) {
-        if (authorizationPayload == null) {
-            throw new IllegalArgumentException("Cannot decode null");
-        }
-
+    public static DecodedLoginCredentials decodeBasicAuthentication(final String authorizationPayload) {
         if (!authorizationPayload.startsWith(BASIC_AUTHENTICATION_SCHEME)) {
             throw new IllegalArgumentException(String.format("Cannot decode input that does not start with: '%s'", BASIC_AUTHENTICATION_SCHEME));
         }
@@ -96,7 +81,7 @@ public final class EncodingUtils {
         return decodeAuthentication(encodedUserNameAndPassword);
     }
 
-    private static Map<String, String> decodeAuthentication(final String encodedUserNameAndPassword) {
+    private static DecodedLoginCredentials decodeAuthentication(final String encodedUserNameAndPassword) {
         final String decodedUserNameAndPassword = new String(Base64.getDecoder().decode(encodedUserNameAndPassword), StandardCharsets.ISO_8859_1);
 
         if (!decodedUserNameAndPassword.contains(DECODED_USERNAME_PASSWORD_DELIMITER)) {
@@ -104,10 +89,6 @@ public final class EncodingUtils {
         }
 
         final String[] userNameAndPasswordTokens = DECODED_USERNAME_PASSWORD_DELIMITER_PATTERN.split(decodedUserNameAndPassword, 2);
-
-        return Map.of(
-            DECODED_USERNAME_KEY, userNameAndPasswordTokens[0],
-            DECODED_PASSWORD_KEY, userNameAndPasswordTokens[1]
-        );
+        return new DecodedLoginCredentials(userNameAndPasswordTokens[0], userNameAndPasswordTokens[1]);
     }
 }

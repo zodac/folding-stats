@@ -153,41 +153,6 @@ class StringUtilsTest {
     }
 
     @Test
-    void whenIsEqualSafe_givenFirstInputIsNull_andSecondIsNull_thenTrueIsReturned() {
-        final boolean result = StringUtils.isEqualSafe(null, null);
-        assertThat(result)
-            .isTrue();
-    }
-
-    @Test
-    void whenIsEqualSafe_givenFirstInputIsNull_andSecondIsNotNull_thenFalseIsReturned() {
-        final boolean result = StringUtils.isEqualSafe(null, "value");
-        assertThat(result)
-            .isFalse();
-    }
-
-    @Test
-    void whenIsEqualSafe_givenFirstInputIsNotNull_andSecondIsNull_thenFalseIsReturned() {
-        final boolean result = StringUtils.isEqualSafe("value", null);
-        assertThat(result)
-            .isFalse();
-    }
-
-    @Test
-    void whenIsEqualSafe_givenFirstInputIsNull_andSecondIsNull_andTheyAreTheSame_thenTrueIsReturned() {
-        final boolean result = StringUtils.isEqualSafe("value", "value");
-        assertThat(result)
-            .isTrue();
-    }
-
-    @Test
-    void whenIsEqualSafe_givenFirstInputIsNotNull_andSecondIsNotNull_andTheyAreDifferent_thenFalseIsReturned() {
-        final boolean result = StringUtils.isEqualSafe("value", "value2");
-        assertThat(result)
-            .isFalse();
-    }
-
-    @Test
     void whenUnescapeHtml_givenEscapedHtml_thenUnescapedHtmlIsReturned() {
         final String result = StringUtils.unescapeHtml("hello%20world");
         assertThat(result)

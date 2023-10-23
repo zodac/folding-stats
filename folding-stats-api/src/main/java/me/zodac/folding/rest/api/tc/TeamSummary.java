@@ -19,6 +19,7 @@ package me.zodac.folding.rest.api.tc;
 
 import java.util.Collection;
 import me.zodac.folding.api.tc.Team;
+import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
 
 /**
  * Summary of the stats of a {@link Team}s and its {@link me.zodac.folding.api.tc.User}s in the {@code Team Competition}.
@@ -27,7 +28,7 @@ import me.zodac.folding.api.tc.Team;
  * Available at the {@code folding/stats} REST endpoint.
  */
 public record TeamSummary(Team team,
-                          String captainName, // Can be null for cases where no captain is set for a team
+                          @Nullable String captainName, // Can be null for cases where no captain is set for a team
                           long teamPoints,
                           long teamMultipliedPoints,
                           int teamUnits,
@@ -53,17 +54,13 @@ public record TeamSummary(Team team,
      * @throws IllegalArgumentException thrown if {@code team} is null
      */
     public static TeamSummary createWithPoints(final Team team,
-                                               final String captainName,
+                                               final @Nullable String captainName,
                                                final long teamPoints,
                                                final long teamMultipliedPoints,
                                                final int teamUnits,
                                                final int rank,
                                                final Collection<UserSummary> activeUsers,
                                                final Collection<RetiredUserSummary> retiredUsers) {
-        if (team == null) {
-            throw new IllegalArgumentException("'team' must not be null");
-        }
-
         return new TeamSummary(team, captainName, teamPoints, teamMultipliedPoints, teamUnits, rank, activeUsers, retiredUsers);
     }
 
@@ -90,7 +87,7 @@ public record TeamSummary(Team team,
      * @throws IllegalArgumentException thrown if {@code team} is null
      */
     public static TeamSummary createWithDefaultRank(final Team team,
-                                                    final String captainName,
+                                                    final @Nullable String captainName,
                                                     final Collection<UserSummary> activeUsers,
                                                     final Collection<RetiredUserSummary> retiredUsers) {
         long teamPoints = 0L;

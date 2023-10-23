@@ -23,6 +23,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Set;
+import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
 
 /**
  * Convenience methods to assist with {@link String}s.
@@ -44,8 +45,10 @@ public final class StringUtils {
      * @param input the {@link String} to check
      * @return {@code true} if the {@link String} is either empty, or a valid URL
      */
-    public static boolean isBlankOrValidUrl(final String input) {
-        return isBlank(input) || isValidUrl(input);
+    public static boolean isBlankOrValidUrl(final @Nullable String input) {
+        return isBlank(input)
+            ||
+            isValidUrl(input);
     }
 
     /**
@@ -54,7 +57,7 @@ public final class StringUtils {
      * @param input the {@link String} to check
      * @return {@code true} if the {@link String} is either {@code null} or {@link String#isBlank()}
      */
-    public static boolean isBlank(final String input) {
+    public static boolean isBlank(final @Nullable String input) {
         return input == null || input.isBlank();
     }
 
@@ -64,7 +67,7 @@ public final class StringUtils {
      * @param input the {@link String} to check
      * @return {@code true} if the {@link String} is neither {@code null} nor {@link String#isBlank()}
      */
-    public static boolean isNotBlank(final String input) {
+    public static boolean isNotBlank(final @Nullable String input) {
         return !isBlank(input);
     }
 
@@ -75,11 +78,11 @@ public final class StringUtils {
      * @param second the second {@link String} to check
      * @return {@code true} if the {@link String}s are neither {@code null} nor {@link String#isBlank()}
      */
-    public static boolean isNeitherBlank(final String first, final String second) {
+    public static boolean isNeitherBlank(final @Nullable String first, @Nullable final String second) {
         return isNotBlank(first) && isNotBlank(second);
     }
 
-    private static boolean isValidUrl(final String input) {
+    private static boolean isValidUrl(final @Nullable String input) {
         final URI uri;
         try {
             uri = new URI(input);
@@ -92,17 +95,6 @@ public final class StringUtils {
     }
 
     /**
-     * Checks if the two {@link String}s are equal, even if one of them is {@code null}.
-     *
-     * @param first  the first {@link String}
-     * @param second the second {@link String}
-     * @return {@code true} if the {@link String}s are equal
-     */
-    public static boolean isEqualSafe(final String first, final String second) {
-        return isBlank(first) ? isBlank(second) : first.equals(second);
-    }
-
-    /**
      * Unescapes a HTML {@link String}.
      *
      * <p>
@@ -111,7 +103,7 @@ public final class StringUtils {
      * @param input the {@link String} to unescape
      * @return the unescaped {@link String}, or a blank {@link String} if the input is {@code null}
      */
-    public static String unescapeHtml(final String input) {
+    public static String unescapeHtml(final @Nullable String input) {
         if (input == null) {
             return "";
         }

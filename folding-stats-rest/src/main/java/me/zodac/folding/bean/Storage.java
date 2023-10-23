@@ -23,7 +23,6 @@ import java.time.Duration;
 import java.time.Month;
 import java.time.Year;
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -39,10 +38,12 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.api.util.DecodedLoginCredentials;
 import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -569,13 +570,12 @@ public class Storage {
     /**
      * Authenticates a system user with {@link DbManager}.
      *
-     * @param userName the system user username
-     * @param password the system user password
+     * @param decodedLoginCredentials the system user credentials
      * @return the {@link UserAuthenticationResult}
      */
     @NotCached
-    public UserAuthenticationResult authenticateSystemUser(final String userName, final String password) {
-        return dbManagerFunction(dbManager -> dbManager.authenticateSystemUser(userName, password));
+    public UserAuthenticationResult authenticateSystemUser(final DecodedLoginCredentials decodedLoginCredentials) {
+        return dbManagerFunction(dbManager -> dbManager.authenticateSystemUser(decodedLoginCredentials));
     }
 
     /**
@@ -584,7 +584,6 @@ public class Storage {
      * <p>
      * Based on the values of the input parameters, a different {@link Collection} of {@link HistoricStats} will be returned:
      * <ul>
-     *     <li>If the {@code year} is null, an empty {@link Collection} is returned</li>
      *     <li>If the {@code month} is null, the monthly {@link HistoricStats} is returned for the given {@link Year}</li>
      *     <li>If the {@code day} is <b>0</b>, the daily {@link HistoricStats} is returned for the given {@link Year}/{@link Month}</li>
      *     <li>Otherwise, the hourly {@link HistoricStats} is returned for the given {@link Year}/{@link Month}/{@code day}</li>
@@ -603,11 +602,7 @@ public class Storage {
      * @see DbManager#getHistoricStatsMonthly(int, Year)
      */
     @NotCached
-    public Collection<HistoricStats> getHistoricStats(final int userId, final Year year, final Month month, final int day) {
-        if (year == null) {
-            return List.of();
-        }
-
+    public Collection<HistoricStats> getHistoricStats(final int userId, final Year year, final @Nullable Month month, final int day) {
         return dbManagerFunction(dbManager -> {
             if (month == null) {
                 return dbManager.getHistoricStatsMonthly(userId, year);

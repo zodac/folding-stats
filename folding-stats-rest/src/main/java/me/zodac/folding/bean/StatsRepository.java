@@ -39,6 +39,7 @@ import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -392,7 +393,7 @@ public class StatsRepository {
         return UserSummary.createWithDefaultRank(user, userTcStats.points(), userTcStats.multipliedPoints(), userTcStats.units());
     }
 
-    private static String getCaptainDisplayName(final String teamName, final Iterable<User> usersOnTeam) {
+    private static @Nullable String getCaptainDisplayName(final String teamName, final Iterable<User> usersOnTeam) {
         for (final User user : usersOnTeam) {
             if (user.role() == Role.CAPTAIN) {
                 return user.displayName();

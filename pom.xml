@@ -90,6 +90,7 @@
         <checkstyle.version>10.12.4</checkstyle.version>
         <error_prone_core.version>2.23.0</error_prone_core.version>
         <licenses.version>1</licenses.version>
+        <nullaway.version>0.10.14</nullaway.version>
         <pitest-junit5-plugin.version>1.2.0</pitest-junit5-plugin.version>
         <pmd.version>7.0.0-rc4</pmd.version>
         <spotbugs.version>4.8.0</spotbugs.version>
@@ -197,6 +198,20 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
                 <scope>provided</scope>
+            </dependency>
+            <!-- Provides @NonNull/@Nullable compile-time checks for NullAway -->
+            <dependency>
+                <groupId>com.uber.nullaway</groupId>
+                <artifactId>nullaway</artifactId>
+                <version>${nullaway.version}</version>
+                <scope>provided</scope>
+                <exclusions>
+                    <!-- We only want the annotations, we won't be using guava -->
+                    <exclusion>
+                        <groupId>com.google.guava</groupId>
+                        <artifactId>guava</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.postgresql</groupId>
@@ -448,13 +463,18 @@
                     <configuration>
                         <release>${java-release}</release>
                         <showWarnings>false</showWarnings>
-
-                        <!-- Configuration for errorprone compiler checks -->
                         <annotationProcessorPaths>
+                            <!-- Configuration for errorprone compiler checks -->
                             <path>
                                 <groupId>com.google.errorprone</groupId>
                                 <artifactId>error_prone_core</artifactId>
                                 <version>${error_prone_core.version}</version>
+                            </path>
+                            <!-- Configuration for NullAway compiler checks -->
+                            <path>
+                                <groupId>com.uber.nullaway</groupId>
+                                <artifactId>nullaway</artifactId>
+                                <version>${nullaway.version}</version>
                             </path>
 
                             <!-- The errorprone checks will fail unless Lombok is also added -->
@@ -469,7 +489,7 @@
                             <arg>-Xdoclint:all</arg>
                             <!-- Configuration for ErrorProne -->
                             <arg>-XDcompilePolicy=simple</arg>
-                            <arg>-Xplugin:ErrorProne</arg>
+                            <arg>-Xplugin:ErrorProne -Xep:NullAway:ERROR -XepOpt:NullAway:AnnotatedPackages=${project.groupId}</arg>
                             <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</arg>
                             <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED</arg>
                             <arg>-J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED</arg>

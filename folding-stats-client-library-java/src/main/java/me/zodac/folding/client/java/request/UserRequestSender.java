@@ -29,6 +29,7 @@ import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.rest.api.util.RestUtilConstants;
+import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
 
 /**
  * Convenience class to send HTTP requests to the {@link me.zodac.folding.api.tc.User} REST endpoint.
@@ -70,7 +71,7 @@ public record UserRequestSender(String usersUrl) {
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> getAllWithoutPasskeys(final String entityTag) throws FoldingRestException {
+    public HttpResponse<String> getAllWithoutPasskeys(final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(usersUrl))
@@ -117,7 +118,8 @@ public record UserRequestSender(String usersUrl) {
      * @return the {@link HttpResponse} from the {@link HttpRequest}
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
-    public HttpResponse<String> getAllWithPasskeys(final String entityTag, final String userName, final String password) throws FoldingRestException {
+    public HttpResponse<String> getAllWithPasskeys(final @Nullable String entityTag, final String userName, final String password)
+        throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(usersUrl + "/all/passkey"))
@@ -165,7 +167,7 @@ public record UserRequestSender(String usersUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #get(int)
      */
-    public HttpResponse<String> get(final int userId, final String entityTag) throws FoldingRestException {
+    public HttpResponse<String> get(final int userId, final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
             .uri(URI.create(usersUrl + '/' + userId))
@@ -216,7 +218,7 @@ public record UserRequestSender(String usersUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      * @see #getWithPasskey(int, String, String)
      */
-    public HttpResponse<String> getWithPasskey(final int userId, final String entityTag, final String userName, final String password)
+    public HttpResponse<String> getWithPasskey(final int userId, final @Nullable String entityTag, final String userName, final String password)
         throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()

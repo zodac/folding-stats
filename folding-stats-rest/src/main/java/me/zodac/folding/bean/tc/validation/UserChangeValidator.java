@@ -17,8 +17,6 @@
 
 package me.zodac.folding.bean.tc.validation;
 
-import static me.zodac.folding.api.util.StringUtils.isEqualSafe;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -160,7 +158,7 @@ public class UserChangeValidator {
         if (previousUser.hardware().id() == userChangeRequest.hardwareId()
             && previousUser.foldingUserName().equals(userChangeRequest.foldingUserName())
             && previousUser.passkey().equals(userChangeRequest.passkey())
-            && isEqualSafe(previousUser.liveStatsLink(), userChangeRequest.liveStatsLink())) {
+            && Objects.equals(previousUser.liveStatsLink(), userChangeRequest.liveStatsLink())) {
             throw new ValidationException(userChangeRequest, "User already has the values supplied in UserChangeRequest");
         }
     }

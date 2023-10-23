@@ -39,13 +39,6 @@ class RetiredUserSummaryTest {
     }
 
     @Test
-    void testCreate_nullDisplayName() {
-        assertThatThrownBy(() -> RetiredUserSummary.create(1, null, 5L, 500L, 1, 2))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("displayName");
-    }
-
-    @Test
     void testCreate_blankDisplayName() {
         assertThatThrownBy(() -> RetiredUserSummary.create(1, "", 5L, 500L, 1, 2))
             .isInstanceOf(IllegalArgumentException.class)

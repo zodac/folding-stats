@@ -17,6 +17,8 @@
 
 package me.zodac.folding.api.util;
 
+import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
+
 /**
  * Utility class used to retrieve the name of log files.
  */
@@ -47,7 +49,7 @@ public enum LoggerName {
      */
     STATS("stats");
 
-    private static final String DEFAULT_VALUE = null;
+    private static final @Nullable String DEFAULT_VALUE = null;
 
     private final String loggerNameValue;
 
@@ -61,6 +63,7 @@ public enum LoggerName {
      *
      * @return the name of the logger
      */
+    @Nullable
     public String get() {
         if (EnvironmentVariableUtils.isEnabled("MULTIPLE_LOG_FILES")) {
             return loggerNameValue;

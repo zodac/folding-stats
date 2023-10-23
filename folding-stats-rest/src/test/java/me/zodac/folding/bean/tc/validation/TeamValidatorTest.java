@@ -33,6 +33,7 @@ import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -55,17 +56,6 @@ class TeamValidatorTest {
         assertThat(response)
             .as("Expected validation to pass")
             .isNotNull();
-    }
-
-    @Test
-    void whenValidatingCreate_givenTeamWithNullName_thenFailureResponseIsReturned() {
-        final TeamRequest team = generateTeamRequest(null, "teamDescription", "https://www.google.com");
-        final FoldingRepository foldingRepository = new MockFoldingRepository();
-
-        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
-        final ValidationException e = catchThrowableOfType(() -> teamValidator.create(team), ValidationException.class);
-        assertThat(e.getValidationFailure().errors())
-            .containsOnly("Field 'teamName' must not be empty");
     }
 
     @Test
@@ -170,21 +160,6 @@ class TeamValidatorTest {
         assertThat(response)
             .as("Expected validation to pass")
             .isNotNull();
-    }
-
-    @Test
-    void whenValidatingUpdate_givenTeamWithNullName_thenFailureResponseIsReturned() {
-        final TeamRequest team = generateTeamRequest(null, "teamDescription", "https://www.google.com");
-
-        final Team existingTeam = generateTeam();
-
-        final FoldingRepository foldingRepository = new MockFoldingRepository();
-
-        final TeamValidator teamValidator = new TeamValidator(foldingRepository);
-        final ValidationException e =
-            catchThrowableOfType(() -> teamValidator.update(team, existingTeam), ValidationException.class);
-        assertThat(e.getValidationFailure().errors())
-            .containsOnly("Field 'teamName' must not be empty");
     }
 
     @Test
@@ -401,7 +376,7 @@ class TeamValidatorTest {
         );
     }
 
-    private static TeamRequest generateTeamRequest(final String teamName, final String teamDescription, final String forumLink) {
+    private static TeamRequest generateTeamRequest(final String teamName, final @Nullable String teamDescription, final @Nullable String forumLink) {
         return new TeamRequest(teamName, teamDescription, forumLink);
     }
 }

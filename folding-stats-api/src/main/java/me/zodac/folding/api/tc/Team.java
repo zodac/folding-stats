@@ -18,8 +18,6 @@
 package me.zodac.folding.api.tc;
 
 import java.util.Objects;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -27,6 +25,7 @@ import lombok.experimental.Accessors;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
+import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
 
 /**
  * POJO defining a single {@link Team} participating in the {@code Team Competition}. There is a limit on the number of users each team can have,
@@ -35,7 +34,6 @@ import me.zodac.folding.rest.api.tc.request.TeamRequest;
  * <p>
  * While each {@link Team} is made up of {@link User}s we do not keep any reference to the {@link User} in this class.
  */
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Accessors(fluent = true)
 @ToString(doNotUseGetters = true)
@@ -50,8 +48,23 @@ public final class Team implements ResponsePojo {
 
     private final int id;
     private final String teamName;
-    private final String teamDescription;
-    private final String forumLink;
+    private final @Nullable String teamDescription;
+    private final @Nullable String forumLink;
+
+    /**
+     * Constructor.
+     *
+     * @param id              the ID
+     * @param teamName        the name of the team
+     * @param teamDescription an optional description for the team
+     * @param forumLink       a link to the {@link Team} thread on the forum
+     */
+    public Team(final int id, final String teamName, @Nullable final String teamDescription, @Nullable final String forumLink) {
+        this.id = id;
+        this.teamName = teamName;
+        this.teamDescription = teamDescription;
+        this.forumLink = forumLink;
+    }
 
     /**
      * Creates a {@link Team}.
@@ -65,7 +78,7 @@ public final class Team implements ResponsePojo {
      * @param forumLink       a link to the {@link Team} thread on the forum
      * @return the created {@link Team}
      */
-    public static Team create(final int teamId, final String teamName, final String teamDescription, final String forumLink) {
+    public static Team create(final int teamId, final String teamName, final @Nullable String teamDescription, final @Nullable String forumLink) {
         final String unescapedTeamName = StringUtils.unescapeHtml(teamName);
         final String teamDescriptionOrNull = StringUtils.isBlank(teamDescription) ? null : teamDescription;
         final String forumLinkOrNull = StringUtils.isBlank(forumLink) ? null : forumLink;

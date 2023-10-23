@@ -18,7 +18,6 @@
 package me.zodac.folding.rest.api.tc;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collection;
 import java.util.List;
@@ -163,14 +162,6 @@ class TeamSummaryTest {
             .toList();
         assertThat(retiredUserRanks)
             .containsExactly(6, 6, 6, 9, 10);
-    }
-
-    @Test
-    void testCreate_nullTeam() {
-        assertThatThrownBy(
-            () -> TeamSummary.createWithDefaultRank(null, "captainName", List.of(), List.of()))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("team");
     }
 
     @Test

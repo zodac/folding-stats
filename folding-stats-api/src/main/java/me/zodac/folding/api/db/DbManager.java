@@ -32,6 +32,7 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.RetiredUserTcStats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.api.tc.stats.UserTcStats;
+import me.zodac.folding.api.util.DecodedLoginCredentials;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
 
 /**
@@ -340,9 +341,8 @@ public interface DbManager {
      * <p>
      * The provided {@code password} will be hashed in the DB, so we verify the hashes match.
      *
-     * @param userName the system user username
-     * @param password the system user password
+     * @param decodedLoginCredentials the system user credentials
      * @return the {@link UserAuthenticationResult}
      */
-    UserAuthenticationResult authenticateSystemUser(String userName, String password);
+    UserAuthenticationResult authenticateSystemUser(DecodedLoginCredentials decodedLoginCredentials);
 }
