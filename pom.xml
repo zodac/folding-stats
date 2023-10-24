@@ -22,12 +22,6 @@
         <java-release>21</java-release>
         <maven-release>3.9.4</maven-release>
 
-        <!-- License Properties -->
-        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
-        <license-file>${project.parent.basedir}/ci/license-template.txt</license-file>
-        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
-        <license-header-definition-file>${project.parent.basedir}/ci/license-header-definition.txt</license-header-definition-file>
-
         <!-- Lint Properties -->
         <!-- All disabled by default, activated through profiles -->
         <skip-linters>true</skip-linters>
@@ -105,17 +99,16 @@
         <spotbugs-maven-plugin.version>4.7.3.6</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
-        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
-        <dependency-check-suppression-file>${project.parent.basedir}/ci/dependency-check-suppression.xml</dependency-check-suppression-file>
-        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
-        <checkstyle-file>${project.parent.basedir}/ci/checkstyle.xml</checkstyle-file>
+        <!--suppress UnresolvedMavenProperty, files are only used in child modules -->
+        <ci-config-directory>${project.parent.basedir}/ci</ci-config-directory>
+        <checkstyle-file>${ci-config-directory}/checkstyle.xml</checkstyle-file>
+        <dependency-check-suppression-file>${ci-config-directory}/dependency-check-suppression.xml</dependency-check-suppression-file>
+        <license-file>${ci-config-directory}/license-template.txt</license-file>
+        <license-header-definition-file>${ci-config-directory}/license-header-definition.txt</license-header-definition-file>
         <pitest-test-strength-threshold>100</pitest-test-strength-threshold>
-        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
-        <pmd-ruleset>${project.parent.basedir}/ci/pmd-ruleset.xml</pmd-ruleset>
-        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
-        <spotbugs-include-file>${project.parent.basedir}/ci/spotbugs-include-filter-file.xml</spotbugs-include-file>
-        <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
-        <spotbugs-exclude-file>${project.parent.basedir}/ci/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
+        <pmd-ruleset>${ci-config-directory}/pmd-ruleset.xml</pmd-ruleset>
+        <spotbugs-include-file>${ci-config-directory}/spotbugs-include-filter-file.xml</spotbugs-include-file>
+        <spotbugs-exclude-file>${ci-config-directory}/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
 
         <!-- ProGuard 3PP Versions -->
         <proguard-base.version>7.4.0</proguard-base.version>
@@ -702,7 +695,7 @@
                         <configLocation>${checkstyle-file}</configLocation>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
                         <!--suppress UnresolvedMavenProperty, file is only used in child modules -->
-                        <propertyExpansion>checkstyle.config.path=${project.parent.basedir}/ci</propertyExpansion>
+                        <propertyExpansion>checkstyle.config.path=${ci-config-directory}</propertyExpansion>
                         <skip>${skip-linters}</skip>
                         <violationSeverity>info</violationSeverity>
                     </configuration>
@@ -865,6 +858,7 @@
                             <param>*RetiredUserSummary</param>
                             <param>*UserStats</param>
                         </excludedClasses>
+                        <!-- TODO: Review these once classes are converted to records -->
                         <excludedMethods>
                             <param>canEqual</param>
                             <param>equals</param>
