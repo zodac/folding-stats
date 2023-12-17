@@ -148,7 +148,7 @@ public final class SecurityInterceptor implements HandlerInterceptor {
 
     private static DecodedLoginCredentials extractDecodedCredentials(final HttpServletRequest request) {
         final String authorizationProperty = request.getHeader(RestHeader.AUTHORIZATION.headerName());
-        if (EncodingUtils.isInvalidBasicAuthentication(authorizationProperty)) {
+        if (authorizationProperty == null || EncodingUtils.isInvalidBasicAuthentication(authorizationProperty)) {
             SECURITY_LOGGER.warn("Invalid {} value provided at '{}': '{}'", RestHeader.AUTHORIZATION.headerName(),
                 request.getRequestURI(), authorizationProperty);
             throw new UnauthorizedException();

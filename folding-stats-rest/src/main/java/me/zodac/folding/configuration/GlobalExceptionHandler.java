@@ -56,7 +56,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
  * (like {@link HttpMessageNotReadableException}), and also handle the generic {@link Exception}.
  */
 @ControllerAdvice
-public class PropagatedExceptionHandler {
+public class GlobalExceptionHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

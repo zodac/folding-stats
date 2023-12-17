@@ -15,43 +15,47 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package me.zodac.folding.rest.controller;
+package me.zodac.folding.configuration;
 
 import static me.zodac.folding.rest.response.Responses.redirect;
 
-import io.swagger.v3.oas.annotations.Hidden;
-import jakarta.servlet.http.HttpServletRequest;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.api.util.LoggerName;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
- * {@link RestController} used to handle invalid URL requests. Redirects to the URL defined in environment variable <b>REDIRECT_URL</b>.
+ * {@link ControllerAdvice} used to handle invalid URL requests. Redirects to the URL defined in environment variable <b>REDIRECT_URL</b>.
+ *
+ * <p>
+ * Marked as {@link Ordered#HIGHEST_PRECEDENCE} so it takes precedence over {@link GlobalExceptionHandler}.
  */
-@Hidden
-@RestController
-@RequestMapping("/error") // Must be on the RestController to override built-in Spring handler for '/error'
-public class ErrorHandlerController implements ErrorController {
+@ControllerAdvice
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class InvalidUrlHandler {
 
     private static final Logger AUDIT_LOGGER = LogManager.getLogger(LoggerName.AUDIT.get());
     private static final String REDIRECT_URL = EnvironmentVariableUtils.getOrDefault("REDIRECT_URL", "https://etf.axihub.ca/");
 
     /**
-     * {@link GetMapping} for the {@code /error} URL (any request with an invalid URL will be sent to this endpoint by Spring).
+     * {@link ExceptionHandler} for when an invalid URL is requested.
      *
-     * @param request the {@link HttpServletRequest}
+     * <p>
+     * # Returns a <b>303_SEE_OTHER</b> response with no response body.
+     *
+     * @param e the {@link NoResourceFoundException}
      * @return {@link HttpStatus#SEE_OTHER} {@link ResponseEntity} with the <b>Location</b> header to the URL defined by <b>REDIRECT_URL</b>
      */
-    @GetMapping
-    public ResponseEntity<Void> redirectOnError(final HttpServletRequest request) {
-        AUDIT_LOGGER.debug("Invalid request found at '{}', redirecting to '{}", request::getRequestURI, () -> REDIRECT_URL);
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Void> redirectOnError(final NoResourceFoundException e) {
+        AUDIT_LOGGER.debug("Invalid request received, redirecting to '{}", () -> REDIRECT_URL);
         return redirect(REDIRECT_URL);
     }
 }
