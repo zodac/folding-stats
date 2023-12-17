@@ -17,10 +17,9 @@
 
 package me.zodac.folding.configuration;
 
-import static me.zodac.folding.rest.response.Responses.redirect;
-
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.api.util.LoggerName;
+import me.zodac.folding.rest.response.Responses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.core.Ordered;
@@ -54,8 +53,8 @@ public class InvalidUrlHandler {
      * @return {@link HttpStatus#SEE_OTHER} {@link ResponseEntity} with the <b>Location</b> header to the URL defined by <b>REDIRECT_URL</b>
      */
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<Void> redirectOnError(final NoResourceFoundException e) {
-        AUDIT_LOGGER.debug("Invalid request received, redirecting to '{}", () -> REDIRECT_URL);
-        return redirect(REDIRECT_URL);
+    public ResponseEntity<Void> redirect(final NoResourceFoundException e) {
+        AUDIT_LOGGER.debug("Invalid request received, redirecting to '{}", REDIRECT_URL, e);
+        return Responses.redirect(REDIRECT_URL);
     }
 }
