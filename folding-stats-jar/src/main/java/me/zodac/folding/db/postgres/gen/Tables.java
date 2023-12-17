@@ -26,7 +26,7 @@ import org.jooq.Result;
 /**
  * Convenience access to all tables in public.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
 
     /**
@@ -51,7 +51,7 @@ public class Tables {
           Configuration configuration
         , String __1
     ) {
-        return configuration.dsl().selectFrom(PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
+        return configuration.dsl().selectFrom(me.zodac.folding.db.postgres.gen.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
               __1
         )).fetch();
     }
@@ -62,8 +62,8 @@ public class Tables {
     public static PgpArmorHeaders PGP_ARMOR_HEADERS(
           String __1
     ) {
-        return PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
-              __1
+        return me.zodac.folding.db.postgres.gen.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
+            __1
         );
     }
 
@@ -73,8 +73,8 @@ public class Tables {
     public static PgpArmorHeaders PGP_ARMOR_HEADERS(
           Field<String> __1
     ) {
-        return PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
-              __1
+        return me.zodac.folding.db.postgres.gen.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
+            __1
         );
     }
 

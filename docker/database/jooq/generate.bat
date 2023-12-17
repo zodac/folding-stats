@@ -1,1 +1,1 @@
-java -cp jooq-3.14.11.jar;jooq-meta-3.14.11.jar;jooq-codegen-3.14.11.jar;reactive-streams-1.0.2.jar;postgresql-42.2.19.jar;jaxb-api-2.3.1.jar org.jooq.codegen.GenerationTool jooq-config.xml
+java -cp jooq-3.19.0.jar;jooq-meta-3.19.0.jar;jooq-codegen-3.19.0.jar;reactive-streams-1.0.3.jar;postgresql-42.7.1.jar;r2dbc-spi-1.0.0.RELEASE.jar;jakarta.xml.bind-api-3.0.0.jar org.jooq.codegen.GenerationTool jooq-config.xml
