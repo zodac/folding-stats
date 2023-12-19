@@ -35,14 +35,17 @@ public class AccessControlFilter extends OncePerRequestFilter {
 
     private static final Duration MAX_AGE = Duration.of(1, ChronoUnit.HOURS);
 
+    /**
+     * Defines the {@code Access-Control-*} headers for each request.
+     */
     @Override
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response,
                                     final FilterChain filterChain) throws ServletException, IOException {
         response.addHeader("Access-Control-Allow-Origin", "*");
-        response.addHeader("Access-Control-Allow-Methods", "GET, FETCH, POST, DELETE, PUT, PATCH, HEAD");
+        response.addHeader("Access-Control-Allow-Methods", "DELETE, GET, HEAD, PATCH, POST, PUT");
         response.addHeader("Access-Control-Allow-Headers",
-            "Origin, Accept, Authorization, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-        response.addHeader("Access-Control-Expose-Headers", "Access-Control-Allow-Origin, Access-Control-Allow-Credentials");
+            "Accept, Access-Control-Request-Headers, Access-Control-Request-Method, Authorization, Content-Type, Origin, X-Requested-With");
+        response.addHeader("Access-Control-Expose-Headers", "Access-Control-Allow-Credentials, Access-Control-Allow-Origin");
         response.addHeader("Access-Control-Allow-Credentials", "true");
         response.addHeader("Access-Control-Max-Age", String.valueOf(MAX_AGE.toSeconds()));
         filterChain.doFilter(request, response);

@@ -154,8 +154,8 @@ public class UserController implements UserEndpoint {
     @RolesAllowed("admin")
     @PutMapping(path = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> updateById(@PathVariable("userId") final int userId,
-                                        @RequestBody final UserRequest userRequest,
-                                        final HttpServletRequest request) {
+                                           @RequestBody final UserRequest userRequest,
+                                           final HttpServletRequest request) {
         AUDIT_LOGGER.info("PUT request for user received at '{}' with request {}", request::getRequestURI, () -> userRequest);
 
         final User existingUser = foldingRepository.getUserWithPasskey(userId);

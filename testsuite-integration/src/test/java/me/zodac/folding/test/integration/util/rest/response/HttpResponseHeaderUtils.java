@@ -30,8 +30,27 @@ import me.zodac.folding.rest.api.header.RestHeader;
  */
 public final class HttpResponseHeaderUtils {
 
+    private static final Map<String, List<String>> CORS_HEADERS = Map.of(
+        "Access-Control-Allow-Origin", List.of("*"),
+        "Access-Control-Allow-Methods", List.of("DELETE, GET, HEAD, PATCH, POST, PUT"),
+        "Access-Control-Allow-Headers",
+        List.of("Accept, Access-Control-Request-Headers, Access-Control-Request-Method, Authorization, Content-Type, Origin, X-Requested-With"),
+        "Access-Control-Expose-Headers", List.of("Access-Control-Allow-Credentials, Access-Control-Allow-Origin"),
+        "Access-Control-Allow-Credentials", List.of("true"),
+        "Access-Control-Max-Age", List.of("3600")
+    );
+
     private HttpResponseHeaderUtils() {
 
+    }
+
+    /**
+     * Map of the expected CORS headers (name and value) for a {@link HttpResponse}.
+     *
+     * @return the expected CORS headers
+     */
+    public static Map<String, List<String>> expectedCorsHeaders() {
+        return CORS_HEADERS;
     }
 
     /**

@@ -111,7 +111,7 @@ services:
       - "5433:5432"
 
   selenium_chrome:
-    image: selenium/standalone-chrome:117.0
+    image: selenium/standalone-chrome:120.0
     container_name: selenium_chrome
     hostname: selenium_chrome
     depends_on:
@@ -122,7 +122,7 @@ services:
       - development
 
   selenium_firefox:
-    image: selenium/standalone-firefox:117.0
+    image: selenium/standalone-firefox:120.0
     container_name: selenium_firefox
     hostname: selenium_firefox
     depends_on:

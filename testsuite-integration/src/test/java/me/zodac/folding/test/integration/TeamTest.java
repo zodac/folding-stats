@@ -41,6 +41,8 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.client.java.response.TeamResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
@@ -51,6 +53,7 @@ import me.zodac.folding.test.integration.util.DummyDataGenerator;
 import me.zodac.folding.test.integration.util.TestConstants;
 import me.zodac.folding.test.integration.util.rest.request.TeamUtils;
 import me.zodac.folding.test.integration.util.rest.request.UserUtils;
+import me.zodac.folding.test.integration.util.rest.response.HttpResponseHeaderUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -76,7 +79,7 @@ class TeamTest {
 
     @Test
     @Order(1)
-    void whenGettingAllTeams_givenNoTeamHasBeenCreated_thenEmptyJsonResponseIsReturned_andHas200Status() throws FoldingRestException {
+    void whenGetAllTeams_givenNoTeamHasBeenCreated_thenEmptyJsonResponseIsReturned_andHas200Status() throws FoldingRestException {
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.getAll();
         assertThat(response.statusCode())
             .as("Did not receive a 200_OK HTTP response: " + response.body())
@@ -93,7 +96,29 @@ class TeamTest {
     }
 
     @Test
-    void whenCreatingTeam_givenPayloadIsValid_thenTheCreatedTeamIsReturnedInResponse_andHasId_andResponseHas201Status()
+    void whenGetAllTeams_givenTeamHasBeenCreated_thenAllAreReturned_andHas200Status_withCorsHeaders() throws FoldingRestException {
+        final Team team = create(generateTeam());
+        final HttpResponse<String> response = TEAM_REQUEST_SENDER.getAll();
+        assertThat(response.statusCode())
+            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_OK);
+
+        final Collection<Team> allTeams = TeamResponseParser.getAll(response);
+        final int xTotalCount = getTotalCount(response);
+
+        assertThat(xTotalCount)
+            .isEqualTo(allTeams.size());
+
+        assertThat(allTeams)
+            .contains(team);
+
+        final Map<String, List<String>> httpHeaders = response.headers().map();
+        assertThat(httpHeaders)
+            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
+    }
+
+    @Test
+    void whenCreatingTeam_givenPayloadIsValid_thenTheCreatedTeamIsReturnedInResponse_andHasId_andHas201Status_withCorsHeaders()
         throws FoldingRestException {
         final TeamRequest teamToCreate = generateTeam();
 
@@ -107,10 +132,14 @@ class TeamTest {
             .as("Did not receive created object as JSON response: " + response.body())
             .extracting("teamName", "teamDescription", "forumLink")
             .containsExactly(teamToCreate.teamName(), teamToCreate.teamDescription(), teamToCreate.forumLink());
+
+        final Map<String, List<String>> httpHeaders = response.headers().map();
+        assertThat(httpHeaders)
+            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenGettingTeam_givenValidTeamId_thenTeamIsReturned_andHas200Status() throws FoldingRestException {
+    void whenGetTeam_givenValidTeamId_thenTeamIsReturned_andHas200Status_withCorsHeaders() throws FoldingRestException {
         final int teamId = create(generateTeam()).id();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamId);
@@ -122,10 +151,14 @@ class TeamTest {
         assertThat(team.id())
             .as("Did not receive the expected team: " + response.body())
             .isEqualTo(teamId);
+
+        final Map<String, List<String>> httpHeaders = response.headers().map();
+        assertThat(httpHeaders)
+            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenGettingTeam_givenValidTeamName_thenTeamIsReturned_andHas200Status() throws FoldingRestException {
+    void whenGetTeam_givenValidTeamName_thenTeamIsReturned_andHas200Status_withCorsHeaders() throws FoldingRestException {
         final String teamName = create(generateTeam()).teamName();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamName);
@@ -137,10 +170,14 @@ class TeamTest {
         assertThat(team.teamName())
             .as("Did not receive the expected team: " + response.body())
             .isEqualTo(teamName);
+
+        final Map<String, List<String>> httpHeaders = response.headers().map();
+        assertThat(httpHeaders)
+            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenUpdatingTeam_givenValidTeamId_andValidPayload_thenUpdatedTeamIsReturned_andNoNewTeamIsCreated_andHas200Status()
+    void whenUpdatingTeam_givenValidTeamId_andValidPayload_thenUpdatedTeamIsReturned_andNoNewTeamIsCreated_andHas200Status_withCorsHeaders()
         throws FoldingRestException {
         final Team createdTeam = create(generateTeam());
         final int initialSize = TeamUtils.getNumberOfTeams();
@@ -163,12 +200,14 @@ class TeamTest {
         assertThat(allTeamsAfterUpdate)
             .as("Expected no new team instances to be created")
             .isEqualTo(initialSize);
+
+        final Map<String, List<String>> httpHeaders = response.headers().map();
+        assertThat(httpHeaders)
+            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
-    // Negative/alternative test cases
-
     @Test
-    void whenDeletingTeam_givenValidTeamId_thenTeamIsDeleted_andHas200Status_andTeamCountIsReduced_andTeamCannotBeRetrievedAgain()
+    void whenDeletingTeam_givenValidTeamId_thenTeamIsDeleted_andHas200Status_andTeamCountIsReduced_andTeamCannotBeRetrievedAgain_withCorsHeaders()
         throws FoldingRestException {
         final int teamId = create(generateTeam()).id();
         final int initialSize = TeamUtils.getNumberOfTeams();
@@ -185,9 +224,15 @@ class TeamTest {
 
         final int newSize = TeamUtils.getNumberOfTeams();
         assertThat(newSize)
-            .as("Get all response did not return the initial teams - deleted team")
+            .as("Get all response did not return (initial teams - deleted team)")
             .isEqualTo(initialSize - 1);
+
+        final Map<String, List<String>> httpHeaders = response.headers().map();
+        assertThat(httpHeaders)
+            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
+
+    // Negative/alternative test cases
 
     @Test
     void whenCreatingTeam_givenTeamWithInvalidUrl_thenJsonResponseWithErrorIsReturned_andHas400Status() throws FoldingRestException {
