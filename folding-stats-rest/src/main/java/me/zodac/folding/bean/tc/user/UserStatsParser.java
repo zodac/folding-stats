@@ -19,6 +19,8 @@ package me.zodac.folding.bean.tc.user;
 
 import static me.zodac.folding.api.util.NumberUtils.formatWithCommas;
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import java.util.List;
 import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.state.ParsingState;
@@ -48,6 +50,10 @@ public class UserStatsParser {
     private final StatsRepository statsRepository;
     private final UserTcStatsCalculator userTcStatsCalculator;
 
+    // Prometheus timers
+    private final Timer allUserStatsRetrieval;
+    private final Timer singleUserStatsRetrieval;
+
     /**
      * {@link Autowired} constructor.
      *
@@ -58,10 +64,19 @@ public class UserStatsParser {
     @Autowired
     public UserStatsParser(final FoldingStatsRetriever foldingStatsRetriever,
                            final StatsRepository statsRepository,
-                           final UserTcStatsCalculator userTcStatsCalculator) {
+                           final UserTcStatsCalculator userTcStatsCalculator,
+                           final MeterRegistry registry) {
         this.foldingStatsRetriever = foldingStatsRetriever;
         this.statsRepository = statsRepository;
         this.userTcStatsCalculator = userTcStatsCalculator;
+
+        allUserStatsRetrieval = Timer.builder("stats_retrieval_per_user")
+            .description("The time taken to retrieve TC stats for single user")
+            .register(registry);
+
+        singleUserStatsRetrieval = Timer.builder("stats_retrieval_all_users")
+            .description("The time taken to retrieve TC stats for all user")
+            .register(registry);
     }
 
     /**
@@ -84,13 +99,18 @@ public class UserStatsParser {
 
         LOGGER.info("Starting Folding stats parsing");
 
-        for (final User user : users) {
-            try {
-                updateTcStatsForUser(user);
-            } catch (final Exception e) {
-                LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.displayName(), user.id(), e);
+        allUserStatsRetrieval.record(() -> {
+            for (final User user : users) {
+                try {
+                    singleUserStatsRetrieval.record(() ->
+                        updateTcStatsForUser(user)
+                    );
+                } catch (final Exception e) {
+                    LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.displayName(), user.id(), e);
+                }
             }
-        }
+        });
+
         LOGGER.info("Finished Folding stats parsing");
 
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
