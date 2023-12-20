@@ -15,6 +15,8 @@
     <properties>
         <!-- Spring Configuration -->
         <main-class>me.zodac.folding.FoldingStatsApplication</main-class>
+        <!-- Value set for local (non-docker) testing, docker deployments will override this value -->
+        <logging-config-location>${project.parent.basedir}/docker/backend/config/log4j2.xml</logging-config-location>
 
         <!-- JaCoCo Configuration -->
         <line-coverage>0.10</line-coverage>

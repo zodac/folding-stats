@@ -25,16 +25,21 @@ RUN apt-get update && apt-get install -yqq --no-install-recommends openssl && \
     cat folding-stats.pem | sed -n '/^-----BEGIN CERTIFICATE-----/,/^-----END CERTIFICATE-----/{p;/^-----END CERTIFICATE-----/q}' > folding-stats.crt && \
     cat folding-stats.pem | sed -n '/^-----BEGIN PRIVATE KEY-----/,/^-----END PRIVATE KEY-----/{p;/^-----END PRIVATE KEY-----/q}' > folding-stats.key
 
-FROM maven:${MAVEN_VERSION}-eclipse-temurin-${JAVA_VERSION} AS maven_builder
+# Pulling maven image but only to retrieve the binary - we don't mind the JDK version here
+FROM maven:${MAVEN_VERSION}-eclipse-temurin-21 AS maven_builder
+
+ARG JAVA_VERSION
+FROM eclipse-temurin:${JAVA_VERSION}-jdk AS application_builder
+
+COPY --from=maven_builder /usr/share/maven/ /usr/share/maven/
+
+ENV MAVEN_HOME "/usr/share/maven/"
+ENV PATH "${PATH}:${MAVEN_HOME}/bin/"
 
 # Build folding-stats
 RUN mkdir --parents /folding-stats-spring-boot
 
 WORKDIR /folding-stats-spring-boot
-
-ARG NEXUS_URL
-COPY ./docker/backend/scripts/configure_custom_nexus.sh /tmp/configure_custom_nexus.sh
-RUN /tmp/configure_custom_nexus.sh "${NEXUS_URL}"
 
 # Copy source code
 # Adding and building each module incrementally so we can retain some docker caches when building for tests
@@ -53,7 +58,7 @@ COPY ./folding-stats-rest/pom.xml ./folding-stats-rest/pom.xml
 COPY ./folding-stats-rest/src/main ./folding-stats-rest/src/main
 
 RUN --mount=type=cache,target=/root/.m2 cd ./folding-stats-rest && \
-    mvn verify -P docker && \
+    mvn verify -P docker -Dlogging-config-location="/var/backend/log4j2.xml" && \
     mv ./target/folding-stats-rest*.jar /folding-stats.jar
 
 ARG JAVA_VERSION
@@ -71,11 +76,11 @@ RUN jlink --compress=2 \
 FROM debian:${DEBIAN_VERSION}-slim AS spring_base
 
 COPY --from=jdk_builder /opt/jdk /opt/jdk
-COPY --from=maven_builder /folding-stats.jar /folding-stats.jar
+COPY --from=application_builder /folding-stats.jar /folding-stats.jar
 COPY ./docker/backend/scripts/startup.sh /startup.sh
 COPY ./docker/backend/config/log4j2.xml /var/backend/log4j2.xml
 
-ENV JAVA_HOME "/opt/jdk"
+ENV JAVA_HOME "/opt/jdk/"
 ENV PATH "${PATH}:${JAVA_HOME}/bin"
 
 # Updating system packages, and installing:

@@ -37,7 +37,6 @@ services:
         MAVEN_VERSION: "3.9.4"
         # Build arguments
         KEYSTORE_PASSWORD: "shroot"
-        NEXUS_URL: "${NEXUS_URL}"
     container_name: backend_dev
     hostname: backend-dev # Using a dash as Java's URI builder will fail with an underscore
     environment:
