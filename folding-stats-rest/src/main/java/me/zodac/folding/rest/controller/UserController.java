@@ -22,6 +22,7 @@ import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.ok;
 
 import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
@@ -88,6 +89,11 @@ public class UserController implements UserEndpoint {
             .register(registry);
         userDeletes = Counter.builder("user_delete_counter")
             .description("Number of User deletions through the REST endpoint")
+            .register(registry);
+
+        // Update frequency defined by property 'management.metrics.export.statsd.polling-frequency'
+        Gauge.builder("books_count", () -> foldingRepository.getAllUsersWithoutPasskeys().size())
+            .description("The current number of Users in the system")
             .register(registry);
     }
 
