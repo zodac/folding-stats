@@ -60,6 +60,7 @@ public class UserStatsParser {
      * @param foldingStatsRetriever the {@link FoldingStatsRetriever}
      * @param statsRepository       the {@link StatsRepository}
      * @param userTcStatsCalculator the {@link UserTcStatsCalculator}
+     * @param registry              the Prometheus {@link MeterRegistry}
      */
     @Autowired
     public UserStatsParser(final FoldingStatsRetriever foldingStatsRetriever,
@@ -70,12 +71,12 @@ public class UserStatsParser {
         this.statsRepository = statsRepository;
         this.userTcStatsCalculator = userTcStatsCalculator;
 
-        allUserStatsRetrieval = Timer.builder("stats_retrieval_per_user")
-            .description("The time taken to retrieve TC stats for single user")
+        allUserStatsRetrieval = Timer.builder("stats_retrieval_all_users")
+            .description("The time taken to retrieve TC stats for all users")
             .register(registry);
 
-        singleUserStatsRetrieval = Timer.builder("stats_retrieval_all_users")
-            .description("The time taken to retrieve TC stats for all user")
+        singleUserStatsRetrieval = Timer.builder("stats_retrieval_single_user")
+            .description("The time taken to retrieve TC stats for a single user")
             .register(registry);
     }
 
