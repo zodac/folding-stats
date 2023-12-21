@@ -145,6 +145,7 @@ services:
     command:
       - --config.file=/etc/prometheus/prometheus.yml
       - --web.config.file=/etc/prometheus/web-config.yml
+      - --storage.tsdb.retention=30d
     container_name: prometheus
     hostname: prometheus
     depends_on:
@@ -160,6 +161,30 @@ services:
     volumes_from:
       - backend:ro
 
+  grafana:
+    build:
+      context: .
+      dockerfile: docker/metrics/grafana/Dockerfile
+      args:
+        # Docker image versions
+        GRAFANA_VERSION: "10.0.10"
+        # Build arguments
+        ADMIN_USERNAME: "${ADMIN_USER}"
+        ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
+    container_name: grafana
+    hostname: grafana
+    depends_on:
+      - prometheus
+    environment:
+      GF_PATHS_CONFIG: "/opt/custom.ini"
+    networks:
+      - production
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    volumes:
+      - grafana-data:/var/lib/grafana
+
 networks:
   production:
 
@@ -174,3 +199,5 @@ volumes:
   prometheus_data:
   # Volume to save the generated SSL certs for Prometheus
   prometheus_certs:
+  # Volume to save Grafana data
+  grafana-data:
