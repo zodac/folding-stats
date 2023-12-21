@@ -92,7 +92,7 @@ public class UserController implements UserEndpoint {
             .register(registry);
 
         // Update frequency defined by property 'management.metrics.export.statsd.polling-frequency'
-        Gauge.builder("books_count", () -> foldingRepository.getAllUsersWithoutPasskeys().size())
+        Gauge.builder("current_user_count", () -> foldingRepository.getAllUsersWithoutPasskeys().size())
             .description("The current number of Users in the system")
             .register(registry);
     }
