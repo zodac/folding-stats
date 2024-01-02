@@ -678,7 +678,7 @@
 
                 <!-- Manual execution: -->
                 <!-- mvn license:check -Dlint -->
-                <!-- To fix missing/invalid licences, run the following in each module: mvn license:format -Dlint -Dyear="2023" -->
+                <!-- To fix missing/invalid licences, run the following in each module: mvn license:format -Dlint -Dyear="2024" -->
                 <plugin>
                     <groupId>com.mycila</groupId>
                     <artifactId>license-maven-plugin</artifactId>
