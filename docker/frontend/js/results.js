@@ -59,6 +59,9 @@ function getPastResult(month, monthName, year) {
                 loadTeamLeaderboard(jsonResponse['teamLeaderboard'])
                 loadCategoryLeaderboard(jsonResponse['userCategoryLeaderboard'])
 
+                hide("leaderboard_div")
+                hide("category_div")
+                show("missing_div")
                 hide("loader")
                 show("main_parent")
             })
@@ -77,10 +80,9 @@ function getPastResult(month, monthName, year) {
             hide("leaderboard_div")
             hide("category_div")
             show("missing_div")
+            hide("loader")
+            show("main_parent")
         }
-
-        hide("loader")
-        show("main_parent")
     })
     .catch((error) => {
         hide("loader")
