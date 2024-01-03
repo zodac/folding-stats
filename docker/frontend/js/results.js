@@ -37,9 +37,9 @@ function getPastResult(month, monthName, year) {
     hide("main_parent")
 
     fetch(REST_ENDPOINT_URL+"/results/result/" + selectedYear + "/" + selectedMonth)
-    .then(response => {
-        jsonResponse = response.json()
-        if(response.ok) {
+    .then(response => response.json().then(data => ({status: response.status, body: data})))
+    .then(function(jsonBlob) {
+        if(jsonBlob.status === 200) {
             leaderboardDiv = document.getElementById("leaderboard_div")
             while (leaderboardDiv.firstChild) {
                 leaderboardDiv.removeChild(leaderboardDiv.lastChild)
@@ -50,8 +50,8 @@ function getPastResult(month, monthName, year) {
                 categoryDiv.removeChild(categoryDiv.lastChild)
             }
 
-            loadTeamLeaderboard(jsonResponse['teamLeaderboard'])
-            loadCategoryLeaderboard(jsonResponse['userCategoryLeaderboard'])
+            loadTeamLeaderboard(jsonBlob.body['teamLeaderboard'])
+            loadCategoryLeaderboard(jsonBlob.body['userCategoryLeaderboard'])
 
             show("leaderboard_div")
             show("category_div")

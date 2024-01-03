@@ -71,24 +71,6 @@ public record MonthlyResult(List<TeamLeaderboardEntry> teamLeaderboard,
     }
 
     /**
-     * Creates an empty {@link MonthlyResult}.
-     *
-     * <p>
-     * Will contain an {@link List#of()} for {@code teamLeaderboard}, and {@code userCategoryLeaderboard} will be populated with an
-     * entry for each instance of {@link Category#getAllValues()}, with a default value of {@link List#of()}.
-     *
-     * @return the empty {@link MonthlyResult}
-     */
-    public static MonthlyResult empty() {
-        final Map<Category, List<UserCategoryLeaderboardEntry>> emptyCategoryResult = new EnumMap<>(Category.class);
-        for (final Category category : Category.getAllValues()) {
-            emptyCategoryResult.put(category, List.of());
-        }
-
-        return createWithCurrentDateTime(List.of(), emptyCategoryResult);
-    }
-
-    /**
      * Takes an existing {@link MonthlyResult} and creates a new instance with an updated {@code userCategoryLeaderboard}.
      *
      * <p>

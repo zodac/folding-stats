@@ -43,28 +43,6 @@ import org.junit.jupiter.api.Test;
 class MonthlyResultTest {
 
     @Test
-    void verifyEmpty() {
-        final MonthlyResult monthlyResult = MonthlyResult.empty();
-
-        assertThat(monthlyResult.teamLeaderboard())
-            .isEmpty();
-
-        final Map<Category, List<UserCategoryLeaderboardEntry>> userCategoryLeaderboard = monthlyResult.userCategoryLeaderboard();
-
-        Set.of(
-            Category.AMD_GPU,
-            Category.NVIDIA_GPU,
-            Category.WILDCARD
-        ).forEach(category -> {
-            assertThat(userCategoryLeaderboard)
-                .containsKey(category);
-
-            assertThat(userCategoryLeaderboard.get(category))
-                .isEmpty();
-        });
-    }
-
-    @Test
     void verifyHasNoStats() {
         final List<TeamLeaderboardEntry> teamLeaderboardEntries = new ArrayList<>();
         teamLeaderboardEntries.add(
