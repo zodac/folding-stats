@@ -59,9 +59,9 @@ function getPastResult(month, monthName, year) {
                 loadTeamLeaderboard(jsonResponse['teamLeaderboard'])
                 loadCategoryLeaderboard(jsonResponse['userCategoryLeaderboard'])
 
-                hide("leaderboard_div")
-                hide("category_div")
-                show("missing_div")
+                show("leaderboard_div")
+                show("category_div")
+                hide("missing_div")
                 hide("loader")
                 show("main_parent")
             })
@@ -71,11 +71,8 @@ function getPastResult(month, monthName, year) {
                 return false
             })
         } else {
-            missingMonthSpan = document.getElementById("missing_month")
-            missingMonthSpan.innerHTML = selectedMonthName
-
-            missingYearSpan = document.getElementById("missing_year")
-            missingYearSpan.innerHTML = selectedYear
+            missingMonthSpan = document.getElementById("missing_month").innerHTML = selectedMonthName
+            missingYearSpan = document.getElementById("missing_year").innerHTML = selectedYear
 
             hide("leaderboard_div")
             hide("category_div")
