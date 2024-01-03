@@ -37,25 +37,36 @@ function getPastResult(month, monthName, year) {
     hide("main_parent")
 
     fetch(REST_ENDPOINT_URL+"/results/result/" + selectedYear + "/" + selectedMonth)
-    .then(response => response.json().then(data => ({status: response.status, body: data})))
-    .then(function(jsonBlob) {
-        if(jsonBlob.status === 200) {
-            leaderboardDiv = document.getElementById("leaderboard_div")
-            while (leaderboardDiv.firstChild) {
-                leaderboardDiv.removeChild(leaderboardDiv.lastChild)
-            }
+    .then(response => {
+        if (response.ok) {
+            // Make a fresh call which we will parse to JSON
+            // Cannot use original call since parsing to JSON will cause the 404 scenario to fail
+            fetch(REST_ENDPOINT_URL+"/results/result/" + selectedYear + "/" + selectedMonth)
+            .then(response => {
+                return response.json()
+            })
+            .then(function(jsonResponse) {
+                leaderboardDiv = document.getElementById("leaderboard_div")
+                while (leaderboardDiv.firstChild) {
+                    leaderboardDiv.removeChild(leaderboardDiv.lastChild)
+                }
 
-            categoryDiv = document.getElementById("category_div")
-            while (categoryDiv.firstChild) {
-                categoryDiv.removeChild(categoryDiv.lastChild)
-            }
+                categoryDiv = document.getElementById("category_div")
+                while (categoryDiv.firstChild) {
+                    categoryDiv.removeChild(categoryDiv.lastChild)
+                }
 
-            loadTeamLeaderboard(jsonBlob.body['teamLeaderboard'])
-            loadCategoryLeaderboard(jsonBlob.body['userCategoryLeaderboard'])
+                loadTeamLeaderboard(jsonResponse['teamLeaderboard'])
+                loadCategoryLeaderboard(jsonResponse['userCategoryLeaderboard'])
 
-            show("leaderboard_div")
-            show("category_div")
-            hide("missing_div")
+                hide("loader")
+                show("main_parent")
+            })
+            .catch((error) => {
+                hide("loader")
+                console.error("Unexpected error loading result: ", error)
+                return false
+            })
         } else {
             missingMonthSpan = document.getElementById("missing_month")
             missingMonthSpan.innerHTML = selectedMonthName
