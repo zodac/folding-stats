@@ -36,6 +36,7 @@ import me.zodac.folding.rest.api.tc.RetiredUserSummary;
 import me.zodac.folding.rest.api.tc.TeamSummary;
 import me.zodac.folding.rest.api.tc.UserSummary;
 import me.zodac.folding.rest.api.tc.historic.HistoricStats;
+import me.zodac.folding.rest.exception.NotFoundException;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -88,11 +89,12 @@ public class StatsRepository {
      *
      * @param month the {@link Month} of the {@link MonthlyResult} to be retrieved
      * @param year  the {@link Year} of the {@link MonthlyResult} to be retrieved
-     * @return the {@code Team Competition} {@link MonthlyResult}, or {@link MonthlyResult#empty()} if none exists
+     * @return an {@link Optional} of the {@code Team Competition} {@link MonthlyResult}
+     * @throws NotFoundException thrown if the {@link MonthlyResult} cannot be found
      */
     public MonthlyResult getMonthlyResult(final Month month, final Year year) {
         return storage.getMonthlyResult(month, year)
-            .orElse(MonthlyResult.empty());
+            .orElseThrow(() -> new NotFoundException(MonthlyResult.class, String.format("%s/%s", year, month)));
     }
 
     /**

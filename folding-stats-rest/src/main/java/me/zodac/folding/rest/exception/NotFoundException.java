@@ -18,7 +18,6 @@
 package me.zodac.folding.rest.exception;
 
 import java.io.Serial;
-import me.zodac.folding.api.ResponsePojo;
 
 /**
  * {@link Exception} thrown when a requested object cannot be found.
@@ -34,7 +33,7 @@ public class NotFoundException extends RuntimeException {
      * @param type the type of object that cannot be found
      * @param id   the ID of the object that cannot be found
      */
-    public NotFoundException(final Class<? extends ResponsePojo> type, final int id) {
+    public NotFoundException(final Class<?> type, final int id) {
         super(String.format("No %s found with ID '%s'", type.getSimpleName(), id));
     }
 
@@ -44,7 +43,7 @@ public class NotFoundException extends RuntimeException {
      * @param type the type of object that cannot be found
      * @param name the name of the object that cannot be found
      */
-    public NotFoundException(final Class<? extends ResponsePojo> type, final String name) {
+    public NotFoundException(final Class<?> type, final String name) {
         super(String.format("No %s found with name '%s'", type.getSimpleName(), name));
     }
 }

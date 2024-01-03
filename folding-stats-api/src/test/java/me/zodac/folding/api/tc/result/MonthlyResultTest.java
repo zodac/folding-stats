@@ -20,6 +20,7 @@ package me.zodac.folding.api.tc.result;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -137,7 +138,11 @@ class MonthlyResultTest {
         assertThat(totalTeamUnits)
             .isEqualTo(1);
 
-        final MonthlyResult emptyMonthlyResult = MonthlyResult.empty();
+        final Map<Category, List<UserCategoryLeaderboardEntry>> emptyCategoryResult = new EnumMap<>(Category.class);
+        for (final Category category : Category.getAllValues()) {
+            emptyCategoryResult.put(category, List.of());
+        }
+        final MonthlyResult emptyMonthlyResult = MonthlyResult.createWithCurrentDateTime(List.of(), emptyCategoryResult);
         assertThat(emptyMonthlyResult.hasNoStats())
             .isTrue();
         long totalEmptyTeamPoints = 0L;

@@ -79,46 +79,16 @@ class MonthlyResultTest {
 
         final HttpResponse<String> response = MONTHLY_RESULT_REQUEST_SENDER.getCurrentMonthlyResult();
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_OK);
-
-        final MonthlyResult monthlyResult = MonthlyResultResponseParser.getMonthlyResult(response);
-        assertThat(monthlyResult.teamLeaderboard())
-            .as("Expected no results in team leaderboard")
-            .isEmpty();
-
-        assertThat(monthlyResult.userCategoryLeaderboard().keySet())
-            .as("Expected each category to have an entry in user category leaderboard")
-            .hasSize(Category.getAllValues().size());
-
-        for (final Map.Entry<Category, List<UserCategoryLeaderboardEntry>> categoryEntry : monthlyResult.userCategoryLeaderboard().entrySet()) {
-            assertThat(categoryEntry.getValue())
-                .as("Expected category '" + categoryEntry.getKey() + "' to have no results")
-                .isEmpty();
-        }
+            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     @Test
     void whenGettingMonthlyResult_andGivenMonthHasNoEntry_thenEmptyResultIsReturned_andResponseHas200Status() throws FoldingRestException {
         final HttpResponse<String> response = MONTHLY_RESULT_REQUEST_SENDER.getMonthlyResult(Year.of(1999), Month.APRIL);
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
-            .isEqualTo(HttpURLConnection.HTTP_OK);
-
-        final MonthlyResult monthlyResult = MonthlyResultResponseParser.getMonthlyResult(response);
-        assertThat(monthlyResult.teamLeaderboard())
-            .as("Expected no results in team leaderboard")
-            .isEmpty();
-
-        assertThat(monthlyResult.userCategoryLeaderboard().keySet())
-            .as("Expected each category to have an entry in user category leaderboard")
-            .hasSize(Category.getAllValues().size());
-
-        for (final Map.Entry<Category, List<UserCategoryLeaderboardEntry>> categoryEntry : monthlyResult.userCategoryLeaderboard().entrySet()) {
-            assertThat(categoryEntry.getValue())
-                .as("Expected category '" + categoryEntry.getKey() + "' to have no results")
-                .isEmpty();
-        }
+            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
     @Test

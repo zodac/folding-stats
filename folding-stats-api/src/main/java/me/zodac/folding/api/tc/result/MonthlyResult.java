@@ -116,7 +116,7 @@ public record MonthlyResult(List<TeamLeaderboardEntry> teamLeaderboard,
      * <p>
      * This can occur if a month's stats have been reset before attempting to create the {@link MonthlyResult}
      *
-     * @return {@code true} if no {@link TeamLeaderboardEntry} has any points, multiplied points or units.
+     * @return {@code true} if no {@link TeamLeaderboardEntry} has any points, multiplied points or units
      */
     public boolean hasNoStats() {
         long totalTeamPoints = 0L;

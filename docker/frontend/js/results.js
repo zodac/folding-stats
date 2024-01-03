@@ -38,21 +38,35 @@ function getPastResult(month, monthName, year) {
 
     fetch(REST_ENDPOINT_URL+"/results/result/" + selectedYear + "/" + selectedMonth)
     .then(response => {
-        return response.json()
-    })
-    .then(function(jsonResponse) {
-        leaderboardDiv = document.getElementById("leaderboard_div")
-        while (leaderboardDiv.firstChild) {
-            leaderboardDiv.removeChild(leaderboardDiv.lastChild)
-        }
+        jsonResponse = response.json()
+        if(response.ok) {
+            leaderboardDiv = document.getElementById("leaderboard_div")
+            while (leaderboardDiv.firstChild) {
+                leaderboardDiv.removeChild(leaderboardDiv.lastChild)
+            }
 
-        categoryDiv = document.getElementById("category_div")
-        while (categoryDiv.firstChild) {
-            categoryDiv.removeChild(categoryDiv.lastChild)
-        }
+            categoryDiv = document.getElementById("category_div")
+            while (categoryDiv.firstChild) {
+                categoryDiv.removeChild(categoryDiv.lastChild)
+            }
 
-        loadTeamLeaderboard(jsonResponse['teamLeaderboard'])
-        loadCategoryLeaderboard(jsonResponse['userCategoryLeaderboard'])
+            loadTeamLeaderboard(jsonResponse['teamLeaderboard'])
+            loadCategoryLeaderboard(jsonResponse['userCategoryLeaderboard'])
+
+            show("leaderboard_div")
+            show("category_div")
+            hide("missing_div")
+        } else {
+            missingMonthSpan = document.getElementById("missing_month")
+            missingMonthSpan.innerHTML = selectedMonthName
+
+            missingYearSpan = document.getElementById("missing_year")
+            missingYearSpan.innerHTML = selectedYear
+
+            hide("leaderboard_div")
+            hide("category_div")
+            show("missing_div")
+        }
 
         hide("loader")
         show("main_parent")
