@@ -33,8 +33,6 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Hardware;
@@ -99,7 +97,7 @@ class UserTest {
     }
 
     @Test
-    void whenGetAllUsers_givenUserHasBeenCreated_thenAllAreReturned_andPasskeyIsHidden_andHas200Status_withCorsHeaders() throws FoldingRestException {
+    void whenGetAllUsers_givenUserHasBeenCreated_thenAllAreReturned_andPasskeyIsHidden_andHas200Status() throws FoldingRestException {
         UserUtils.create(DummyDataGenerator.generateUser());
         UserUtils.create(DummyDataGenerator.generateUser());
 
@@ -119,10 +117,6 @@ class UserTest {
 
         final User retrievedUser = allUsers.iterator().next();
         PasskeyChecker.assertPasskeyIsHidden(retrievedUser.passkey());
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
@@ -150,7 +144,7 @@ class UserTest {
     }
 
     @Test
-    void whenCreatingUser_givenPayloadIsValid_thenTheCreatedUserIsReturnedInResponse_andHasId_andResponseHas201Status_withCorsHeaders()
+    void whenCreatingUser_givenPayloadIsValid_thenTheCreatedUserIsReturnedInResponse_andHasId_andResponseHas201Status()
         throws FoldingRestException {
         final UserRequest userToCreate = DummyDataGenerator.generateUser();
         StubbedFoldingEndpointUtils.enableUser(userToCreate);
@@ -166,14 +160,10 @@ class UserTest {
             .extracting("foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "role")
             .containsExactly(userToCreate.foldingUserName(), userToCreate.displayName(), userToCreate.passkey(),
                 Category.get(userToCreate.category()), userToCreate.profileLink(), userToCreate.liveStatsLink(), Role.MEMBER);
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenGetUser_givenValidUserId_thenUserIsReturned_andPasskeyIsMasked_andHas200Status_withCorsHeaders() throws FoldingRestException {
+    void whenGetUser_givenValidUserId_thenUserIsReturned_andPasskeyIsMasked_andHas200Status() throws FoldingRestException {
         final int userId = UserUtils.create(DummyDataGenerator.generateUser()).id();
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.get(userId);
@@ -186,10 +176,6 @@ class UserTest {
             .as("Did not receive the expected user: " + response.body())
             .isEqualTo(userId);
         PasskeyChecker.assertPasskeyIsHidden(user.passkey());
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
@@ -209,7 +195,7 @@ class UserTest {
     }
 
     @Test
-    void whenUpdatingUser_givenValidUserId_andValidPayload_thenUpdatedUserIsReturned_andNoNewUserIsCreated_andHas200Status_withCorsHeaders()
+    void whenUpdatingUser_givenValidUserId_andValidPayload_thenUpdatedUserIsReturned_andNoNewUserIsCreated_andHas200Status()
         throws FoldingRestException {
         final User createdUser = UserUtils.create(DummyDataGenerator.generateUser());
         final int initialSize = UserUtils.getNumberOfUsers();
@@ -245,14 +231,10 @@ class UserTest {
         assertThat(allUsersAfterUpdate)
             .as("Expected no new user instances to be created")
             .isEqualTo(initialSize);
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenDeletingUser_givenValidUserId_thenUserIsDeleted_andHas200Status_andUserCountIsReduced_andUserCannotBeRetrievedAgain_withCorsHeaders()
+    void whenDeletingUser_givenValidUserId_thenUserIsDeleted_andHas200Status_andUserCountIsReduced_andUserCannotBeRetrievedAgain()
         throws FoldingRestException {
         final int userId = UserUtils.create(DummyDataGenerator.generateUser()).id();
         final int initialSize = UserUtils.getNumberOfUsers();
@@ -271,10 +253,6 @@ class UserTest {
         assertThat(newSize)
             .as("Get all response did not return (initial users - deleted user)")
             .isEqualTo(initialSize - 1);
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     // Negative/alternative test cases

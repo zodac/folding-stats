@@ -44,60 +44,60 @@
         <hikariCP.version>5.1.0</hikariCP.version>
         <jakartaee-web-api.version>10.0.0</jakartaee-web-api.version>
         <jersey-server.version>3.1.5</jersey-server.version>
-        <jooq.version>3.19.0</jooq.version>
-        <jsoup.version>1.17.1</jsoup.version>
-        <log4j.version>3.0.0-alpha1</log4j.version>
+        <jooq.version>3.19.3</jooq.version>
+        <jsoup.version>1.17.2</jsoup.version>
+        <log4j.version>3.0.0-beta1</log4j.version>
         <lombok.version>1.18.30</lombok.version>
-        <micrometer.version>1.12.1</micrometer.version>
+        <micrometer.version>1.12.2</micrometer.version>
         <postgresql.version>42.7.1</postgresql.version>
         <resilience4j.version>2.2.0</resilience4j.version>
         <snakeyaml.version>2.2</snakeyaml.version>
-        <spring-boot.version>3.2.0</spring-boot.version>
+        <spring-boot.version>3.2.2</spring-boot.version>
         <springdoc-openapi.version>2.3.0</springdoc-openapi.version>
         <slf4j-api.version>2.0.9</slf4j-api.version>
 
         <!-- Test 3PP Versions -->
-        <assertj-core.version>3.24.2</assertj-core.version>
+        <assertj-core.version>3.25.2</assertj-core.version>
         <embedded-postgres.version>2.0.6</embedded-postgres.version>
         <embedded-postgres-binaries-bom.version>16.1.1</embedded-postgres-binaries-bom.version>
-        <flyway-core.version>10.3.0</flyway-core.version>
+        <flyway-core.version>10.6.0</flyway-core.version>
         <junit-bom.version>5.10.1</junit-bom.version>
-        <selenium-java.version>4.16.1</selenium-java.version>
+        <selenium-java.version>4.17.0</selenium-java.version>
 
         <!-- Plugin Versions -->
         <build-helper-maven-plugin.version>3.5.0</build-helper-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
         <jmeter-maven-plugin.version>3.8.0</jmeter-maven-plugin.version>
         <maven-clean-plugin.version>3.3.2</maven-clean-plugin.version>
-        <maven-compiler-plugin.version>3.12.0</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.6.1</maven-dependency-plugin.version>
         <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
-        <maven-failsafe-plugin.version>3.2.3</maven-failsafe-plugin.version>
+        <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
         <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-project-info-reports-plugin.version>3.5.0</maven-project-info-reports-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
         <maven-site-plugin.version>4.0.0-M13</maven-site-plugin.version>
-        <maven-surefire-plugin.version>3.2.3</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>10.12.6</checkstyle.version>
+        <checkstyle.version>10.13.0</checkstyle.version>
         <error_prone_core.version>2.23.0</error_prone_core.version>
         <licenses.version>1</licenses.version>
-        <nullaway.version>0.10.18</nullaway.version>
+        <nullaway.version>0.10.21</nullaway.version>
         <pitest-junit5-plugin.version>1.2.1</pitest-junit5-plugin.version>
         <pmd.version>7.0.0-rc4</pmd.version>
         <spotbugs.version>4.8.3</spotbugs.version>
 
         <!-- Linter Plugin Versions -->
-        <dependency-check-maven.version>9.0.7</dependency-check-maven.version>
+        <dependency-check-maven.version>9.0.9</dependency-check-maven.version>
         <license-maven-plugin.version>4.3</license-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.21.1-pmd-7.0.0-SNAPSHOT</maven-pmd-plugin.version>
-        <pitest-maven.version>1.15.3</pitest-maven.version>
-        <spotbugs-maven-plugin.version>4.8.2.0</spotbugs-maven-plugin.version>
+        <pitest-maven.version>1.15.6</pitest-maven.version>
+        <spotbugs-maven-plugin.version>4.8.3.0</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, files are only used in child modules -->

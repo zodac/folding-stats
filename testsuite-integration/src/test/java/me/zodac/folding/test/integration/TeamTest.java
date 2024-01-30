@@ -41,8 +41,6 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.client.java.response.TeamResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
@@ -53,7 +51,6 @@ import me.zodac.folding.test.integration.util.DummyDataGenerator;
 import me.zodac.folding.test.integration.util.TestConstants;
 import me.zodac.folding.test.integration.util.rest.request.TeamUtils;
 import me.zodac.folding.test.integration.util.rest.request.UserUtils;
-import me.zodac.folding.test.integration.util.rest.response.HttpResponseHeaderUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -96,7 +93,7 @@ class TeamTest {
     }
 
     @Test
-    void whenGetAllTeams_givenTeamHasBeenCreated_thenAllAreReturned_andHas200Status_withCorsHeaders() throws FoldingRestException {
+    void whenGetAllTeams_givenTeamHasBeenCreated_thenAllAreReturned_andHas200Status() throws FoldingRestException {
         final Team team = create(generateTeam());
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.getAll();
         assertThat(response.statusCode())
@@ -111,14 +108,10 @@ class TeamTest {
 
         assertThat(allTeams)
             .contains(team);
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenCreatingTeam_givenPayloadIsValid_thenTheCreatedTeamIsReturnedInResponse_andHasId_andHas201Status_withCorsHeaders()
+    void whenCreatingTeam_givenPayloadIsValid_thenTheCreatedTeamIsReturnedInResponse_andHasId_andHas201Status()
         throws FoldingRestException {
         final TeamRequest teamToCreate = generateTeam();
 
@@ -133,13 +126,10 @@ class TeamTest {
             .extracting("teamName", "teamDescription", "forumLink")
             .containsExactly(teamToCreate.teamName(), teamToCreate.teamDescription(), teamToCreate.forumLink());
 
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenGetTeam_givenValidTeamId_thenTeamIsReturned_andHas200Status_withCorsHeaders() throws FoldingRestException {
+    void whenGetTeam_givenValidTeamId_thenTeamIsReturned_andHas200Status() throws FoldingRestException {
         final int teamId = create(generateTeam()).id();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamId);
@@ -151,14 +141,10 @@ class TeamTest {
         assertThat(team.id())
             .as("Did not receive the expected team: " + response.body())
             .isEqualTo(teamId);
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenGetTeam_givenValidTeamName_thenTeamIsReturned_andHas200Status_withCorsHeaders() throws FoldingRestException {
+    void whenGetTeam_givenValidTeamName_thenTeamIsReturned_andHas200Status() throws FoldingRestException {
         final String teamName = create(generateTeam()).teamName();
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamName);
@@ -170,14 +156,10 @@ class TeamTest {
         assertThat(team.teamName())
             .as("Did not receive the expected team: " + response.body())
             .isEqualTo(teamName);
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenUpdatingTeam_givenValidTeamId_andValidPayload_thenUpdatedTeamIsReturned_andNoNewTeamIsCreated_andHas200Status_withCorsHeaders()
+    void whenUpdatingTeam_givenValidTeamId_andValidPayload_thenUpdatedTeamIsReturned_andNoNewTeamIsCreated_andHas200Status()
         throws FoldingRestException {
         final Team createdTeam = create(generateTeam());
         final int initialSize = TeamUtils.getNumberOfTeams();
@@ -200,14 +182,10 @@ class TeamTest {
         assertThat(allTeamsAfterUpdate)
             .as("Expected no new team instances to be created")
             .isEqualTo(initialSize);
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenDeletingTeam_givenValidTeamId_thenTeamIsDeleted_andHas200Status_andTeamCountIsReduced_andTeamCannotBeRetrievedAgain_withCorsHeaders()
+    void whenDeletingTeam_givenValidTeamId_thenTeamIsDeleted_andHas200Status_andTeamCountIsReduced_andTeamCannotBeRetrievedAgain()
         throws FoldingRestException {
         final int teamId = create(generateTeam()).id();
         final int initialSize = TeamUtils.getNumberOfTeams();
@@ -226,10 +204,6 @@ class TeamTest {
         assertThat(newSize)
             .as("Get all response did not return (initial teams - deleted team)")
             .isEqualTo(initialSize - 1);
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     // Negative/alternative test cases

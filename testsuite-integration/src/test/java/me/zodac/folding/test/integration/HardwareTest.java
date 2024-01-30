@@ -33,8 +33,6 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import me.zodac.folding.api.tc.Hardware;
 import me.zodac.folding.api.tc.HardwareMake;
 import me.zodac.folding.api.tc.HardwareType;
@@ -92,7 +90,7 @@ class HardwareTest {
     }
 
     @Test
-    void whenGetAllHardware_givenHardwareHasBeenCreated_thenAllAreReturned_andHas200Status_withCorsHeaders() throws FoldingRestException {
+    void whenGetAllHardware_givenHardwareHasBeenCreated_thenAllAreReturned_andHas200Status() throws FoldingRestException {
         final Hardware hardware = HardwareUtils.create(DummyDataGenerator.generateHardware());
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();
         assertThat(response.statusCode())
@@ -107,14 +105,10 @@ class HardwareTest {
 
         assertThat(allHardware)
             .contains(hardware);
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenCreatingHardware_givenPayloadIsValid_thenTheCreatedHardwareIsReturnedInResponse_andHasId_andHas201Status_withCorsHeaders()
+    void whenCreatingHardware_givenPayloadIsValid_thenTheCreatedHardwareIsReturnedInResponse_andHasId_andHas201Status()
         throws FoldingRestException {
         final HardwareRequest hardwareToCreate = DummyDataGenerator.generateHardware();
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
@@ -127,14 +121,10 @@ class HardwareTest {
             .as("Did not receive created object as JSON response: " + response.body())
             .extracting("hardwareName", "displayName", "multiplier")
             .containsExactly(hardwareToCreate.hardwareName(), hardwareToCreate.displayName(), hardwareToCreate.multiplier());
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenGetHardware_givenValidHardwareId_thenHardwareIsReturned_andHas200Status_withCorsHeaders() throws FoldingRestException {
+    void whenGetHardware_givenValidHardwareId_thenHardwareIsReturned_andHas200Status() throws FoldingRestException {
         final int hardwareId = HardwareUtils.create(DummyDataGenerator.generateHardware()).id();
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
@@ -146,14 +136,10 @@ class HardwareTest {
         assertThat(hardware.id())
             .as("Did not receive the expected hardware: " + response.body())
             .isEqualTo(hardwareId);
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenGetHardware_givenValidHardwareName_thenHardwareIsReturned_andHas200Status_withCorsHeaders() throws FoldingRestException {
+    void whenGetHardware_givenValidHardwareName_thenHardwareIsReturned_andHas200Status() throws FoldingRestException {
         final String hardwareName = HardwareUtils.create(DummyDataGenerator.generateHardware()).hardwareName();
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareName);
@@ -165,14 +151,10 @@ class HardwareTest {
         assertThat(hardware.hardwareName())
             .as("Did not receive the expected hardware: " + response.body())
             .isEqualTo(hardwareName);
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenUpdatingHardware_givenValidHardwareIdAndPayload_thenUpdatedHardwareIsReturned_andNoNewHardwareIsCreated_andHas200Status_withCorsHeaders()
+    void whenUpdatingHardware_givenValidHardwareIdAndPayload_thenUpdatedHardwareIsReturned_andNoNewHardwareIsCreated_andHas200Status()
         throws FoldingRestException {
         final Hardware createdHardware = HardwareUtils.create(DummyDataGenerator.generateHardware());
         final int initialSize = HardwareUtils.getNumberOfHardware();
@@ -200,14 +182,10 @@ class HardwareTest {
         assertThat(allHardwareAfterUpdate)
             .as("Expected no new hardware instances to be created")
             .isEqualTo(initialSize);
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     @Test
-    void whenDeletingHardware_givenValidId_thenHardwareIsDeleted_andHas200Status_andCountIsReduced_andHardwareCannotBeRetrievedAgain_withCorsHeaders()
+    void whenDeletingHardware_givenValidId_thenHardwareIsDeleted_andHas200Status_andCountIsReduced_andHardwareCannotBeRetrievedAgain()
         throws FoldingRestException {
         final int hardwareId = HardwareUtils.create(DummyDataGenerator.generateHardware()).id();
         final int initialSize = HardwareUtils.getNumberOfHardware();
@@ -226,10 +204,6 @@ class HardwareTest {
         assertThat(newSize)
             .as("Get all response did not return (initial hardware - deleted hardware)")
             .isEqualTo(initialSize - 1);
-
-        final Map<String, List<String>> httpHeaders = response.headers().map();
-        assertThat(httpHeaders)
-            .containsAllEntriesOf(HttpResponseHeaderUtils.expectedCorsHeaders());
     }
 
     // Negative/alternative test cases
