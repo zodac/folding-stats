@@ -6,7 +6,7 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         # Docker image versions
-        NODE_VERSION: "21.6.0" # https://hub.docker.com/_/node
+        NODE_VERSION: "21.6.2" # https://hub.docker.com/_/node
         # Build arguments
         ADMIN_EMAIL_ADDRESS: "email@test.com"
         FORUM_LINK: "https://extremehw.net/forum/125-extreme-team-folding"
@@ -32,7 +32,7 @@ services:
       dockerfile: docker/backend/Dockerfile
       args:
         # Docker image versions
-        DEBIAN_VERSION: "12.4" # https://hub.docker.com/_/debian
+        DEBIAN_VERSION: "12.5" # https://hub.docker.com/_/debian
         JAVA_VERSION: "21"     # https://hub.docker.com/_/eclipse-temurin
         MAVEN_VERSION: "3.9.6" # https://hub.docker.com/_/maven
         # Build arguments
@@ -84,7 +84,7 @@ services:
       dockerfile: docker/database/Dockerfile
       args:
         # Docker image versions
-        POSTGRES_VERSION: "16.1" # https://hub.docker.com/_/postgres
+        POSTGRES_VERSION: "16.2" # https://hub.docker.com/_/postgres
         # Build arguments
         ADMIN_USERNAME: "root"
         ADMIN_PASSWORD: "shroot"
@@ -110,7 +110,7 @@ services:
       - "5433:5432"
 
   selenium_chrome:
-    image: selenium/standalone-chrome:120.0
+    image: selenium/standalone-chrome:121.0
     container_name: selenium_chrome
     hostname: selenium_chrome
     depends_on:

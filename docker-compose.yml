@@ -8,7 +8,7 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         # Docker image versions
-        NODE_VERSION: "21.6.0" # https://hub.docker.com/_/node
+        NODE_VERSION: "21.6.2" # https://hub.docker.com/_/node
         # Build arguments
         ADMIN_EMAIL_ADDRESS: "${ADMIN_EMAIL_ADDRESS}"
         FORUM_LINK: "${FORUM_LINK}"
@@ -35,7 +35,7 @@ services:
       dockerfile: docker/backend/Dockerfile
       args:
         # Docker image versions
-        DEBIAN_VERSION: "12.4" # https://hub.docker.com/_/debian
+        DEBIAN_VERSION: "12.5" # https://hub.docker.com/_/debian
         JAVA_VERSION: "21"     # https://hub.docker.com/_/eclipse-temurin
         MAVEN_VERSION: "3.9.6" # https://hub.docker.com/_/maven
         # Build arguments
@@ -97,7 +97,7 @@ services:
       dockerfile: docker/database/Dockerfile
       args:
         # Docker image versions
-        POSTGRES_VERSION: "16.1" # https://hub.docker.com/_/postgres
+        POSTGRES_VERSION: "16.2" # https://hub.docker.com/_/postgres
         # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
@@ -136,7 +136,7 @@ services:
       dockerfile: docker/metrics/prometheus/Dockerfile
       args:
         # Docker image versions
-        DEBIAN_VERSION: "12.4"        # https://hub.docker.com/_/debian
+        DEBIAN_VERSION: "12.5"        # https://hub.docker.com/_/debian
         JAVA_VERSION: "21"            # https://hub.docker.com/_/eclipse-temurin
         PROMETHEUS_VERSION: "v2.49.1" # https://hub.docker.com/r/prom/prometheus/tags
         # Build arguments
@@ -167,7 +167,7 @@ services:
       dockerfile: docker/metrics/grafana/Dockerfile
       args:
         # Docker image versions
-        GRAFANA_VERSION: "10.3.1" # https://hub.docker.com/r/grafana/grafana-oss/tags
+        GRAFANA_VERSION: "10.3.3" # https://hub.docker.com/r/grafana/grafana-oss/tags
         # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
