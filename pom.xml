@@ -52,7 +52,7 @@
         <postgresql.version>42.7.2</postgresql.version>
         <resilience4j.version>2.2.0</resilience4j.version>
         <snakeyaml.version>2.2</snakeyaml.version>
-        <spring-boot.version>3.2.2</spring-boot.version>
+        <spring-boot.version>3.2.3</spring-boot.version>
         <springdoc-openapi.version>2.3.0</springdoc-openapi.version>
         <slf4j-api.version>2.1.0-alpha1</slf4j-api.version>
 
@@ -116,7 +116,7 @@
         <proguard-core.version>9.1.1</proguard-core.version>
 
         <!-- ProGuard Plugin Versions -->
-        <proguard-maven-plugin.version>2.6.0</proguard-maven-plugin.version>
+        <proguard-maven-plugin.version>2.6.1</proguard-maven-plugin.version>
 
         <!-- ProGuard Properties -->
         <!-- Each module must have own ProGuard definition -->
