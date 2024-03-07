@@ -20,7 +20,7 @@
         <!-- Project Properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java-release>21</java-release>
-        <maven-release>3.9.4</maven-release>
+        <maven-release>3.9.6</maven-release>
 
         <!-- Lint Properties -->
         <!-- All disabled by default, activated through profiles -->
@@ -44,8 +44,7 @@
         <hikariCP.version>5.1.0</hikariCP.version>
         <jakartaee-web-api.version>11.0.0-M1</jakartaee-web-api.version>
         <jersey-server.version>3.1.5</jersey-server.version>
-        <jooq.version>3.19.4</jooq.version>
-        <jsoup.version>1.17.2</jsoup.version>
+        <jooq.version>3.19.5</jooq.version>
         <log4j.version>3.0.0-beta2</log4j.version>
         <lombok.version>1.18.30</lombok.version>
         <micrometer.version>1.12.3</micrometer.version>
@@ -55,12 +54,13 @@
         <spring-boot.version>3.2.3</spring-boot.version>
         <springdoc-openapi.version>2.3.0</springdoc-openapi.version>
         <slf4j-api.version>2.1.0-alpha1</slf4j-api.version>
+        <swagger.version>2.2.20</swagger.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.25.3</assertj-core.version>
         <embedded-postgres.version>2.0.6</embedded-postgres.version>
         <embedded-postgres-binaries-bom.version>16.2.0</embedded-postgres-binaries-bom.version>
-        <flyway-core.version>10.8.1</flyway-core.version>
+        <flyway-core.version>10.9.0</flyway-core.version>
         <junit-bom.version>5.10.2</junit-bom.version>
         <selenium-java.version>4.18.1</selenium-java.version>
 
@@ -82,10 +82,10 @@
         <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>10.13.0</checkstyle.version>
+        <checkstyle.version>10.14.0</checkstyle.version>
         <error_prone_core.version>2.25.0</error_prone_core.version>
         <licenses.version>1</licenses.version>
-        <nullaway.version>0.10.23</nullaway.version>
+        <nullaway.version>0.10.24</nullaway.version>
         <pitest-junit5-plugin.version>1.2.1</pitest-junit5-plugin.version>
         <pmd.version>7.0.0-rc4</pmd.version>
         <spotbugs.version>4.8.3</spotbugs.version>
@@ -171,11 +171,6 @@
                 <groupId>org.jooq</groupId>
                 <artifactId>jooq</artifactId>
                 <version>${jooq.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jsoup</groupId>
-                <artifactId>jsoup</artifactId>
-                <version>${jsoup.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
@@ -364,6 +359,11 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
 
             <!-- Test Dependencies -->
             <dependency>
@@ -538,11 +538,6 @@
                         <fork>true</fork>
                     </configuration>
                     <inherited>true</inherited>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>${maven-dependency-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -758,6 +753,33 @@
                             <version>${checkstyle.version}</version>
                         </dependency>
                     </dependencies>
+                </plugin>
+
+                <!-- Manual execution: -->
+                <!-- mvn dependency:analyze-only -Dlint -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${maven-dependency-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <configuration>
+                                <failOnWarning>true</failOnWarning>
+                                <!-- We're only interested in 'compile' scope dependencies when performing analysis -->
+                                <ignoreNonCompile>true</ignoreNonCompile>
+                                <ignoredUsedUndeclaredDependencies>
+                                    <!-- Included with nullaway, which is scoped 'provided' but appears as a false-positive -->
+                                    <ignoredUsedUndeclaredDependency>org.checkerframework:dataflow-nullaway::</ignoredUsedUndeclaredDependency>
+                                </ignoredUsedUndeclaredDependencies>
+                                <skip>${skip-linters}</skip>
+                            </configuration>
+                            <goals>
+                                <goal>analyze-only</goal>
+                            </goals>
+                            <!-- Needs to execute after the 'compile' phase, but before 'test-compile', or else test dependencies cause failures -->
+                            <phase>process-classes</phase>
+                        </execution>
+                    </executions>
                 </plugin>
 
                 <!-- Manual execution: -->

@@ -19,55 +19,26 @@ package me.zodac.folding.api.state;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Set;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * Unit tests for {@link SystemState}.
  */
 class SystemStateTest {
 
-    @Test
-    void verifyUnblockedStates() {
-        Set.of(
-            SystemState.AVAILABLE,
-            SystemState.WRITE_EXECUTED
-        ).forEach(
-            systemState -> {
-                assertThat(systemState.isReadBlocked())
-                    .isFalse();
-                assertThat(systemState.isWriteBlocked())
-                    .isFalse();
-            }
-        );
-    }
-
-    @Test
-    void verifyReadBlockedStates() {
-        Set.of(
-            SystemState.RESETTING_STATS,
-            SystemState.STARTING
-        ).forEach(
-            systemState -> {
-                assertThat(systemState.isReadBlocked())
-                    .isTrue();
-                assertThat(systemState.isWriteBlocked())
-                    .isTrue();
-            }
-        );
-    }
-
-    @Test
-    void verifyWriteBlockedStates() {
-        Set.of(
-            SystemState.UPDATING_STATS
-        ).forEach(
-            systemState -> {
-                assertThat(systemState.isReadBlocked())
-                    .isFalse();
-                assertThat(systemState.isWriteBlocked())
-                    .isTrue();
-            }
-        );
+    @ParameterizedTest
+    @CsvSource({
+        "AVAILABLE,false,false",
+        "WRITE_EXECUTED,false,false",
+        "RESETTING_STATS,true,true",
+        "STARTING,true,true",
+        "UPDATING_STATS,false,true",
+    })
+    void testSystemStates(final SystemState input, final boolean isReadBlocked, final boolean isWriteBlocked) {
+        assertThat(input.isReadBlocked())
+            .isEqualTo(isReadBlocked);
+        assertThat(input.isWriteBlocked())
+            .isEqualTo(isWriteBlocked);
     }
 }
