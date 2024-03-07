@@ -25,7 +25,7 @@ jobs:
         with:
           java-distribution: 'temurin'
           java-version: '21'
-          maven-version: '3.9.4'
+          maven-version: '3.9.6'
       - name: Cache local .m2
         uses: actions/cache@v3.3.2
         with:
