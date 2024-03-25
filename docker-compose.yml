@@ -8,7 +8,7 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         # Docker image versions
-        NODE_VERSION: "21.6.2" # https://hub.docker.com/_/node
+        NODE_VERSION: "21.7.1" # https://hub.docker.com/_/node
         # Build arguments
         ADMIN_EMAIL_ADDRESS: "${ADMIN_EMAIL_ADDRESS}"
         FORUM_LINK: "${FORUM_LINK}"
@@ -138,7 +138,7 @@ services:
         # Docker image versions
         DEBIAN_VERSION: "12.5"        # https://hub.docker.com/_/debian
         JAVA_VERSION: "21"            # https://hub.docker.com/_/eclipse-temurin
-        PROMETHEUS_VERSION: "v2.50.1" # https://hub.docker.com/r/prom/prometheus/tags
+        PROMETHEUS_VERSION: "v2.51.0" # https://hub.docker.com/r/prom/prometheus/tags
         # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
@@ -167,7 +167,7 @@ services:
       dockerfile: docker/metrics/grafana/Dockerfile
       args:
         # Docker image versions
-        GRAFANA_VERSION: "10.3.4" # https://hub.docker.com/r/grafana/grafana-oss/tags
+        GRAFANA_VERSION: "10.3.5" # https://hub.docker.com/r/grafana/grafana-oss/tags
         # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"

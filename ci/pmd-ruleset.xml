@@ -38,6 +38,8 @@
         <!-- Would be nice to keep the check for other cases (interfaces/annotations), but not possible -->
         <!-- Caught by SonarQube analysis -->
         <exclude name="UnnecessaryModifier"/>
+        <!-- I'm happy to use 'var', no need to forbid it -->
+        <exclude name="UseExplicitTypes" />
 
         <!-- Issues for a style guide -->
         <exclude name="ClassNamingConventions"/>
@@ -72,9 +74,7 @@
 
         <!-- Issues for a style guide -->
         <exclude name="CouplingBetweenObjects"/>
-        <exclude name="ExcessiveClassLength"/>
         <exclude name="ExcessiveImports"/>
-        <exclude name="ExcessiveMethodLength"/>
         <exclude name="ExcessiveParameterList"/>
         <exclude name="TooManyMethods"/>
         <exclude name="UseObjectForClearerAPI"/>
