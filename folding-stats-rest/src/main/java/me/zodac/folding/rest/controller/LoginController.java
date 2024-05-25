@@ -19,8 +19,6 @@ package me.zodac.folding.rest.controller;
 
 import static me.zodac.folding.rest.response.Responses.ok;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.security.PermitAll;
 import me.zodac.folding.api.UserAuthenticationResult;
 import me.zodac.folding.api.util.DecodedLoginCredentials;
@@ -54,29 +52,13 @@ public class LoginController implements LoginEndpoint {
 
     private final FoldingRepository foldingRepository;
 
-    // Prometheus counters
-    private final Counter loginAttempts;
-    private final Counter successfulLogins;
-    private final Counter failedLogins;
-
     /**
-     * {@link Autowired} constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     * {@link Autowired} constructor.
      *
      * @param foldingRepository the {@link FoldingRepository}
-     * @param registry          the Prometheus {@link MeterRegistry}
      */
-    public LoginController(final FoldingRepository foldingRepository, final MeterRegistry registry) {
+    public LoginController(final FoldingRepository foldingRepository) {
         this.foldingRepository = foldingRepository;
-
-        loginAttempts = Counter.builder("login_attempts_counter")
-            .description("Number of login attempts to the admin page")
-            .register(registry);
-        successfulLogins = Counter.builder("login_success_counter")
-            .description("Number of successful login attempts to the admin page")
-            .register(registry);
-        failedLogins = Counter.builder("login_failure_counter")
-            .description("Number of failed login attempts to the admin page")
-            .register(registry);
     }
 
     @Override
@@ -85,11 +67,9 @@ public class LoginController implements LoginEndpoint {
     @PostMapping(path = "/admin", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> loginAsAdmin(@RequestBody final LoginCredentials loginCredentials) {
         AUDIT_LOGGER.info("Login request received");
-        loginAttempts.increment();
 
         if (EncodingUtils.isInvalidBasicAuthentication(loginCredentials.encodedUserNameAndPassword())) {
             AUDIT_LOGGER.error("Invalid payload: {}", loginCredentials);
-            failedLogins.increment();
             throw new InvalidLoginCredentialsException(loginCredentials);
         }
 
@@ -102,22 +82,18 @@ public class LoginController implements LoginEndpoint {
 
             if (!userAuthenticationResult.userExists() || !userAuthenticationResult.passwordMatch()) {
                 AUDIT_LOGGER.warn("Invalid user credentials supplied: {}", loginCredentials);
-                failedLogins.increment();
                 throw new UnauthorizedException();
             }
 
             if (!userAuthenticationResult.isAdmin()) {
                 AUDIT_LOGGER.warn("User '{}' is not an admin", decodedLoginCredentials.username());
-                failedLogins.increment();
                 throw new ForbiddenException();
             }
 
             AUDIT_LOGGER.info("Admin user '{}' logged in", decodedLoginCredentials.username());
-            successfulLogins.increment();
             return ok();
         } catch (final IllegalArgumentException e) {
             AUDIT_LOGGER.error("Encoded username and password was not a valid Base64 string", e);
-            failedLogins.increment();
             throw new InvalidLoginCredentialsException(loginCredentials, e);
         }
     }

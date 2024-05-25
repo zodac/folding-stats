@@ -96,7 +96,6 @@ There are four components to the system:
 - The `frontend` container, hosting the UI
 - The `backend` container, for stats calculation and hardware/team/user management
 - The `database` container, for persistent storage
-- The `prometheus` container, for metrics
 
 These are all run as individual docker containers, and are configured by the `docker-compose.yml` file in the root of the repository. To start, you
 can run the commands:
@@ -291,7 +290,6 @@ following:
 
     CONTAINER ID   IMAGE                      COMMAND                  CREATED                  STATUS                            PORTS                                           NAMES
     6d314cbbb902   folding-stats_frontend     "httpd-foreground"       Less than a second ago   Up Less than a second             80/tcp, 0.0.0.0:443->443/tcp, :::443->443/tcp   frontend
-    306642a8aa39   folding-stats_prometheus   "/bin/prometheus --c…"   2 seconds ago            Up 1 second                       0.0.0.0:9090->9090/tcp, :::9090->9090/tcp       prometheus
     a7b722f8a178   folding-stats_backend      "/startup.sh"            2 seconds ago            Up 1 second (health: starting)    0.0.0.0:8443->8443/tcp, :::8443->8443/tcp       backend
     312f5f61ec87   folding-stats_database     "docker-entrypoint.s…"   3 seconds ago            Up 3 seconds (health: starting)   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp       database
 
@@ -302,7 +300,6 @@ up, as seen by the value **health: starting**. Once they are successfully online
 
     CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS                   PORTS                                           NAMES
     7092e5a354eb   folding-stats_frontend     "httpd-foreground"       17 hours ago   Up 17 hours             80/tcp, 0.0.0.0:443->443/tcp, :::443->443/tcp   frontend
-    306642a8aa39   folding-stats_prometheus   "/bin/prometheus --c…"   17 hours ago   Up 16 hours             0.0.0.0:9090->9090/tcp, :::9090->9090/tcp       prometheus
     6d2128137d5a   folding-stats_backend      "/startup.sh"            17 hours ago   Up 17 hours (healthy)   0.0.0.0:8443->8443/tcp, :::8443->8443/tcp       backend
     e713645e6a43   folding-stats_database     "docker-entrypoint.s…"   17 hours ago   Up 17 hours (healthy)   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp       database
 
@@ -310,7 +307,6 @@ However, if one or more of the containers has stopped, you may see a container m
 
     CONTAINER ID   IMAGE                        COMMAND                  CREATED         STATUS                             PORTS                                           NAMES
     7092e5a354eb   folding-stats_frontend     "httpd-foreground"       17 hours ago   Up 17 hours                           80/tcp, 0.0.0.0:443->443/tcp, :::443->443/tcp   frontend
-    306642a8aa39   folding-stats_prometheus   "/bin/prometheus --c…"   17 hours ago   Exited (0) 10 seconds ago             0.0.0.0:9090->9090/tcp, :::9090->9090/tcp       prometheus
     6d2128137d5a   folding-stats_backend      "/startup.sh"            17 hours ago   Up 17 hours (healthy)                 0.0.0.0:8443->8443/tcp, :::8443->8443/tcp       backend
     e713645e6a43   folding-stats_database     "docker-entrypoint.s…"   17 hours ago   Up 17 hours (healthy)                 0.0.0.0:5432->5432/tcp, :::5432->5432/tcp       database
 
@@ -400,8 +396,6 @@ For example, first check the available volumes:
     local     folding-stats_backend_certs
     local     folding-stats_backend_logs
     local     folding-stats_database_content
-    local     folding-stats_prometheus_certs
-    local     folding-stats_prometheus_data
 
 Then create a simple container, attaching the `folding-stats_backend_logs` volume (in read-only mode):
 

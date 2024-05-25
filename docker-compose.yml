@@ -130,74 +130,13 @@ services:
     volumes:
       - database_content:/var/lib/postgresql/data
 
-  prometheus:
-    build:
-      context: .
-      dockerfile: docker/metrics/prometheus/Dockerfile
-      args:
-        # Docker image versions
-        DEBIAN_VERSION: "12.5"        # https://hub.docker.com/_/debian
-        JAVA_VERSION: "21"            # https://hub.docker.com/_/eclipse-temurin
-        PROMETHEUS_VERSION: "v2.51.0" # https://hub.docker.com/r/prom/prometheus/tags
-        # Build arguments
-        ADMIN_USERNAME: "${ADMIN_USER}"
-        ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
-    command:
-      - --config.file=/etc/prometheus/prometheus.yml
-      - --web.config.file=/etc/prometheus/web-config.yml
-      - --storage.tsdb.retention=30d
-    container_name: prometheus
-    hostname: prometheus
-    depends_on:
-      - backend
-    networks:
-      - production
-    ports:
-      - "9090:9090"
-    restart: unless-stopped
-    volumes:
-      - prometheus_data:/prometheus/
-      - prometheus_certs:/usr/local/certs/metrics/
-    volumes_from:
-      - backend:ro
-
-  grafana:
-    build:
-      context: .
-      dockerfile: docker/metrics/grafana/Dockerfile
-      args:
-        # Docker image versions
-        GRAFANA_VERSION: "10.3.5" # https://hub.docker.com/r/grafana/grafana-oss/tags
-        # Build arguments
-        ADMIN_USERNAME: "${ADMIN_USER}"
-        ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
-    container_name: grafana
-    hostname: grafana
-    depends_on:
-      - prometheus
-    environment:
-      GF_PATHS_CONFIG: "/opt/custom.ini"
-    networks:
-      - production
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
-    volumes:
-      - grafana-data:/var/lib/grafana
-
 networks:
   production:
 
 volumes:
   # Volume to save the database contents
-  database_content:
+  database_content: { }
   # Volume to save the backend logs in case of a crash
-  backend_logs:
+  backend_logs: { }
   # Volume to save the generated SSL certs for the backend
-  backend_certs:
-  # Volume to save Prometheus metrics
-  prometheus_data:
-  # Volume to save the generated SSL certs for Prometheus
-  prometheus_certs:
-  # Volume to save Grafana data
-  grafana-data:
+  backend_certs: { }

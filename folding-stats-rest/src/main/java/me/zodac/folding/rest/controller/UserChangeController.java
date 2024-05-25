@@ -21,8 +21,6 @@ import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParameters;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
@@ -70,41 +68,20 @@ public class UserChangeController implements UserChangeEndpoint {
     private final UserChangeApplier userChangeApplier;
     private final UserChangeValidator userChangeValidator;
 
-    // Prometheus counters
-    private final Counter userChangeCreates;
-    private final Counter userChangeRejects;
-    private final Counter userChangeImmediateApprovals;
-    private final Counter userChangeNextMonthApprovals;
-
     /**
-     * {@link Autowired} constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     * {@link Autowired} constructor.
      *
      * @param foldingRepository   the {@link FoldingRepository}
-     * @param registry            the Prometheus {@link MeterRegistry}
      * @param userChangeApplier   the {@link UserChangeApplier}
      * @param userChangeValidator the {@link UserChangeValidator}
      */
     @Autowired
     public UserChangeController(final FoldingRepository foldingRepository,
-                                final MeterRegistry registry,
                                 final UserChangeApplier userChangeApplier,
                                 final UserChangeValidator userChangeValidator) {
         this.foldingRepository = foldingRepository;
         this.userChangeApplier = userChangeApplier;
         this.userChangeValidator = userChangeValidator;
-
-        userChangeCreates = Counter.builder("user_change_create_counter")
-            .description("Number of UserChange creations through the REST endpoint")
-            .register(registry);
-        userChangeRejects = Counter.builder("user_change_reject_counter")
-            .description("Number of UserChange rejections through the REST endpoint")
-            .register(registry);
-        userChangeImmediateApprovals = Counter.builder("user_change_approval_immediate_counter")
-            .description("Number of UserChange approvals for immediate change through the REST endpoint")
-            .register(registry);
-        userChangeNextMonthApprovals = Counter.builder("user_change_approval_next_month_counter")
-            .description("Number of UserChange approvals for next month through the REST endpoint")
-            .register(registry);
     }
 
     @Override
@@ -117,8 +94,6 @@ public class UserChangeController implements UserChangeEndpoint {
 
         final UserChange validatedUserChange = userChangeValidator.validate(userChangeRequest);
         final UserChange createdUserChange = foldingRepository.createUserChange(validatedUserChange);
-
-        userChangeCreates.increment();
 
         // TODO: When creating this change, does the response include user passkeys?
         return created(createdUserChange, createdUserChange.id());
@@ -190,7 +165,6 @@ public class UserChangeController implements UserChangeEndpoint {
     @PutMapping(path = "/{userChangeId}/approve/immediate", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserChange> approveImmediately(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
         AUDIT_LOGGER.info("PUT request to approve user change immediately received at '{}'", request::getRequestURI);
-        userChangeImmediateApprovals.increment();
         return update(userChangeId, UserChangeState.APPROVED_NOW);
     }
 
@@ -200,7 +174,6 @@ public class UserChangeController implements UserChangeEndpoint {
     @PutMapping(path = "/{userChangeId}/approve/next", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserChange> approveNextMonth(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
         AUDIT_LOGGER.info("PUT request to approve user change next month received at '{}'", request::getRequestURI);
-        userChangeNextMonthApprovals.increment();
         return update(userChangeId, UserChangeState.APPROVED_NEXT_MONTH);
     }
 
@@ -210,7 +183,6 @@ public class UserChangeController implements UserChangeEndpoint {
     @PutMapping(path = "/{userChangeId}/reject", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserChange> reject(@PathVariable("userChangeId") final int userChangeId, final HttpServletRequest request) {
         AUDIT_LOGGER.info("PUT request to reject user change received at '{}'", request::getRequestURI);
-        userChangeRejects.increment();
         return update(userChangeId, UserChangeState.REJECTED);
     }
 

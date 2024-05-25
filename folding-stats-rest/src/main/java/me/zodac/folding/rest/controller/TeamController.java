@@ -22,8 +22,6 @@ import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParameters;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
@@ -67,31 +65,15 @@ public class TeamController implements TeamEndpoint {
     private final FoldingRepository foldingRepository;
     private final TeamValidator teamValidator;
 
-    // Prometheus counters
-    private final Counter teamCreates;
-    private final Counter teamUpdates;
-    private final Counter teamDeletes;
-
     /**
-     * {@link Autowired} constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     * {@link Autowired} constructor.
      *
      * @param foldingRepository the {@link FoldingRepository}
-     * @param registry          the Prometheus {@link MeterRegistry}
      * @param teamValidator     the {@link TeamValidator}
      */
-    public TeamController(final FoldingRepository foldingRepository, final MeterRegistry registry, final TeamValidator teamValidator) {
+    public TeamController(final FoldingRepository foldingRepository, final TeamValidator teamValidator) {
         this.foldingRepository = foldingRepository;
         this.teamValidator = teamValidator;
-
-        teamCreates = Counter.builder("team_create_counter")
-            .description("Number of Team creations through the REST endpoint")
-            .register(registry);
-        teamUpdates = Counter.builder("team_update_counter")
-            .description("Number of Team updates through the REST endpoint")
-            .register(registry);
-        teamDeletes = Counter.builder("team_delete_counter")
-            .description("Number of Team deletions through the REST endpoint")
-            .register(registry);
     }
 
     @Override
@@ -106,7 +88,6 @@ public class TeamController implements TeamEndpoint {
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
         AUDIT_LOGGER.info("Created team with ID {}", elementWithId.id());
-        teamCreates.increment();
         return created(elementWithId, elementWithId.id());
     }
 
@@ -172,7 +153,6 @@ public class TeamController implements TeamEndpoint {
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
         AUDIT_LOGGER.info("Updated team with ID {}", updatedTeamWithId.id());
-        teamUpdates.increment();
         return ok(updatedTeamWithId, updatedTeamWithId.id());
     }
 
@@ -190,7 +170,6 @@ public class TeamController implements TeamEndpoint {
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
         AUDIT_LOGGER.info("Deleted team with ID {}", teamId);
-        teamDeletes.increment();
         return ok();
     }
 }

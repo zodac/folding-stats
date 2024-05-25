@@ -134,13 +134,29 @@ public class StubbedPointsEndpoint {
         return PointsResponse.empty();
     }
 
-    private record PointsResponse(long earned) {
+    /**
+     * POJO defining the response for the number of earned points.
+     *
+     * @param earned the number of earned points
+     */
+    public record PointsResponse(long earned) {
 
-        static PointsResponse create(final long earned) {
+        /**
+         * Create a new {@link PointsResponse}.
+         *
+         * @param earned the earned points
+         * @return the {@link PointsResponse}
+         */
+        public static PointsResponse create(final long earned) {
             return new PointsResponse(earned);
         }
 
-        static PointsResponse empty() {
+        /**
+         * Create a new {@link PointsResponse} with no earned points.
+         *
+         * @return the {@link PointsResponse}
+         */
+        public static PointsResponse empty() {
             return create(0L);
         }
     }

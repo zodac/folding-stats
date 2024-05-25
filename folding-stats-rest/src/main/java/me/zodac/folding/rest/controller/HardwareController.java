@@ -22,8 +22,6 @@ import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParameters;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
@@ -68,32 +66,16 @@ public class HardwareController implements HardwareEndpoint {
     private final HardwareValidator hardwareValidator;
     private final FoldingRepository foldingRepository;
 
-    // Prometheus counters
-    private final Counter hardwareCreates;
-    private final Counter hardwareUpdates;
-    private final Counter hardwareDeletes;
-
     /**
-     * {@link Autowired} constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     * {@link Autowired} constructor.
      *
      * @param hardwareValidator the {@link HardwareValidator}
      * @param foldingRepository the {@link FoldingRepository}
-     * @param registry          the Prometheus {@link MeterRegistry}
      */
     @Autowired
-    public HardwareController(final HardwareValidator hardwareValidator, final FoldingRepository foldingRepository, final MeterRegistry registry) {
+    public HardwareController(final HardwareValidator hardwareValidator, final FoldingRepository foldingRepository) {
         this.hardwareValidator = hardwareValidator;
         this.foldingRepository = foldingRepository;
-
-        hardwareCreates = Counter.builder("hardware_create_counter")
-            .description("Number of Hardware creations through the REST endpoint")
-            .register(registry);
-        hardwareUpdates = Counter.builder("hardware_update_counter")
-            .description("Number of Hardware updates through the REST endpoint")
-            .register(registry);
-        hardwareDeletes = Counter.builder("hardware_delete_counter")
-            .description("Number of Hardware deletions through the REST endpoint")
-            .register(registry);
     }
 
     @Override
@@ -108,7 +90,6 @@ public class HardwareController implements HardwareEndpoint {
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
         AUDIT_LOGGER.info("Created hardware with ID {}", elementWithId.id());
-        hardwareCreates.increment();
         return created(elementWithId, elementWithId.id());
     }
 
@@ -175,7 +156,6 @@ public class HardwareController implements HardwareEndpoint {
 
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         AUDIT_LOGGER.info("Updated hardware with ID {}", updatedHardwareWithId.id());
-        hardwareUpdates.increment();
         return ok(updatedHardwareWithId, updatedHardwareWithId.id());
     }
 
@@ -192,7 +172,6 @@ public class HardwareController implements HardwareEndpoint {
         foldingRepository.deleteHardware(validatedHardware);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         AUDIT_LOGGER.info("Deleted hardware with ID {}", hardwareId);
-        hardwareDeletes.increment();
         return ok();
     }
 }

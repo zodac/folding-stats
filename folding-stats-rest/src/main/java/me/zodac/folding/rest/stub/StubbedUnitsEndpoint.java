@@ -133,9 +133,20 @@ public class StubbedUnitsEndpoint {
         return List.of();
     }
 
-    private record UnitsResponse(int finished) {
+    /**
+     * POJO defining the response for the number of finished units.
+     *
+     * @param finished the number of finished units
+     */
+    public record UnitsResponse(int finished) {
 
-        static UnitsResponse create(final int finished) {
+        /**
+         * Create a new {@link UnitsResponse}.
+         *
+         * @param finished the finished units
+         * @return the {@link UnitsResponse}
+         */
+        public static UnitsResponse create(final int finished) {
             return new UnitsResponse(finished);
         }
     }

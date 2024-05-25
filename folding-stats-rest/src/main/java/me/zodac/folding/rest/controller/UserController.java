@@ -21,9 +21,6 @@ import static me.zodac.folding.rest.response.Responses.cachedOk;
 import static me.zodac.folding.rest.response.Responses.created;
 import static me.zodac.folding.rest.response.Responses.ok;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,37 +61,16 @@ public class UserController implements UserEndpoint {
     private final FoldingRepository foldingRepository;
     private final UserValidator userValidator;
 
-    // Prometheus counters
-    private final Counter userCreates;
-    private final Counter userUpdates;
-    private final Counter userDeletes;
-
     /**
-     * {@link Autowired} constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     * {@link Autowired} constructor.
      *
      * @param foldingRepository the {@link FoldingRepository}
-     * @param registry          the Prometheus {@link MeterRegistry}
      * @param userValidator     the {@link UserValidator}
      */
     @Autowired
-    public UserController(final FoldingRepository foldingRepository, final MeterRegistry registry, final UserValidator userValidator) {
+    public UserController(final FoldingRepository foldingRepository, final UserValidator userValidator) {
         this.foldingRepository = foldingRepository;
         this.userValidator = userValidator;
-
-        userCreates = Counter.builder("user_create_counter")
-            .description("Number of User creations through the REST endpoint")
-            .register(registry);
-        userUpdates = Counter.builder("user_update_counter")
-            .description("Number of User updates through the REST endpoint")
-            .register(registry);
-        userDeletes = Counter.builder("user_delete_counter")
-            .description("Number of User deletions through the REST endpoint")
-            .register(registry);
-
-        // Update frequency defined by property 'management.metrics.export.statsd.polling-frequency'
-        Gauge.builder("current_user_count", () -> foldingRepository.getAllUsersWithoutPasskeys().size())
-            .description("The current number of Users in the system")
-            .register(registry);
     }
 
     @Override
@@ -109,7 +85,6 @@ public class UserController implements UserEndpoint {
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
         AUDIT_LOGGER.info("Created user with ID {}", elementWithId.id());
-        userCreates.increment();
         return created(elementWithId, elementWithId.id());
     }
 
@@ -180,7 +155,6 @@ public class UserController implements UserEndpoint {
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
 
         AUDIT_LOGGER.info("Updated user with ID {}", updatedUserWithId.id());
-        userUpdates.increment();
         return ok(updatedUserWithId, updatedUserWithId.id());
     }
 
@@ -197,7 +171,6 @@ public class UserController implements UserEndpoint {
         foldingRepository.deleteUser(validatedUser);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         AUDIT_LOGGER.info("Deleted user with ID {}", userId);
-        userDeletes.increment();
         return ok();
     }
 }

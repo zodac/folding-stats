@@ -20,8 +20,6 @@ package me.zodac.folding.rest.controller;
 import static me.zodac.folding.rest.response.Responses.ok;
 import static me.zodac.folding.rest.util.RequestParameterExtractor.extractParameters;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.servlet.http.HttpServletRequest;
@@ -78,16 +76,11 @@ public class TeamCompetitionStatsController implements TeamCompetitionStatsEndpo
     private final UserStatsParser userStatsParser;
     private final UserStatsResetter userStatsResetter;
 
-    // Prometheus counters
-    private final Counter visitCounter;
-    private final Counter userStatsOffsets;
-
     /**
-     * {@link Autowired} constructor to inject {@link MeterRegistry} and configure Prometheus {@link Counter}s.
+     * {@link Autowired} constructor.
      *
      * @param foldingRepository         the {@link FoldingRepository}
      * @param leaderboardStatsGenerator the {@link LeaderboardStatsGenerator}
-     * @param registry                  the Prometheus {@link MeterRegistry}
      * @param statsRepository           the {@link StatsRepository}
      * @param userStatsParser           the {@link UserStatsParser}
      * @param userStatsResetter         the {@link UserStatsResetter}
@@ -95,7 +88,6 @@ public class TeamCompetitionStatsController implements TeamCompetitionStatsEndpo
     @Autowired
     public TeamCompetitionStatsController(final FoldingRepository foldingRepository,
                                           final LeaderboardStatsGenerator leaderboardStatsGenerator,
-                                          final MeterRegistry registry,
                                           final StatsRepository statsRepository,
                                           final UserStatsParser userStatsParser,
                                           final UserStatsResetter userStatsResetter) {
@@ -104,14 +96,6 @@ public class TeamCompetitionStatsController implements TeamCompetitionStatsEndpo
         this.statsRepository = statsRepository;
         this.userStatsParser = userStatsParser;
         this.userStatsResetter = userStatsResetter;
-
-        visitCounter = Counter.builder("visit_counter")
-            .description("Number of visits to the site")
-            .register(registry);
-
-        userStatsOffsets = Counter.builder("user_stats_offset_counter")
-            .description("Number of times a user's stats have been manually offset")
-            .register(registry);
     }
 
     @Override
@@ -120,7 +104,6 @@ public class TeamCompetitionStatsController implements TeamCompetitionStatsEndpo
     @GetMapping(path = "/summary", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CompetitionSummary> getCompetitionStats() {
         AUDIT_LOGGER.debug("GET request received to show TC summary stats");
-        visitCounter.increment();
         final AllTeamsSummary allTeamsSummary = statsRepository.getAllTeamsSummary();
         return ok(allTeamsSummary.competitionSummary());
     }
@@ -181,7 +164,6 @@ public class TeamCompetitionStatsController implements TeamCompetitionStatsEndpo
         userStatsParser.parseTcStatsForUser(user);
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         AUDIT_LOGGER.info("Updated user with ID {} with points offset: {}", userId, createdOffsetStats);
-        userStatsOffsets.increment();
         return ok();
     }
 

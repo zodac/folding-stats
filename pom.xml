@@ -47,7 +47,6 @@
         <jooq.version>3.19.7</jooq.version>
         <log4j.version>3.0.0-beta2</log4j.version>
         <lombok.version>1.18.32</lombok.version>
-        <micrometer.version>1.12.5</micrometer.version>
         <postgresql.version>42.7.3</postgresql.version>
         <resilience4j.version>2.2.0</resilience4j.version>
         <snakeyaml.version>2.2</snakeyaml.version>
@@ -220,28 +219,10 @@
 
             <!-- Spring Dependencies -->
             <dependency>
-                <groupId>io.micrometer</groupId>
-                <artifactId>micrometer-registry-prometheus</artifactId>
-                <version>${micrometer.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter</artifactId>
                 <version>${spring-boot.version}</version>
                 <exclusions>
-                    <!-- Already being brought in explicitly -->
-                    <exclusion>
-                        <groupId>io.micrometer</groupId>
-                        <artifactId>micrometer-commons</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>io.micrometer</groupId>
-                        <artifactId>micrometer-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>io.micrometer</groupId>
-                        <artifactId>micrometer-observation</artifactId>
-                    </exclusion>
                     <!-- Remove built-in logging and use own -->
                     <exclusion>
                         <groupId>org.springframework.boot</groupId>
@@ -254,19 +235,6 @@
                 <artifactId>spring-boot-starter-actuator</artifactId>
                 <version>${spring-boot.version}</version>
                 <exclusions>
-                    <!-- Already being brought in explicitly -->
-                    <exclusion>
-                        <groupId>io.micrometer</groupId>
-                        <artifactId>micrometer-commons</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>io.micrometer</groupId>
-                        <artifactId>micrometer-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>io.micrometer</groupId>
-                        <artifactId>micrometer-observation</artifactId>
-                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
@@ -294,19 +262,6 @@
                 <artifactId>spring-boot-starter-security</artifactId>
                 <version>${spring-boot.version}</version>
                 <exclusions>
-                    <!-- Already being brought in explicitly -->
-                    <exclusion>
-                        <groupId>io.micrometer</groupId>
-                        <artifactId>micrometer-commons</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>io.micrometer</groupId>
-                        <artifactId>micrometer-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>io.micrometer</groupId>
-                        <artifactId>micrometer-observation</artifactId>
-                    </exclusion>
                     <!-- Excluding spring dependencies, since spring-boot-starter-security updates versions slower than others -->
                     <exclusion>
                         <groupId>org.springframework</groupId>
@@ -322,19 +277,6 @@
                     <exclusion>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-starter-json</artifactId>
-                    </exclusion>
-                    <!-- Already being brought in explicitly -->
-                    <exclusion>
-                        <groupId>io.micrometer</groupId>
-                        <artifactId>micrometer-commons</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>io.micrometer</groupId>
-                        <artifactId>micrometer-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>io.micrometer</groupId>
-                        <artifactId>micrometer-observation</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

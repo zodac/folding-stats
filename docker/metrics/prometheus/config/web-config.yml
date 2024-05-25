@@ -1,5 +1,0 @@
-tls_server_config:
-  cert_file: /usr/local/certs/metrics/prometheus.crt
-  key_file: /usr/local/certs/metrics/prometheus.key
-basic_auth_users:
-  %ADMIN_USERNAME%: %ADMIN_PASSWORD%
