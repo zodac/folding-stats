@@ -83,7 +83,7 @@ public class HardwareController implements HardwareEndpoint {
     @RolesAllowed("admin")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Hardware> create(@RequestBody final HardwareRequest hardwareRequest, final HttpServletRequest request) {
-        AUDIT_LOGGER.info("POST request received to create hardware at '{}' with request: {}", request::getRequestURI, () -> hardwareRequest);
+        AUDIT_LOGGER.info("POST request received to create hardware at '{}' with request: {}", request.getRequestURI(), hardwareRequest);
 
         final Hardware validatedHardware = hardwareValidator.create(hardwareRequest);
         final Hardware elementWithId = foldingRepository.createHardware(validatedHardware);
@@ -98,7 +98,7 @@ public class HardwareController implements HardwareEndpoint {
     @PermitAll
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<Hardware>> getAll(final HttpServletRequest request) {
-        AUDIT_LOGGER.debug("GET request received for all hardwares at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request received for all hardwares at '{}'", request.getRequestURI());
         final Collection<Hardware> elements = foldingRepository.getAllHardware();
         return cachedOk(elements);
     }
@@ -108,7 +108,7 @@ public class HardwareController implements HardwareEndpoint {
     @PermitAll
     @GetMapping(path = "/{hardwareId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Hardware> getById(@PathVariable("hardwareId") final int hardwareId, final HttpServletRequest request) {
-        AUDIT_LOGGER.debug("GET request for hardware received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request for hardware received at '{}'", request.getRequestURI());
 
         final Hardware element = foldingRepository.getHardware(hardwareId);
         return cachedOk(element);
@@ -119,7 +119,7 @@ public class HardwareController implements HardwareEndpoint {
     @PermitAll
     @GetMapping(path = "/fields", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Hardware> getByHardwareName(@RequestParam("hardwareName") final String hardwareName, final HttpServletRequest request) {
-        AUDIT_LOGGER.debug("GET request for hardware received at '{}?{}'", request::getRequestURI, () -> extractParameters(request));
+        AUDIT_LOGGER.debug("GET request for hardware received at '{}?{}'", request.getRequestURI(), extractParameters(request));
         final String unescapedHardwareName = StringUtils.unescapeHtml(hardwareName);
 
         final Hardware retrievedHardware = foldingRepository.getAllHardware()
@@ -139,7 +139,7 @@ public class HardwareController implements HardwareEndpoint {
                                                @RequestBody final HardwareRequest hardwareRequest,
                                                final HttpServletRequest request
     ) {
-        AUDIT_LOGGER.info("PUT request for hardware received at '{}' with request {}", request::getRequestURI, () -> hardwareRequest);
+        AUDIT_LOGGER.info("PUT request for hardware received at '{}' with request {}", request.getRequestURI(), hardwareRequest);
 
         final Hardware existingHardware = foldingRepository.getHardware(hardwareId);
 
@@ -164,7 +164,7 @@ public class HardwareController implements HardwareEndpoint {
     @RolesAllowed("admin")
     @DeleteMapping(path = "/{hardwareId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteById(@PathVariable("hardwareId") final int hardwareId, final HttpServletRequest request) {
-        AUDIT_LOGGER.info("DELETE request for hardware received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.info("DELETE request for hardware received at '{}'", request.getRequestURI());
 
         final Hardware hardware = foldingRepository.getHardware(hardwareId);
         final Hardware validatedHardware = hardwareValidator.delete(hardware);

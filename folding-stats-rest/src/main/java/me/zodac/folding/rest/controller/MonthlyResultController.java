@@ -73,7 +73,7 @@ public class MonthlyResultController implements MonthlyResultEndpoint {
     public ResponseEntity<MonthlyResult> getMonthlyResult(@PathVariable("year") final String year,
                                                           @PathVariable("month") final String month,
                                                           final HttpServletRequest request) {
-        AUDIT_LOGGER.debug("GET request received to retrieve monthly TC result at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request received to retrieve monthly TC result at '{}'", request.getRequestURI());
 
         final MonthDetails date = DateParser.of(year, month);
         final MonthlyResult monthlyResult = statsRepository.getMonthlyResult(date.month(), date.year());

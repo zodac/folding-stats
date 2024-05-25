@@ -114,8 +114,8 @@ public class UserStatsParser {
         if (offsetTcStats.isEmpty()) {
             LOGGER.trace("Retrieved empty stats offset for user: {}", () -> user);
         } else {
-            LOGGER.debug("{}: {} offset points | {} offset units", user::displayName,
-                () -> formatWithCommas(offsetTcStats.multipliedPointsOffset()), () -> formatWithCommas(offsetTcStats.unitsOffset()));
+            LOGGER.debug("{}: {} offset points | {} offset units", user.displayName(), formatWithCommas(offsetTcStats.multipliedPointsOffset()),
+                formatWithCommas(offsetTcStats.unitsOffset()));
         }
 
         final UserStats totalStats = getTotalStatsForUserOrEmpty(user);

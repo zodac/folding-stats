@@ -40,31 +40,31 @@
 
         <!-- 3PP Versions -->
         <caffeine.version>3.1.8</caffeine.version>
-        <gson.version>2.10.1</gson.version>
+        <gson.version>2.11.0</gson.version>
         <hikariCP.version>5.1.0</hikariCP.version>
         <jakartaee-web-api.version>11.0.0-M2</jakartaee-web-api.version>
         <jersey-server.version>4.0.0-M1</jersey-server.version>
-        <jooq.version>3.19.7</jooq.version>
+        <jooq.version>3.19.8</jooq.version>
         <log4j.version>3.0.0-beta2</log4j.version>
         <lombok.version>1.18.32</lombok.version>
         <postgresql.version>42.7.3</postgresql.version>
         <resilience4j.version>2.2.0</resilience4j.version>
         <snakeyaml.version>2.2</snakeyaml.version>
-        <spring-boot.version>3.2.5</spring-boot.version>
+        <spring-boot.version>3.3.0</spring-boot.version>
         <springdoc-openapi.version>2.5.0</springdoc-openapi.version>
         <slf4j-api.version>2.1.0-alpha1</slf4j-api.version>
-        <swagger.version>2.2.21</swagger.version>
+        <swagger.version>2.2.22</swagger.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.25.3</assertj-core.version>
         <embedded-postgres.version>2.0.7</embedded-postgres.version>
         <embedded-postgres-binaries-bom.version>16.2.0</embedded-postgres-binaries-bom.version>
-        <flyway-core.version>10.11.1</flyway-core.version>
-        <junit-bom.version>5.10.2</junit-bom.version>
-        <selenium-java.version>4.19.1</selenium-java.version>
+        <flyway-core.version>10.13.0</flyway-core.version>
+        <junit-bom.version>5.11.0-M2</junit-bom.version>
+        <selenium-java.version>4.21.0</selenium-java.version>
 
         <!-- Plugin Versions -->
-        <build-helper-maven-plugin.version>3.5.0</build-helper-maven-plugin.version>
+        <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
         <jmeter-maven-plugin.version>3.8.0</jmeter-maven-plugin.version>
         <maven-clean-plugin.version>3.3.2</maven-clean-plugin.version>
@@ -72,31 +72,31 @@
         <maven-dependency-plugin.version>3.6.1</maven-dependency-plugin.version>
         <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
         <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
-        <maven-install-plugin.version>3.1.1</maven-install-plugin.version>
+        <maven-install-plugin.version>3.1.2</maven-install-plugin.version>
         <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version>
         <maven-project-info-reports-plugin.version>3.5.0</maven-project-info-reports-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-        <maven-site-plugin.version>4.0.0-M13</maven-site-plugin.version>
+        <maven-site-plugin.version>4.0.0-M14</maven-site-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>10.15.0</checkstyle.version>
-        <error_prone_core.version>2.26.1</error_prone_core.version>
+        <checkstyle.version>10.16.0</checkstyle.version>
+        <error_prone_core.version>2.27.0</error_prone_core.version>
         <licenses.version>1</licenses.version>
-        <nullaway.version>0.10.25</nullaway.version>
+        <nullaway.version>0.10.26</nullaway.version>
         <pitest-junit5-plugin.version>1.2.1</pitest-junit5-plugin.version>
-        <pmd.version>7.0.0</pmd.version>
-        <spotbugs.version>4.8.4</spotbugs.version>
+        <pmd.version>7.1.0</pmd.version>
+        <spotbugs.version>4.8.5</spotbugs.version>
 
         <!-- Linter Plugin Versions -->
-        <dependency-check-maven.version>9.1.0</dependency-check-maven.version>
-        <license-maven-plugin.version>4.3</license-maven-plugin.version>
+        <dependency-check-maven.version>9.2.0</dependency-check-maven.version>
+        <license-maven-plugin.version>4.5</license-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
-        <maven-pmd-plugin.version>3.21.2</maven-pmd-plugin.version>
-        <pitest-maven.version>1.16.0</pitest-maven.version>
-        <spotbugs-maven-plugin.version>4.8.4.0</spotbugs-maven-plugin.version>
+        <maven-pmd-plugin.version>3.22.0</maven-pmd-plugin.version>
+        <pitest-maven.version>1.16.1</pitest-maven.version>
+        <spotbugs-maven-plugin.version>4.8.5.0</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, files are only used in child modules -->
@@ -112,7 +112,7 @@
 
         <!-- ProGuard 3PP Versions -->
         <proguard-base.version>7.4.2</proguard-base.version>
-        <proguard-core.version>9.1.2</proguard-core.version>
+        <proguard-core.version>9.1.4</proguard-core.version>
 
         <!-- ProGuard Plugin Versions -->
         <proguard-maven-plugin.version>2.6.1</proguard-maven-plugin.version>
@@ -150,6 +150,13 @@
                 <groupId>com.github.ben-manes.caffeine</groupId>
                 <artifactId>caffeine</artifactId>
                 <version>${caffeine.version}</version>
+                <exclusions>
+                    <!-- Conflicts with version in gson, this one is older and less important -->
+                    <exclusion>
+                        <groupId>com.google.errorprone</groupId>
+                        <artifactId>error_prone_annotations</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
@@ -354,17 +361,31 @@
             </dependency>
 
             <!-- Conflicting Dependencies -->
-            <!-- Used by [HikariCP, resilience4j-core, resilience4j-retry], setting to latest available -->
+            <!-- Used by [HikariCP, resilience4j-core, resilience4j-retry] -->
+            <!-- Setting to latest available -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j-api.version}</version>
             </dependency>
-            <!-- Used by [springdoc-openapi-starter-webmvc-ui:jackson-dataformat-yaml, springdoc-openapi-starter-webmvc-ui:swagger-core-jakarta], setting to latest available -->
+            <!-- Used by [springdoc-openapi-starter-webmvc-ui:jackson-dataformat-yaml, springdoc-openapi-starter-webmvc-ui:swagger-core-jakarta] -->
+            <!-- Setting to latest available -->
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
+            </dependency>
+            <!-- Used by [spring-boot-starter, spring-boot-starter-actuator, spring-boot-starter-security, spring-boot-starter-web] -->
+            <!-- Setting to 1.12.6 due to CVEs with 1.13.0 -->
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-commons</artifactId>
+                <version>1.12.6</version>
+            </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-observation</artifactId>
+                <version>1.12.6</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -976,21 +997,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <!-- TODO: Only added to download SNAPSHOT version of PMD plugin, remove when PMD7 is supported on main branch -->
-    <pluginRepositories>
-        <pluginRepository>
-            <id>apache.snapshots</id>
-            <name>Apache Snapshot Repository</name>
-            <url>https://repository.apache.org/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
     <profiles>
         <!-- Default profile with all child modules listed -->

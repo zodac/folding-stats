@@ -520,7 +520,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
     @Override
     public UserTcStats createHourlyTcStats(final UserTcStats userTcStats) {
-        SQL_LOGGER.debug("Inserting TC stats for user ID: {}", userTcStats::userId);
+        SQL_LOGGER.debug("Inserting TC stats for user ID: {}", userTcStats.userId());
 
         executeQuery(queryContext -> {
             final var query = queryContext
@@ -644,8 +644,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
     }
 
     private UserTcStats getCurrentDayFirstHourTcStats(final int userId, final int day, final Month month, final Year year) {
-        SQL_LOGGER.debug("Getting current day's first hour TC stats for user {} on {}/{}/{}", () -> userId, year::getValue, month::getValue,
-            () -> day);
+        SQL_LOGGER.debug("Getting current day's first hour TC stats for user {} on {}/{}/{}", userId, year.getValue(), month.getValue(), day);
 
         return executeQuery(queryContext -> {
             final LocalDateTime start = DateTimeConverterUtils.getLocalDateTimeOf(year, month, day, 0, 0, 0);
@@ -678,8 +677,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
     }
 
     private UserTcStats getPreviousDayLastHourTcStats(final int userId, final int day, final Month month, final Year year) {
-        SQL_LOGGER.debug("Getting previous day's last hour TC stats for user {} on {}/{}/{}", () -> userId, year::getValue, month::getValue,
-            () -> day);
+        SQL_LOGGER.debug("Getting previous day's last hour TC stats for user {} on {}/{}/{}", userId, year.getValue(), month.getValue(), day);
 
         return executeQuery(queryContext -> {
             final LocalDateTime start = DateTimeConverterUtils.getLocalDateTimeOf(year, month, day, 23, 0, 0);
@@ -888,7 +886,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
     @Override
     public UserStats createInitialStats(final UserStats userStats) {
-        SQL_LOGGER.debug("Inserting initial stats for user {} to DB", userStats::userId);
+        SQL_LOGGER.debug("Inserting initial stats for user {} to DB", userStats.userId());
 
         executeQuery(queryContext -> {
             final var query = queryContext
@@ -936,7 +934,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
     @Override
     public UserStats createTotalStats(final UserStats userStats) {
-        SQL_LOGGER.debug("Inserting total stats for user ID {} to DB", userStats::userId);
+        SQL_LOGGER.debug("Inserting total stats for user ID {} to DB", userStats.userId());
 
         executeQuery(queryContext -> {
             final var query = queryContext

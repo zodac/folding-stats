@@ -78,11 +78,11 @@ public class HistoricStatsController implements HistoricStatsEndpoint {
     @PermitAll
     @GetMapping(path = "/users/{userId}/{year}/{month}/{day}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<HistoricStats>> getUserHistoricStatsHourly(@PathVariable("userId") final int userId,
-                                                        @PathVariable("year") final String year,
-                                                        @PathVariable("month") final String month,
-                                                        @PathVariable("day") final String day,
-                                                        final HttpServletRequest request) {
-        AUDIT_LOGGER.debug("GET request received to show hourly TC user stats at '{}'", request::getRequestURI);
+                                                                                @PathVariable("year") final String year,
+                                                                                @PathVariable("month") final String month,
+                                                                                @PathVariable("day") final String day,
+                                                                                final HttpServletRequest request) {
+        AUDIT_LOGGER.debug("GET request received to show hourly TC user stats at '{}'", request.getRequestURI());
 
         final DateDetails date = DateParser.of(year, month, day);
         final User user = foldingRepository.getUserWithPasskey(userId);
@@ -95,10 +95,10 @@ public class HistoricStatsController implements HistoricStatsEndpoint {
     @PermitAll
     @GetMapping(path = "/users/{userId}/{year}/{month}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<HistoricStats>> getUserHistoricStatsDaily(@PathVariable("userId") final int userId,
-                                                       @PathVariable("year") final String year,
-                                                       @PathVariable("month") final String month,
-                                                       final HttpServletRequest request) {
-        AUDIT_LOGGER.debug("GET request received to show daily TC user stats at '{}'", request::getRequestURI);
+                                                                               @PathVariable("year") final String year,
+                                                                               @PathVariable("month") final String month,
+                                                                               final HttpServletRequest request) {
+        AUDIT_LOGGER.debug("GET request received to show daily TC user stats at '{}'", request.getRequestURI());
 
         final MonthDetails date = DateParser.of(year, month);
         final User user = foldingRepository.getUserWithPasskey(userId);
@@ -111,9 +111,9 @@ public class HistoricStatsController implements HistoricStatsEndpoint {
     @PermitAll
     @GetMapping(path = "/users/{userId}/{year}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<HistoricStats>> getUserHistoricStatsMonthly(@PathVariable("userId") final int userId,
-                                                         @PathVariable("year") final String year,
-                                                         final HttpServletRequest request) {
-        AUDIT_LOGGER.debug("GET request received to show monthly TC user stats at '{}'", request::getRequestURI);
+                                                                                 @PathVariable("year") final String year,
+                                                                                 final HttpServletRequest request) {
+        AUDIT_LOGGER.debug("GET request received to show monthly TC user stats at '{}'", request.getRequestURI());
 
         final YearDetails date = DateParser.of(year);
         final User user = foldingRepository.getUserWithPasskey(userId);
@@ -126,11 +126,11 @@ public class HistoricStatsController implements HistoricStatsEndpoint {
     @PermitAll
     @GetMapping(path = "/teams/{teamId}/{year}/{month}/{day}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<HistoricStats>> getTeamHistoricStatsHourly(@PathVariable("teamId") final int teamId,
-                                                        @PathVariable("year") final String year,
-                                                        @PathVariable("month") final String month,
-                                                        @PathVariable("day") final String day,
-                                                        final HttpServletRequest request) {
-        AUDIT_LOGGER.debug("GET request received to show hourly TC user stats at '{}'", request::getRequestURI);
+                                                                                @PathVariable("year") final String year,
+                                                                                @PathVariable("month") final String month,
+                                                                                @PathVariable("day") final String day,
+                                                                                final HttpServletRequest request) {
+        AUDIT_LOGGER.debug("GET request received to show hourly TC user stats at '{}'", request.getRequestURI());
 
         final DateDetails date = DateParser.of(year, month, day);
         final Team team = foldingRepository.getTeam(teamId);
@@ -153,10 +153,10 @@ public class HistoricStatsController implements HistoricStatsEndpoint {
     @PermitAll
     @GetMapping(path = "/teams/{teamId}/{year}/{month}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<HistoricStats>> getTeamHistoricStatsDaily(@PathVariable("teamId") final int teamId,
-                                                       @PathVariable("year") final String year,
-                                                       @PathVariable("month") final String month,
-                                                       final HttpServletRequest request) {
-        AUDIT_LOGGER.debug("GET request received to show daily TC user stats at '{}'", request::getRequestURI);
+                                                                               @PathVariable("year") final String year,
+                                                                               @PathVariable("month") final String month,
+                                                                               final HttpServletRequest request) {
+        AUDIT_LOGGER.debug("GET request received to show daily TC user stats at '{}'", request.getRequestURI());
 
         final MonthDetails date = DateParser.of(year, month);
         final Team team = foldingRepository.getTeam(teamId);
@@ -179,9 +179,9 @@ public class HistoricStatsController implements HistoricStatsEndpoint {
     @PermitAll
     @GetMapping(path = "/teams/{teamId}/{year}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<HistoricStats>> getTeamHistoricStatsMonthly(@PathVariable("teamId") final int teamId,
-                                                         @PathVariable("year") final String year,
-                                                         final HttpServletRequest request) {
-        AUDIT_LOGGER.debug("GET request received to show monthly TC team stats at '{}'", request::getRequestURI);
+                                                                                 @PathVariable("year") final String year,
+                                                                                 final HttpServletRequest request) {
+        AUDIT_LOGGER.debug("GET request received to show monthly TC team stats at '{}'", request.getRequestURI());
 
         final YearDetails date = DateParser.of(year);
         final Team team = foldingRepository.getTeam(teamId);

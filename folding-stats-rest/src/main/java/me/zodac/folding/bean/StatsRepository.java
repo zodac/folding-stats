@@ -337,7 +337,7 @@ public class StatsRepository {
 
     private AllTeamsSummary constructAllTeamsSummary() {
         final List<TeamSummary> teamSummaries = getStatsForTeams();
-        LOGGER.debug("Found {} TC teams", teamSummaries::size);
+        LOGGER.debug("Found {} TC teams", teamSummaries.size());
 
         if (teamSummaries.isEmpty()) {
             LOGGER.warn("No TC teams to show");
@@ -354,7 +354,7 @@ public class StatsRepository {
     }
 
     private TeamSummary getTcTeamResult(final Team team) {
-        LOGGER.debug("Converting team '{}' for TC stats", team::teamName);
+        LOGGER.debug("Converting team '{}' for TC stats", team.teamName());
 
         final Collection<User> usersOnTeam = getUsersFromTeam(team);
         LOGGER.debug("Found {} users for team '{}': {}", usersOnTeam.size(), team.teamName(), usersOnTeam);
@@ -390,8 +390,8 @@ public class StatsRepository {
 
     private UserSummary getTcStatsForUser(final User user) {
         final UserTcStats userTcStats = getHourlyTcStats(user);
-        LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user::displayName, userTcStats::points,
-            userTcStats::multipliedPoints, userTcStats::units);
+        LOGGER.debug("Results for {}: {} points | {} multiplied points | {} units", user.displayName(), userTcStats.points(),
+            userTcStats.multipliedPoints(), userTcStats.units());
         return UserSummary.createWithDefaultRank(user, userTcStats.points(), userTcStats.multipliedPoints(), userTcStats.units());
     }
 

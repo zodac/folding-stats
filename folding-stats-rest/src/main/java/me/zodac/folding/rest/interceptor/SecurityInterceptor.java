@@ -94,7 +94,7 @@ public final class SecurityInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) {
-        SECURITY_LOGGER.debug("Validating REST request at '{}'", request::getRequestURI);
+        SECURITY_LOGGER.debug("Validating REST request at '{}'", request.getRequestURI());
 
         if (!(handler instanceof HandlerMethod)) {
             if (isPreflightRequest(handler)) {

@@ -59,7 +59,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
     @Override
     public Stats getStats(final FoldingStatsDetails foldingStatsDetails) throws ExternalConnectionException {
         LOGGER.debug(""); // Line-break to differentiate different users
-        LOGGER.debug("Getting stats for username/passkey '{}/{}'", foldingStatsDetails::foldingUserName, foldingStatsDetails::passkey);
+        LOGGER.debug("Getting stats for username/passkey '{}/{}'", foldingStatsDetails.foldingUserName(), foldingStatsDetails.passkey());
         final long userPoints = getPoints(foldingStatsDetails);
         final int userUnits = getUnits(foldingStatsDetails);
         return Stats.create(userPoints, userUnits);
@@ -79,7 +79,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
         LOGGER.debug("Sending points request to: {}", pointsRequestUrl);
         final HttpResponse<String> response = sendFoldingRequest(pointsRequestUrl);
-        LOGGER.debug("Points response: {}", response::body);
+        LOGGER.debug("Points response: {}", response.body());
         return getPointsFromResponse(response);
     }
 
@@ -91,7 +91,7 @@ public final class HttpFoldingStatsRetriever implements FoldingStatsRetriever {
 
         LOGGER.debug("Sending units request to: {}", unitsRequestUrl);
         final HttpResponse<String> response = sendFoldingRequest(unitsRequestUrl);
-        LOGGER.debug("Units response: {}", response::body);
+        LOGGER.debug("Units response: {}", response.body());
         return getUnitsFromResponse(foldingStatsDetails, response);
     }
 }

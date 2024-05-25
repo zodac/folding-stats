@@ -123,7 +123,7 @@ public class TeamCompetitionStatsController implements TeamCompetitionStatsEndpo
     @PermitAll
     @GetMapping(path = "/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserSummary> getTeamCompetitionStatsForUser(@PathVariable("userId") final int userId, final HttpServletRequest request) {
-        AUDIT_LOGGER.debug("GET request received to show TC stats for user received at '{}'", request::getRequestURI);
+        AUDIT_LOGGER.debug("GET request received to show TC stats for user received at '{}'", request.getRequestURI());
 
         final User user = foldingRepository.getUserWithoutPasskey(userId);
 
@@ -149,7 +149,7 @@ public class TeamCompetitionStatsController implements TeamCompetitionStatsEndpo
     public ResponseEntity<Void> updateUserWithOffset(@PathVariable("userId") final int userId,
                                                      @RequestBody final OffsetTcStatsRequest offsetTcStatsRequest,
                                                      final HttpServletRequest request) {
-        AUDIT_LOGGER.info("PATCH request to offset user stats received at '{}' with request {}", request::getRequestURI, () -> offsetTcStatsRequest);
+        AUDIT_LOGGER.info("PATCH request to offset user stats received at '{}' with request {}", request.getRequestURI(), offsetTcStatsRequest);
 
         final User user = foldingRepository.getUserWithPasskey(userId);
         final Hardware hardware = user.hardware();
@@ -192,7 +192,7 @@ public class TeamCompetitionStatsController implements TeamCompetitionStatsEndpo
     @RolesAllowed("admin")
     @PostMapping(path = "/manual/update")
     public ResponseEntity<Void> updateStats(final HttpServletRequest request) {
-        AUDIT_LOGGER.info("GET request received to manually update TC stats at '{}?{}", request::getRequestURI, () -> extractParameters(request));
+        AUDIT_LOGGER.info("GET request received to manually update TC stats at '{}?{}", request.getRequestURI(), extractParameters(request));
         final Collection<User> users = foldingRepository.getAllUsersWithPasskeys();
         userStatsParser.parseTcStatsForUsers(users);
         return ok();
