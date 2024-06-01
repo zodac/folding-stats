@@ -27,6 +27,7 @@ import java.time.OffsetDateTime;
 import java.time.Year;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 
@@ -60,7 +61,7 @@ class DateTimeUtilsTest {
     void whenGetCurrentUtcYear_thenCurrentUtcYearIsReturned() {
         final Year currentUtcYear = DATE_TIME_UTILS.currentUtcYear();
 
-        assertThat(currentUtcYear)
+        assertThat((Temporal) currentUtcYear)
             .isEqualTo(Year.of(TEST_TIME.getYear()));
     }
 
@@ -69,7 +70,7 @@ class DateTimeUtilsTest {
         final Month currentUtcMonth = DATE_TIME_UTILS.currentUtcMonth();
 
         assertThat(currentUtcMonth)
-            .isEqualTo(TEST_TIME.getMonth());
+            .isEqualByComparingTo(TEST_TIME.getMonth());
     }
 
     @Test

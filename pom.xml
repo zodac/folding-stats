@@ -20,7 +20,7 @@
         <!-- Project Properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java-release>21</java-release>
-        <maven-release>3.9.6</maven-release>
+        <maven-release>3.9.7</maven-release>
 
         <!-- Lint Properties -->
         <!-- All disabled by default, activated through profiles -->
@@ -42,25 +42,25 @@
         <caffeine.version>3.1.8</caffeine.version>
         <gson.version>2.11.0</gson.version>
         <hikariCP.version>5.1.0</hikariCP.version>
-        <jakartaee-web-api.version>11.0.0-M2</jakartaee-web-api.version>
-        <jersey-server.version>4.0.0-M1</jersey-server.version>
-        <jooq.version>3.19.8</jooq.version>
-        <log4j.version>3.0.0-beta2</log4j.version>
+        <jakarta.jakartaee-web-api.version>10.0.0</jakarta.jakartaee-web-api.version>
+        <jersey-server.version>3.1.7</jersey-server.version>
+        <jooq.version>3.19.9</jooq.version>
+        <log4j.version>2.23.1</log4j.version>
         <lombok.version>1.18.32</lombok.version>
         <postgresql.version>42.7.3</postgresql.version>
         <resilience4j.version>2.2.0</resilience4j.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <spring-boot.version>3.3.0</spring-boot.version>
         <springdoc-openapi.version>2.5.0</springdoc-openapi.version>
-        <slf4j-api.version>2.1.0-alpha1</slf4j-api.version>
+        <slf4j-api.version>2.0.13</slf4j-api.version>
         <swagger.version>2.2.22</swagger.version>
 
         <!-- Test 3PP Versions -->
-        <assertj-core.version>3.25.3</assertj-core.version>
+        <assertj-core.version>3.26.0</assertj-core.version>
         <embedded-postgres.version>2.0.7</embedded-postgres.version>
         <embedded-postgres-binaries-bom.version>16.2.0</embedded-postgres-binaries-bom.version>
         <flyway-core.version>10.13.0</flyway-core.version>
-        <junit-bom.version>5.11.0-M2</junit-bom.version>
+        <junit-bom.version>5.10.2</junit-bom.version>
         <selenium-java.version>4.21.0</selenium-java.version>
 
         <!-- Plugin Versions -->
@@ -70,30 +70,30 @@
         <maven-clean-plugin.version>3.3.2</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.6.1</maven-dependency-plugin.version>
-        <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
+        <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
         <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
         <maven-install-plugin.version>3.1.2</maven-install-plugin.version>
         <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version>
         <maven-project-info-reports-plugin.version>3.5.0</maven-project-info-reports-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
-        <maven-site-plugin.version>4.0.0-M14</maven-site-plugin.version>
+        <maven-site-plugin.version>3.12.1</maven-site-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>10.16.0</checkstyle.version>
-        <error_prone_core.version>2.27.0</error_prone_core.version>
+        <checkstyle.version>10.17.0</checkstyle.version>
+        <error_prone_core.version>2.27.1</error_prone_core.version>
         <licenses.version>1</licenses.version>
-        <nullaway.version>0.10.26</nullaway.version>
+        <nullaway.version>0.11.0</nullaway.version>
         <pitest-junit5-plugin.version>1.2.1</pitest-junit5-plugin.version>
-        <pmd.version>7.1.0</pmd.version>
+        <pmd.version>7.2.0</pmd.version>
         <spotbugs.version>4.8.5</spotbugs.version>
 
         <!-- Linter Plugin Versions -->
         <dependency-check-maven.version>9.2.0</dependency-check-maven.version>
         <license-maven-plugin.version>4.5</license-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
-        <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.7.0</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.22.0</maven-pmd-plugin.version>
         <pitest-maven.version>1.16.1</pitest-maven.version>
         <spotbugs-maven-plugin.version>4.8.5.0</spotbugs-maven-plugin.version>
@@ -111,7 +111,7 @@
         <spotbugs-exclude-file>${ci-config-directory}/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
 
         <!-- ProGuard 3PP Versions -->
-        <proguard-base.version>7.4.2</proguard-base.version>
+        <proguard-base.version>7.5.0</proguard-base.version>
         <proguard-core.version>9.1.4</proguard-core.version>
 
         <!-- ProGuard Plugin Versions -->
@@ -171,7 +171,7 @@
             <dependency>
                 <groupId>jakarta.platform</groupId>
                 <artifactId>jakarta.jakartaee-web-api</artifactId>
-                <version>${jakartaee-web-api.version}</version>
+                <version>${jakarta.jakartaee-web-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
@@ -544,6 +544,15 @@
                         <!-- If a valid update becomes available, it can be updated and removed from below -->
                         <excludes/>
                         <generateBackupPoms>false</generateBackupPoms>
+                        <ruleSet>
+                            <ignoreVersions>
+                                <!-- Exclude alpha, beta, milestone and SNAPSHOT releases -->
+                                <ignoreVersion>
+                                    <type>regex</type>
+                                    <version>.*(-alpha|-beta|-M\d|-SNAPSHOT).*</version>
+                                </ignoreVersion>
+                            </ignoreVersions>
+                        </ruleSet>
                     </configuration>
                 </plugin>
 
