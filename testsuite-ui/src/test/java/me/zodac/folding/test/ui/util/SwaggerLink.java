@@ -40,26 +40,10 @@ public enum SwaggerLink {
      */
     SWAGGER_UI_URL("http://backend-dev:8079/folding/swagger-ui/index.html");
 
-    private static final Collection<SwaggerLink> ALL_VALUES = Stream.of(values())
-        .toList();
-
     private final String url;
 
     SwaggerLink(final String url) {
         this.url = url;
-    }
-
-    /**
-     * Retrieve all available {@link SwaggerLink}s.
-     *
-     * <p>
-     * Should be used instead of {@link SwaggerLink#values()}, as that recalculates the array for each call,
-     * while this method uses a static {@link Collection}.
-     *
-     * @return a {@link Collection} of all {@link SwaggerLink}s
-     */
-    public static Collection<SwaggerLink> getAllValues() {
-        return ALL_VALUES;
     }
 
     /**

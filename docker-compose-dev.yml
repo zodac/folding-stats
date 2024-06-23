@@ -6,7 +6,7 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         # Docker image versions
-        NODE_VERSION: "22.2.0" # https://hub.docker.com/_/node
+        NODE_VERSION: "22.3.0" # https://hub.docker.com/_/node
         # Build arguments
         ADMIN_EMAIL_ADDRESS: "email@test.com"
         FORUM_LINK: "https://extremehw.net/forum/125-extreme-team-folding"
@@ -32,9 +32,9 @@ services:
       dockerfile: docker/backend/Dockerfile
       args:
         # Docker image versions
-        DEBIAN_VERSION: "12.5" # https://hub.docker.com/_/debian
-        JAVA_VERSION: "22"     # https://hub.docker.com/_/eclipse-temurin
-        MAVEN_VERSION: "3.9.7" # https://hub.docker.com/_/maven
+        DEBIAN_VERSION: "12.5"    # https://hub.docker.com/_/debian
+        JAVA_VERSION: "22.0.1_8"  # https://hub.docker.com/_/eclipse-temurin
+        MAVEN_VERSION: "3.9.7"    # https://hub.docker.com/_/maven
         # Build arguments
         KEYSTORE_PASSWORD: "shroot"
     container_name: backend_dev
@@ -110,7 +110,7 @@ services:
       - "5433:5432"
 
   selenium_chrome:
-    image: selenium/standalone-chrome:125.0
+    image: selenium/standalone-chrome:126.0
     container_name: selenium_chrome
     hostname: selenium_chrome
     depends_on:
@@ -121,7 +121,7 @@ services:
       - development
 
   selenium_firefox:
-    image: selenium/standalone-firefox:126.0
+    image: selenium/standalone-firefox:127.0
     container_name: selenium_firefox
     hostname: selenium_firefox
     depends_on:

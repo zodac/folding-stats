@@ -164,7 +164,7 @@ class UserChangeValidatorTest {
         foldingRepository.createUser(user);
 
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
+        final ValidationException e = catchThrowableOfType(ValidationException.class, () -> userChangeValidator.validate(userChange));
         assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'foldingUserName' must have at least one alphanumeric character, or an underscore, period or hyphen");
     }
@@ -189,7 +189,7 @@ class UserChangeValidatorTest {
         foldingRepository.createUser(user);
 
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
+        final ValidationException e = catchThrowableOfType(ValidationException.class, () -> userChangeValidator.validate(userChange));
         assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'passkey' must be 32 characters long and include only alphanumeric characters");
     }
@@ -241,7 +241,7 @@ class UserChangeValidatorTest {
         foldingRepository.createUser(user);
 
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
+        final ValidationException e = catchThrowableOfType(ValidationException.class, () -> userChangeValidator.validate(userChange));
         assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'liveStatsLink' is not a valid link: 'invalidUrl'");
     }
@@ -266,7 +266,7 @@ class UserChangeValidatorTest {
         foldingRepository.createUser(user);
 
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
+        final ValidationException e = catchThrowableOfType(ValidationException.class, () -> userChangeValidator.validate(userChange));
         assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Field 'hardwareId' must be one of: [%s: %s]", hardware.id(), hardware.hardwareName()));
     }
@@ -290,7 +290,7 @@ class UserChangeValidatorTest {
         foldingRepository.createUser(user);
 
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
+        final ValidationException e = catchThrowableOfType(ValidationException.class, () -> userChangeValidator.validate(userChange));
         assertThat(e.getValidationFailure().errors())
             .containsOnly("No hardwares exist on the system");
     }
@@ -315,7 +315,7 @@ class UserChangeValidatorTest {
         foldingRepository.createUser(user);
 
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
+        final ValidationException e = catchThrowableOfType(ValidationException.class, () -> userChangeValidator.validate(userChange));
         assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Field 'userId' must be one of: [%s: %s]", user.id(), user.displayName()));
     }
@@ -339,7 +339,7 @@ class UserChangeValidatorTest {
         foldingRepository.createHardware(hardware);
 
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
+        final ValidationException e = catchThrowableOfType(ValidationException.class, () -> userChangeValidator.validate(userChange));
         assertThat(e.getValidationFailure().errors())
             .containsOnly("No users exist on the system");
     }
@@ -364,7 +364,7 @@ class UserChangeValidatorTest {
         foldingRepository.createUser(user);
 
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
+        final ValidationException e = catchThrowableOfType(ValidationException.class, () -> userChangeValidator.validate(userChange));
         assertThat(e.getValidationFailure().errors())
             .containsOnly("Field 'existingPasskey' does not match the existing passkey for the user");
     }
@@ -389,7 +389,7 @@ class UserChangeValidatorTest {
         foldingRepository.createUser(user);
 
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
+        final ValidationException e = catchThrowableOfType(ValidationException.class, () -> userChangeValidator.validate(userChange));
         assertThat(e.getValidationFailure().errors())
             .containsOnly("User already has the values supplied in UserChangeRequest");
     }
@@ -432,7 +432,7 @@ class UserChangeValidatorTest {
         foldingRepository.createUserChange(existingUserChange);
 
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ValidFoldingStatsRetriever());
-        final ConflictException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ConflictException.class);
+        final ConflictException e = catchThrowableOfType(ConflictException.class, () -> userChangeValidator.validate(userChange));
         assertThat(e.getConflictFailure().conflictingAttributes())
             .containsOnly(
                 "foldingUserName",
@@ -553,7 +553,7 @@ class UserChangeValidatorTest {
         foldingRepository.createUser(user);
 
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new NoUnitsFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
+        final ValidationException e = catchThrowableOfType(ValidationException.class, () -> userChangeValidator.validate(userChange));
         assertThat(e.getValidationFailure().errors())
             .containsOnly(
                 String.format(
@@ -582,7 +582,7 @@ class UserChangeValidatorTest {
         foldingRepository.createUser(user);
 
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new NoUnitsFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
+        final ValidationException e = catchThrowableOfType(ValidationException.class, () -> userChangeValidator.validate(userChange));
         assertThat(e.getValidationFailure().errors())
             .containsOnly(
                 String.format(
@@ -611,7 +611,7 @@ class UserChangeValidatorTest {
         foldingRepository.createUser(user);
 
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new ExternalConnectionFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
+        final ValidationException e = catchThrowableOfType(ValidationException.class, () -> userChangeValidator.validate(userChange));
         assertThat(e.getValidationFailure().errors())
             .containsOnly(
                 String.format("Unable to connect to 'https://www.google.com' to check stats for user '%s': Error connecting",
@@ -639,7 +639,7 @@ class UserChangeValidatorTest {
         foldingRepository.createUser(user);
 
         final UserChangeValidator userChangeValidator = new UserChangeValidator(foldingRepository, new UnexpectedExceptionFoldingStatsRetriever());
-        final ValidationException e = catchThrowableOfType(() -> userChangeValidator.validate(userChange), ValidationException.class);
+        final ValidationException e = catchThrowableOfType(ValidationException.class, () -> userChangeValidator.validate(userChange));
         assertThat(e.getValidationFailure().errors())
             .containsOnly(String.format("Unable to check stats for user '%s': Error", user.foldingUserName()));
     }
