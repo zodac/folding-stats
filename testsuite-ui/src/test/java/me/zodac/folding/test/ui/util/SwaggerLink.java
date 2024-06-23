@@ -17,9 +17,6 @@
 
 package me.zodac.folding.test.ui.util;
 
-import java.util.Collection;
-import java.util.stream.Stream;
-
 /**
  * Enum defining the frontend API's Swagger UI URL links.
  */

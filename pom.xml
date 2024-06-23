@@ -383,16 +383,16 @@
                 <version>${snakeyaml.version}</version>
             </dependency>
             <!-- Used by [spring-boot-starter, spring-boot-starter-actuator, spring-boot-starter-security, spring-boot-starter-web] -->
-            <!-- Setting to 1.12.6 due to CVEs with 1.13.0 -->
+            <!-- Setting to latest available -->
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-commons</artifactId>
-                <version>1.12.6</version>
+                <version>1.13.1</version>
             </dependency>
             <dependency>
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-observation</artifactId>
-                <version>1.12.6</version>
+                <version>1.13.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
