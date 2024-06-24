@@ -15,3 +15,9 @@ RUN sed -i -e "s|%ADMIN_USERNAME%|${ADMIN_USERNAME}|g" /docker-entrypoint-initdb
     sed -i -e "s|%ADMIN_PASSWORD%|${ADMIN_PASSWORD}|g" /docker-entrypoint-initdb.d/system-users.sql && \
     sed -i -e "s|%READ_ONLY_USERNAME%|${READ_ONLY_USERNAME}|g" /docker-entrypoint-initdb.d/system-users.sql && \
     sed -i -e "s|%READ_ONLY_PASSWORD%|${READ_ONLY_PASSWORD}|g" /docker-entrypoint-initdb.d/system-users.sql
+
+HEALTHCHECK --interval=30s \
+            --timeout=5s \
+            --start-period=10s \
+            --retries=3 \
+            CMD [ "pg_isready", "--host", "localhost" ]

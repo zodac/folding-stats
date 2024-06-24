@@ -84,12 +84,12 @@ ENV JAVA_HOME "/opt/jdk/"
 ENV PATH "${PATH}:${JAVA_HOME}/bin"
 
 # Updating system packages, and installing:
-# - curl to run healthcheck
 # - nano to allow user to edit log4j2.xml (smaller than vi)
+# - wget to run healthcheck
 RUN --mount=type=cache,target=/var/cache/apt apt-get update && apt-get upgrade -y && \
     apt-get install -yqq --no-install-recommends \
-      curl \
       nano \
+      wget \
     && \
     apt-get autoremove && \
     apt-get clean && \
@@ -108,5 +108,11 @@ USER backend_user
 
 # Set default directory to the log directory
 WORKDIR /var/backend/logs/
+
+HEALTHCHECK --interval=30s \
+            --timeout=5s \
+            --start-period=10s \
+            --retries=3 \
+            CMD [ "/usr/bin/wget", "--no-check-certificate", "--no-verbose", "--tries=1", "--spider", "http://localhost:8443/folding/actuator/health" ]
 
 ENTRYPOINT [ "/startup.sh" ]

@@ -2,6 +2,8 @@ version: '2.3'
 
 networks:
   production:
+    name: production
+    driver: bridge
 
 services:
 
@@ -15,7 +17,6 @@ services:
         # Build arguments
         ADMIN_EMAIL_ADDRESS: "${ADMIN_EMAIL_ADDRESS}"
         FORUM_LINK: "${FORUM_LINK}"
-        HTTPS_FRONTEND_PORT: "${HTTPS_FRONTEND_PORT}"
         REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"
         ROOT_URL: "${ROOT_URL}"
         TITLE: "${TITLE}"
@@ -27,7 +28,7 @@ services:
     networks:
       - production
     ports:
-      - "${HTTPS_FRONTEND_PORT}:${HTTPS_FRONTEND_PORT}"
+      - "${HTTPS_FRONTEND_PORT}:443"
     restart: unless-stopped
     volumes_from:
       - backend:ro
@@ -79,16 +80,10 @@ services:
       CONTACT_NAME: "${CONTACT_NAME}"
       FORUM_LINK: "${FORUM_LINK}"
       REST_ENDPOINT_URL: "${REST_ENDPOINT_URL}"
-    healthcheck:
-      test: "curl --fail --silent -k https://localhost:8443/folding/actuator/health | grep UP || exit 1"
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
     networks:
       - production
     ports:
-      - "${HTTPS_BACKEND_PORT}:${HTTPS_BACKEND_PORT}"
+      - "${HTTPS_BACKEND_PORT}:8443"
     restart: unless-stopped
     volumes:
       - backend_certs:/usr/local/certs/stats/

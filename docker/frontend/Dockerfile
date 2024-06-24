@@ -51,12 +51,10 @@ COPY ./docker/frontend/conf/httpd.conf /usr/local/apache2/conf/httpd.conf
 COPY ./docker/frontend/conf/httpd-ssl.conf /usr/local/apache2/conf/extra/httpd-ssl.conf
 
 ARG ADMIN_EMAIL_ADDRESS
-ARG HTTPS_FRONTEND_PORT
 ARG ROOT_URL
 
 # Replace environment arguments in httpd config files
-RUN sed -i -e "s|%HTTPS_FRONTEND_PORT%|${HTTPS_FRONTEND_PORT}|g" /usr/local/apache2/conf/extra/httpd-ssl.conf && \
-    sed -i -e "s|%ROOT_URL%|${ROOT_URL}|g" /usr/local/apache2/conf/extra/httpd-ssl.conf && \
+RUN sed -i -e "s|%ROOT_URL%|${ROOT_URL}|g" /usr/local/apache2/conf/extra/httpd-ssl.conf && \
     sed -i -e "s|%ADMIN_EMAIL_ADDRESS%|${ADMIN_EMAIL_ADDRESS}|g" /usr/local/apache2/conf/extra/httpd-ssl.conf
 
 WORKDIR /usr/local/apache2/htdocs/
@@ -128,3 +126,9 @@ RUN adduser -D frontend_user && \
     mkdir --parents /usr/local/apache2/logs && \
     chown -R frontend_user:frontend_user /usr/local/apache2/logs
 USER frontend_user
+
+HEALTHCHECK --interval=30s \
+            --timeout=5s \
+            --start-period=10s \
+            --retries=3 \
+            CMD [ "/usr/bin/wget", "--no-check-certificate", "--no-verbose", "--tries=1", "--spider", "https://localhost:443" ]

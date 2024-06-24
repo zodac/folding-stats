@@ -1,3 +1,8 @@
+networks:
+  development:
+    name: development
+    driver: bridge
+
 services:
 
   frontend_dev:
@@ -10,7 +15,6 @@ services:
         # Build arguments
         ADMIN_EMAIL_ADDRESS: "email@test.com"
         FORUM_LINK: "https://extremehw.net/forum/125-extreme-team-folding"
-        HTTPS_FRONTEND_PORT: "81"
         REST_ENDPOINT_URL: "http://127.0.0.1:8079/folding"
         ROOT_URL: "https://127.0.0.1:81"
         TITLE: "Extreme Team Folding"
@@ -22,7 +26,8 @@ services:
     networks:
       - development
     ports:
-      - "81:81"
+      - "81:443"
+    restart: no
     volumes_from:
       - backend_dev
 
@@ -41,8 +46,8 @@ services:
     hostname: backend-dev # Using a dash as Java's URI builder will fail with an underscore
     environment:
       # External URL configuration
-      LARS_URL_ROOT: "http://backend-dev:8079/folding"
-      STATS_URL_ROOT: "http://backend-dev:8079/folding"
+      LARS_URL_ROOT: "http://backend-dev:8443/folding"
+      STATS_URL_ROOT: "http://backend-dev:8443/folding"
       REDIRECT_URL: "https://127.0.0.1:81"
       # Spring configuration
       DEPLOYMENT_TYPE: "test"
@@ -74,7 +79,8 @@ services:
     networks:
       - development
     ports:
-      - "8079:8079"
+      - "8079:8443"
+    restart: no
     volumes:
       - /usr/local/certs/stats/
 
@@ -108,6 +114,7 @@ services:
       - development
     ports:
       - "5433:5432"
+    restart: no
 
   selenium_chrome:
     image: selenium/standalone-chrome:126.0
@@ -115,10 +122,11 @@ services:
     hostname: selenium_chrome
     depends_on:
       - frontend_dev
-    ports:
-      - "4444:4444"
     networks:
       - development
+    ports:
+      - "4444:4444"
+    restart: no
 
   selenium_firefox:
     image: selenium/standalone-firefox:127.0
@@ -126,10 +134,8 @@ services:
     hostname: selenium_firefox
     depends_on:
       - frontend_dev
-    ports:
-      - "4445:4444"
     networks:
       - development
-
-networks:
-  development:
+    ports:
+      - "4445:4444"
+    restart: no
