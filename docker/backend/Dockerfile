@@ -113,6 +113,6 @@ HEALTHCHECK --interval=30s \
             --timeout=5s \
             --start-period=10s \
             --retries=3 \
-            CMD [ "/usr/bin/wget", "--no-check-certificate", "--no-verbose", "--tries=1", "--spider", "http://localhost:8443/folding/actuator/health" ]
+            CMD [ "/usr/bin/wget", "--no-check-certificate", "--no-verbose", "--tries=1", "--spider", "https://127.0.0.1:8443/folding/actuator/health" ]
 
 ENTRYPOINT [ "/startup.sh" ]
