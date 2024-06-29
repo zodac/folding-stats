@@ -34,4 +34,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Run linters and unit tests
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: mvn clean install -Dlint -Dunit-tests
