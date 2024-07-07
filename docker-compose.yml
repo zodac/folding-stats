@@ -13,7 +13,7 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         # Docker image versions
-        NODE_VERSION: "22.3.0" # https://hub.docker.com/_/node
+        NODE_VERSION: "22.4.0" # https://hub.docker.com/_/node
         # Build arguments
         ADMIN_EMAIL_ADDRESS: "${ADMIN_EMAIL_ADDRESS}"
         FORUM_LINK: "${FORUM_LINK}"
@@ -39,9 +39,9 @@ services:
       dockerfile: docker/backend/Dockerfile
       args:
         # Docker image versions
-        DEBIAN_VERSION: "12.5"    # https://hub.docker.com/_/debian
+        DEBIAN_VERSION: "12.6"    # https://hub.docker.com/_/debian
         JAVA_VERSION: "22.0.1_8"  # https://hub.docker.com/_/eclipse-temurin
-        MAVEN_VERSION: "3.9.7"    # https://hub.docker.com/_/maven
+        MAVEN_VERSION: "3.9.8"    # https://hub.docker.com/_/maven
         # Build arguments
         KEYSTORE_PASSWORD: "${KEYSTORE_PASSWORD}"
     container_name: backend
