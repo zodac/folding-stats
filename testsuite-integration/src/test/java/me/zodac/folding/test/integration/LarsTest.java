@@ -47,8 +47,7 @@ class LarsTest {
 
     @AfterEach
     void tearDown() throws FoldingRestException {
-        SystemCleaner.cleanSystemForSimpleTests();
-        LarsUtils.deleteAllGpusFromLarsDb();
+        setUp();
     }
 
     @Test
