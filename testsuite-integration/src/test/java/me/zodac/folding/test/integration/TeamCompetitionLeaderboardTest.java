@@ -174,7 +174,7 @@ class TeamCompetitionLeaderboardTest {
             .as("Expected one entry per category, found: " + results.keySet() + ", : " + response.body())
             .hasSize(Category.getAllValues().size());
 
-        assertThat(results.values().stream().flatMap(Collection::stream).collect(toList()))
+        assertThat(results.values().stream().flatMap(Collection::stream).toList())
             .as("Incorrect number of user summaries returned: " + response.body())
             .hasSize(4);
 
