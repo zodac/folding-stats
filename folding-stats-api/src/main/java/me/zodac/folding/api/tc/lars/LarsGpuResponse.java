@@ -29,7 +29,7 @@ import java.util.Collection;
  *     {
  *         "api_name": "Folding@Home GPU PPD Rank List - Overall Ranks - Average All OS",
  *         "api_description": "GPUs ranked by overall PPD best to worst based on data collected and processed by https://folding.lar.systems",
- *         "api_licence": "API data is free to use to non profit folding@home teams, only condition of use is a credit / link must be provided back to https://folding.lar.systems to encourage use of the folding@home in the dark extension that makes providing this data possible.",
+ *         "api_licence": "API data is free to use to non profit folding@home teams, ... (truncated for length)",
  *         "credit_link_website": "https://folding.lar.systems",
  *         "credit_link_chrome_extension": "https://chrome.google.com/webstore/detail/folding-at-home-in-the-da/alpjkkbjnbkddolgnicglknicbgfahoe",
  *         "date_last_update": "2022-03-22T19:44:55.4063819Z",
