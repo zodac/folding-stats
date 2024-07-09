@@ -38,7 +38,7 @@ class RetiredUserTcStatsTest {
 
     @Test
     void testCreate_blankDisplayName() {
-        assertThatThrownBy(() ->createTestUser(""))
+        assertThatThrownBy(() -> createTestUser(""))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("displayName");
     }
