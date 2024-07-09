@@ -795,22 +795,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
 
                 // First entry will be zeroed, so we need to manually get the first day's stats for the user
                 if (resultSet.next()) {
-                    final LocalDateTime localDateTime = resultSet.getTimestamp("daily_timestamp").toLocalDateTime();
-                    final UserTcStats userTcStats = getTcStatsForFirstDayOfMonth(localDateTime, userId);
-
-                    if (userTcStats.isEmpty()) {
-                        SQL_LOGGER.warn("Error getting historic stats for first day of {} for user with ID {}", formatMonth(month),
-                            userId);
-                    } else {
-                        userStats.add(
-                            HistoricStats.create(
-                                localDateTime,
-                                userTcStats.points(),
-                                userTcStats.multipliedPoints(),
-                                userTcStats.units()
-                            )
-                        );
-                    }
+                    retrieveFirstEntry(userId, month, resultSet, userStats);
                 }
 
                 // All remaining entries will be diff-ed from the previous entry
@@ -829,6 +814,26 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
             }
         } catch (final SQLException e) {
             throw new DatabaseConnectionException("Error opening connection to the DB", e);
+        }
+    }
+
+    private void retrieveFirstEntry(final int userId, final Month month, final ResultSet resultSet, final Collection<? super HistoricStats> userStats)
+        throws SQLException {
+        final LocalDateTime localDateTime = resultSet.getTimestamp("daily_timestamp").toLocalDateTime();
+        final UserTcStats userTcStats = getTcStatsForFirstDayOfMonth(localDateTime, userId);
+
+        if (userTcStats.isEmpty()) {
+            SQL_LOGGER.warn("Error getting historic stats for first day of {} for user with ID {}", formatMonth(month),
+                userId);
+        } else {
+            userStats.add(
+                HistoricStats.create(
+                    localDateTime,
+                    userTcStats.points(),
+                    userTcStats.multipliedPoints(),
+                    userTcStats.units()
+                )
+            );
         }
     }
 
