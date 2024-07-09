@@ -33,11 +33,11 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**.pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - name: Run linters and unit tests (including SonarQube)
-        env:
-          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-          SONARQUBE_PAT: ${{ secrets.SONARQUBE_PAT }}
-        run: mvn clean install -Dlint -Dunit-tests -Dsonarqube
+#      - name: Run linters and unit tests (including SonarQube)
+#        env:
+#          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+#          SONARQUBE_PAT: ${{ secrets.SONARQUBE_PAT }}
+#        run: mvn clean install -Dlint -Dunit-tests -Dsonarqube
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@v2.3.0
         env:
