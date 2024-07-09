@@ -115,7 +115,7 @@
         <sonar.java.pmd.reportPaths>${project.build.directory}/pmd.xml</sonar.java.pmd.reportPaths>
         <sonar.java.spotbugs.reportPaths>${project.build.directory}/spotbugsXml.xml</sonar.java.spotbugs.reportPaths>
         <sonar.language>java</sonar.language>
-        <sonar.projectKey>folding-stats_2</sonar.projectKey>
+        <sonar.projectKey>${project.artifactId}</sonar.projectKey>
         <sonar.projectName>${project.artifactId}</sonar.projectName>
         <!--suppress UnresolvedMavenProperty, injected by environment variable -->
         <sonar.token>${env.SONARQUBE_PAT}</sonar.token>
