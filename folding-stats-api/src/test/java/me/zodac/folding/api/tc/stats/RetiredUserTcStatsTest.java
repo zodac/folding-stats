@@ -29,7 +29,7 @@ class RetiredUserTcStatsTest {
 
     @Test
     void testCreate() {
-        final RetiredUserTcStats retiredUserTcStats = RetiredUserTcStats.create(1, 1, "user", UserTcStats.createNow(1, 5L, 500L, 1));
+        final RetiredUserTcStats retiredUserTcStats = createTestUser("user");
 
         assertThat(retiredUserTcStats)
             .extracting("retiredUserId", "teamId", "displayName", "points", "multipliedPoints", "units")
@@ -38,7 +38,7 @@ class RetiredUserTcStatsTest {
 
     @Test
     void testCreate_blankDisplayName() {
-        assertThatThrownBy(() -> RetiredUserTcStats.create(1, 1, "", UserTcStats.createNow(1, 5L, 500L, 1)))
+        assertThatThrownBy(() ->createTestUser(""))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("displayName");
     }
@@ -52,5 +52,9 @@ class RetiredUserTcStatsTest {
         final RetiredUserTcStats updatedRetiredUserTcStats = RetiredUserTcStats.updateWithId(3, retiredUserTcStats);
         assertThat(updatedRetiredUserTcStats.retiredUserId())
             .isEqualTo(3);
+    }
+
+    private static RetiredUserTcStats createTestUser(final String displayName) {
+        return RetiredUserTcStats.create(1, 1, displayName, UserTcStats.createNow(1, 5L, 500L, 1));
     }
 }
