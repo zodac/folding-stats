@@ -55,30 +55,41 @@ public class UserStatsResetter {
     }
 
     /**
-     * Resets the {@code Team Competition} stats for all {@link User}s.
+     * Resets the {@code Team Competition} stats for all {@link User}s, at the end of a month.
      *
      * <p>
-     * If the reset is for the start of a new month, we will also pull the latest stats for each {@link User}.
+     * Since it's the reset of the current month, we don't pull the latest stats due to rate-limiting from Folding@Home API. Technically means we
+     * could have some points drop in the two minutes between last update and reset, but I can live with that.
      *
-     * @param isStartOfCompetition if the reset is for the start of a new month of the {@code Team Competition}
      * @see StatsRepository#resetAllTeamCompetitionUserStats()
-     * @see UserStatsParser#parseTcStatsForUsers(Iterable)
      */
-    public void resetTeamCompetitionStats(final boolean isStartOfCompetition) {
+    public void resetTeamCompetitionStatsForEndOfMonth() {
         try {
-            final Collection<User> users = foldingRepository.getAllUsersWithPasskeys();
-
-            // Only pulling the latest stats if we are starting the competition for a new month.
-            // If it's the reset of the current month, we don't pull the latest stats due to rate-limiting from Folding@Home API.
-            // Technically means we could have some points drop in the two minutes between last update and reset, but I can live with that. :)
-            if (isStartOfCompetition) {
-                userStatsParser.parseTcStatsForUsers(users);
-            }
-
             LOGGER.info("Resetting Team Competition stats");
             statsRepository.resetAllTeamCompetitionUserStats();
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error manually resetting TC stats", e);
+        }
+    }
+
+    /**
+     * Resets the {@code Team Competition} stats for all {@link User}s, for the start of a new month.
+     *
+     * <p>
+     * When we're starting a new month, we'll also pull the latest stats for all {@link User}s for their initial stats for the month.
+     *
+     * @see StatsRepository#resetAllTeamCompetitionUserStats()
+     * @see UserStatsParser#parseTcStatsForUsers(Iterable)
+     */
+    public void resetTeamCompetitionStatsForStartOfMonth() {
+        try {
+            final Collection<User> users = foldingRepository.getAllUsersWithPasskeys();
+            userStatsParser.parseTcStatsForUsers(users);
+
+            LOGGER.info("Resetting Team Competition stats for start of a new month");
+            statsRepository.resetAllTeamCompetitionUserStats();
+        } catch (final Exception e) {
+            LOGGER.warn("Unexpected error manually resetting TC stats for new month", e);
         }
     }
 }

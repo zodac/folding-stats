@@ -206,7 +206,7 @@ public class TeamCompetitionStatsController implements TeamCompetitionStatsEndpo
         AUDIT_LOGGER.info("GET request received to manually reset TC stats");
 
         SystemStateManager.next(SystemState.RESETTING_STATS);
-        userStatsResetter.resetTeamCompetitionStats(true);
+        userStatsResetter.resetTeamCompetitionStatsForStartOfMonth();
         SystemStateManager.next(SystemState.WRITE_EXECUTED);
         return ok();
     }
