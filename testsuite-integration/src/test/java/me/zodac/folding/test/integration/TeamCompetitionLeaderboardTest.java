@@ -65,13 +65,13 @@ class TeamCompetitionLeaderboardTest {
         final HttpResponse<String> response = TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER.getTeamLeaderboard();
 
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<TeamLeaderboardEntry> result = TeamCompetitionStatsResponseParser.getTeamLeaderboard(response);
 
         assertThat(result)
-            .as("Expected no teams: " + result)
+            .as("Expected no teams: %s", result)
             .isEmpty();
     }
 
@@ -94,30 +94,30 @@ class TeamCompetitionLeaderboardTest {
         final HttpResponse<String> response = TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER.getTeamLeaderboard();
 
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final List<TeamLeaderboardEntry> results = new ArrayList<>(TeamCompetitionStatsResponseParser.getTeamLeaderboard(response));
 
         assertThat(results)
-            .as("Incorrect number of team summaries returned: " + response.body())
+            .as("Incorrect number of team summaries returned: %s", response.body())
             .hasSize(3);
 
         final TeamLeaderboardEntry firstResult = results.getFirst();
         assertThat(firstResult)
-            .as("Did not receive the expected result for rank 1: " + response.body())
+            .as("Did not receive the expected result for rank 1: %s", response.body())
             .extracting("rank", "team", "teamMultipliedPoints", "diffToLeader", "diffToNext")
             .containsExactly(1, secondTeam, 15_000L, 0L, 0L);
 
         final TeamLeaderboardEntry secondResult = results.get(1);
         assertThat(secondResult)
-            .as("Did not receive the expected result for rank 2: " + response.body())
+            .as("Did not receive the expected result for rank 2: %s", response.body())
             .extracting("rank", "team", "teamMultipliedPoints", "diffToLeader", "diffToNext")
             .containsExactly(2, firstTeam, 10_000L, 5_000L, 5_000L);
 
         final TeamLeaderboardEntry thirdResult = results.get(2);
         assertThat(thirdResult)
-            .as("Did not receive the expected result for rank 3: " + response.body())
+            .as("Did not receive the expected result for rank 3: %s", response.body())
             .extracting("rank", "team", "teamMultipliedPoints", "diffToLeader", "diffToNext")
             .containsExactly(3, thirdTeam, 1_000L, 14_000L, 9_000L);
     }
@@ -127,18 +127,18 @@ class TeamCompetitionLeaderboardTest {
         final HttpResponse<String> response = TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER.getCategoryLeaderboard();
 
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Map<String, List<UserCategoryLeaderboardEntry>> result = TeamCompetitionStatsResponseParser.getCategoryLeaderboard(response);
 
         assertThat(result.keySet())
-            .as("Expected category keys even if there are no teams: " + result)
+            .as("Expected category keys even if there are no teams: %s", result)
             .hasSize(Category.getAllValues().size());
 
         for (final Category category : Category.getAllValues()) {
             assertThat(result.get(category.toString()))
-                .as("Expected no values for category: " + category)
+                .as("Expected no values for category: %s", category)
                 .isEmpty();
         }
     }
@@ -164,73 +164,72 @@ class TeamCompetitionLeaderboardTest {
         final HttpResponse<String> response = TeamCompetitionStatsUtils.TEAM_COMPETITION_REQUEST_SENDER.getCategoryLeaderboard();
 
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Map<String, List<UserCategoryLeaderboardEntry>> results = TeamCompetitionStatsResponseParser.getCategoryLeaderboard(response);
 
         assertThat(results)
-            .as("Expected one entry per category, found: " + results.keySet() + ", : " + response.body())
+            .as("Expected one entry per category, found: %s: %s", results.keySet(), response.body())
             .hasSize(Category.getAllValues().size());
 
         assertThat(results.values().stream().flatMap(Collection::stream).toList())
-            .as("Incorrect number of user summaries returned: " + response.body())
+            .as("Incorrect number of user summaries returned: %s", response.body())
             .hasSize(4);
 
         final List<UserCategoryLeaderboardEntry> firstCategoryUsers = results.getOrDefault(Category.AMD_GPU.toString(), List.of());
         assertThat(firstCategoryUsers)
-            .as("Incorrect number of " + Category.AMD_GPU + " user summaries returned: " + response.body())
+            .as("Incorrect number of %s user summaries returned:", Category.AMD_GPU, response.body())
             .hasSize(3);
 
         final List<UserCategoryLeaderboardEntry> secondCategoryUsers = results.getOrDefault(Category.NVIDIA_GPU.toString(), List.of());
         assertThat(secondCategoryUsers)
-            .as("Incorrect number of " + Category.NVIDIA_GPU + " user summaries returned: " + response.body())
+            .as("Incorrect number of %s user summaries returned:", Category.NVIDIA_GPU, response.body())
             .hasSize(1);
 
         final List<UserCategoryLeaderboardEntry> thirdCategoryUsers = results.getOrDefault(Category.WILDCARD.toString(), List.of());
         assertThat(thirdCategoryUsers)
-            .as("Incorrect number of " + Category.WILDCARD + " user summaries returned: " + response.body())
+            .as("Incorrect number of %s user summaries returned:", Category.WILDCARD, response.body())
             .isEmpty();
 
         final UserCategoryLeaderboardEntry firstResult = firstCategoryUsers.getFirst();
         assertThat(firstResult.user().displayName())
-            .as("Did not receive the expected user for rank 1, " + Category.AMD_GPU + ": " + response.body())
+            .as("Did not receive the expected user for rank 1, category %s: %s", Category.AMD_GPU, response.body())
             .isEqualTo(secondUser.displayName());
         assertThat(firstResult)
-            .as("Did not receive the expected result for rank 1, " + Category.AMD_GPU + ": " + response.body())
+            .as("Did not receive the expected result for rank 1, category %s: %s", Category.AMD_GPU, response.body())
             .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
             .containsExactly(1, 15_000L, 0L, 0L);
 
         final UserCategoryLeaderboardEntry secondResult = firstCategoryUsers.get(1);
         assertThat(secondResult.user().displayName())
-            .as("Did not receive the expected user for rank 2, " + Category.AMD_GPU + ": " + response.body())
+            .as("Did not receive the expected user for rank 2, category %s: %s", Category.AMD_GPU, response.body())
             .isEqualTo(firstUser.displayName());
         assertThat(secondResult)
-            .as("Did not receive the expected result for rank 2, " + Category.AMD_GPU + ": " + response.body())
+            .as("Did not receive the expected result for rank 2, category %s: %s", Category.AMD_GPU, response.body())
             .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
             .containsExactly(2, 10_000L, 5_000L, 5_000L);
 
         final UserCategoryLeaderboardEntry thirdResult = firstCategoryUsers.get(2);
         assertThat(thirdResult.user().displayName())
-            .as("Did not receive the expected user for rank 3, " + Category.AMD_GPU + ": " + response.body())
+            .as("Did not receive the expected user for rank 3, category %s: %s", Category.AMD_GPU, response.body())
             .isEqualTo(thirdUser.displayName());
         assertThat(thirdResult)
-            .as("Did not receive the expected result for rank 3, " + Category.AMD_GPU + ": " + response.body())
+            .as("Did not receive the expected result for rank 3, category %s: %s", Category.AMD_GPU, response.body())
             .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
             .containsExactly(3, 1_000L, 14_000L, 9_000L);
 
         final UserCategoryLeaderboardEntry fourthResult = secondCategoryUsers.getFirst();
         assertThat(fourthResult.user().displayName())
-            // TODO: .as() can use String.format() format for args
-            .as("Did not receive the expected user for rank 1, " + Category.NVIDIA_GPU + ": " + response.body())
+            .as("Did not receive the expected user for rank 1, category %s: %s", Category.NVIDIA_GPU, response.body())
             .isEqualTo(fourthUser.displayName());
         assertThat(fourthResult)
-            .as("Did not receive the expected result for rank 1, category " + Category.NVIDIA_GPU + ":" + response.body())
+            .as("Did not receive the expected result for rank 1, category %s: %s", Category.NVIDIA_GPU, response.body())
             .extracting("rank", "multipliedPoints", "diffToLeader", "diffToNext")
             .containsExactly(1, 1_000L, 0L, 0L);
 
         assertThat(fourthResult.user().passkey())
-            .as("Expected user passkey to be masked: " + response.body())
+            .as("Expected user passkey to be masked: %s", response.body())
             .contains("*");
     }
 }

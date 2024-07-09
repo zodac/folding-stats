@@ -46,7 +46,7 @@ class LoginTest {
     void whenLoggingIn_givenCredentialsAreCorrect_andUserIsAdmin_thenResponseHas200Status() throws FoldingRestException {
         final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
     }
 
@@ -54,7 +54,7 @@ class LoginTest {
     void whenLoggingIn_givenCredentialsAreCorrect_andUserIsNotAdmin_thenResponseHas403Status() throws FoldingRestException {
         final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(READ_ONLY_USER.userName(), READ_ONLY_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 403_FORBIDDEN HTTP response: " + response.body())
+            .as("Did not receive a 403_FORBIDDEN HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_FORBIDDEN);
     }
 
@@ -62,7 +62,7 @@ class LoginTest {
     void whenLoggingIn_givenCredentialsAreIncorrect_thenResponseHas401Status() throws FoldingRestException {
         final HttpResponse<Void> response = LOGIN_REQUEST_SENDER.loginAsAdmin(INVALID_USERNAME.userName(), INVALID_USERNAME.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -77,7 +77,7 @@ class LoginTest {
         try {
             final HttpResponse<Void> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
             assertThat(response.statusCode())
-                .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+                .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
                 .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();

@@ -79,7 +79,7 @@ class TeamTest {
     void whenGetAllTeams_givenNoTeamHasBeenCreated_thenEmptyJsonResponseIsReturned_andHas200Status() throws FoldingRestException {
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.getAll();
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<Team> allTeams = TeamResponseParser.getAll(response);
@@ -97,7 +97,7 @@ class TeamTest {
         final Team team = create(generateTeam());
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.getAll();
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<Team> allTeams = TeamResponseParser.getAll(response);
@@ -117,12 +117,12 @@ class TeamTest {
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 201_CREATED HTTP response: " + response.body())
+            .as("Did not receive a 201_CREATED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         final Team actual = TeamResponseParser.create(response);
         assertThat(actual)
-            .as("Did not receive created object as JSON response: " + response.body())
+            .as("Did not receive created object as JSON response: %s", response.body())
             .extracting("teamName", "teamDescription", "forumLink")
             .containsExactly(teamToCreate.teamName(), teamToCreate.teamDescription(), teamToCreate.forumLink());
 
@@ -134,12 +134,12 @@ class TeamTest {
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamId);
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Team team = TeamResponseParser.get(response);
         assertThat(team.id())
-            .as("Did not receive the expected team: " + response.body())
+            .as("Did not receive the expected team: %s", response.body())
             .isEqualTo(teamId);
     }
 
@@ -149,12 +149,12 @@ class TeamTest {
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(teamName);
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Team team = TeamResponseParser.get(response);
         assertThat(team.teamName())
-            .as("Did not receive the expected team: " + response.body())
+            .as("Did not receive the expected team: %s", response.body())
             .isEqualTo(teamName);
     }
 
@@ -169,12 +169,12 @@ class TeamTest {
         final HttpResponse<String> response =
             TEAM_REQUEST_SENDER.update(createdTeam.id(), teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Team actual = TeamResponseParser.update(response);
         assertThat(actual)
-            .as("Did not receive created object as JSON response: " + response.body())
+            .as("Did not receive created object as JSON response: %s", response.body())
             .extracting("id", "teamName", "teamDescription", "forumLink")
             .containsExactly(createdTeam.id(), teamToUpdate.teamName(), teamToUpdate.teamDescription(), teamToUpdate.forumLink());
 
@@ -192,7 +192,7 @@ class TeamTest {
 
         final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(teamId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final HttpResponse<String> getResponse = TEAM_REQUEST_SENDER.get(teamId);
@@ -214,7 +214,7 @@ class TeamTest {
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(team, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
@@ -231,7 +231,7 @@ class TeamTest {
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamWithSameName, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 409_CONFLICT HTTP response: " + response.body())
+            .as("Did not receive a 409_CONFLICT HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
 
@@ -240,11 +240,11 @@ class TeamTest {
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.get(TestConstants.NON_EXISTING_ID);
 
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         assertThat(response.body())
-            .as("Did not receive an empty JSON response: " + response.body())
+            .as("Did not receive an empty JSON response: %s", response.body())
             .isEmpty();
     }
 
@@ -253,11 +253,11 @@ class TeamTest {
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.get("nonExistingName");
 
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         assertThat(response.body())
-            .as("Did not receive an empty JSON response: " + response.body())
+            .as("Did not receive an empty JSON response: %s", response.body())
             .isEmpty();
     }
 
@@ -271,11 +271,11 @@ class TeamTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
+            .as("Did not receive valid error message: %s", response.body())
             .contains("not a valid format");
     }
 
@@ -286,11 +286,11 @@ class TeamTest {
         final HttpResponse<String> response =
             TEAM_REQUEST_SENDER.update(TestConstants.NON_EXISTING_ID, updatedTeam, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         assertThat(response.body())
-            .as("Did not receive an empty JSON response: " + response.body())
+            .as("Did not receive an empty JSON response: %s", response.body())
             .isEmpty();
     }
 
@@ -309,11 +309,11 @@ class TeamTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
+            .as("Did not receive valid error message: %s", response.body())
             .contains("not a valid format");
     }
 
@@ -322,7 +322,7 @@ class TeamTest {
         final HttpResponse<Void> response = TEAM_REQUEST_SENDER.delete(TestConstants.NON_EXISTING_ID, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -337,7 +337,7 @@ class TeamTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -350,7 +350,7 @@ class TeamTest {
             TEAM_REQUEST_SENDER.update(createdTeam.id(), teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(updateResponse.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + updateResponse.body())
+            .as("Did not receive a 200_OK HTTP response: %s", updateResponse.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Team actual = TeamResponseParser.update(updateResponse);
@@ -367,7 +367,7 @@ class TeamTest {
 
         final HttpResponse<Void> deleteTeamResponse = TEAM_REQUEST_SENDER.delete(teamId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(deleteTeamResponse.statusCode())
-            .as("Expected to fail due to a 409_CONFLICT: " + deleteTeamResponse)
+            .as("Expected to fail due to a 409_CONFLICT: %s", deleteTeamResponse)
             .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
 
@@ -427,7 +427,7 @@ class TeamTest {
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -446,7 +446,7 @@ class TeamTest {
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -463,7 +463,7 @@ class TeamTest {
 
         final HttpResponse<Void> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -474,7 +474,7 @@ class TeamTest {
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, INVALID_USERNAME.userName(), INVALID_USERNAME.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -485,7 +485,7 @@ class TeamTest {
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, INVALID_PASSWORD.userName(), INVALID_PASSWORD.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -496,7 +496,7 @@ class TeamTest {
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, READ_ONLY_USER.userName(), READ_ONLY_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 403_FORBIDDEN HTTP response: " + response.body())
+            .as("Did not receive a 403_FORBIDDEN HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_FORBIDDEN);
     }
 
@@ -511,7 +511,7 @@ class TeamTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -529,7 +529,7 @@ class TeamTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -539,14 +539,14 @@ class TeamTest {
 
         final HttpResponse<String> response = TEAM_REQUEST_SENDER.create(teamToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 201_CREATED HTTP response: " + response.body())
+            .as("Did not receive a 201_CREATED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         final int teamId = TeamResponseParser.create(response).id();
 
         final Team actual = TeamUtils.get(teamId);
         assertThat(actual)
-            .as("Empty optional value should not be returned: " + response.body())
+            .as("Empty optional value should not be returned: %s", response.body())
             .extracting("forumLink")
             .isNull();
     }
@@ -561,12 +561,12 @@ class TeamTest {
         final HttpResponse<String> response =
             TEAM_REQUEST_SENDER.update(createdTeam.id(), teamToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Team actual = TeamUtils.get(createdTeam.id());
         assertThat(actual)
-            .as("Empty optional value should not be returned: " + response.body())
+            .as("Empty optional value should not be returned: %s", response.body())
             .extracting("forumLink")
             .isNull();
     }
@@ -584,7 +584,7 @@ class TeamTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 415_UNSUPPORTED_MEDIA_TYPE HTTP response: " + response.body())
+            .as("Did not receive a 415_UNSUPPORTED_MEDIA_TYPE HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNSUPPORTED_TYPE);
     }
 }

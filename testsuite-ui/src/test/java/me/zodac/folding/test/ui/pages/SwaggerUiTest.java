@@ -65,7 +65,7 @@ class SwaggerUiTest {
             driver.navigate().to(SwaggerLink.SWAGGER_UI_URL.url());
 
             assertThat(driver.getTitle())
-                .as(String.format("Unexpected tab title for URL '%s'", SwaggerLink.SWAGGER_UI_URL.url()))
+                .as("Unexpected tab title for URL '%s'", SwaggerLink.SWAGGER_UI_URL.url())
                 .isEqualTo("Swagger UI");
         });
     }

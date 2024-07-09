@@ -96,7 +96,7 @@ class ResetTest {
 
         final HttpResponse<Void> response = RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -139,11 +139,11 @@ class ResetTest {
         final TeamSummary teamSummary = getTeamFromCompetition(result, team.teamName());
 
         assertThat(teamSummary.activeUsers())
-            .as("Expected exactly 2 active users at start: " + teamSummary)
+            .as("Expected exactly 2 active users at start: %s", teamSummary)
             .hasSize(2);
 
         assertThat(teamSummary.retiredUsers())
-            .as("Expected no retired users at start: " + teamSummary)
+            .as("Expected no retired users at start: %s", teamSummary)
             .isEmpty();
 
         // User must have points or else will not show as 'retired' for the team
@@ -157,11 +157,11 @@ class ResetTest {
         final TeamSummary teamSummaryAfterRetirement = getTeamFromCompetition(resultAfterRetirement, team.teamName());
 
         assertThat(teamSummaryAfterRetirement.activeUsers())
-            .as("Expected exactly 1 active users after retirement: " + teamSummaryAfterRetirement)
+            .as("Expected exactly 1 active users after retirement: %s", teamSummaryAfterRetirement)
             .hasSize(1);
 
         assertThat(teamSummaryAfterRetirement.retiredUsers())
-            .as("Expected exactly 1 retired users after retirement: " + teamSummaryAfterRetirement)
+            .as("Expected exactly 1 retired users after retirement: %s", teamSummaryAfterRetirement)
             .hasSize(1);
 
         manuallyResetStats();
@@ -170,11 +170,11 @@ class ResetTest {
         final TeamSummary teamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, team.teamName());
 
         assertThat(teamSummaryAfterReset.activeUsers())
-            .as("Expected exactly 1 active users after reset: " + teamSummaryAfterReset)
+            .as("Expected exactly 1 active users after reset: %s", teamSummaryAfterReset)
             .hasSize(1);
 
         assertThat(teamSummaryAfterReset.retiredUsers())
-            .as("Expected no retired users after reset: " + teamSummaryAfterReset)
+            .as("Expected no retired users after reset: %s", teamSummaryAfterReset)
             .isEmpty();
     }
 
@@ -202,18 +202,18 @@ class ResetTest {
 
         final AllTeamsSummary result = TeamCompetitionStatsUtils.getStats();
         assertThat(result.competitionSummary().totalPoints())
-            .as("Expected points from all three users: " + result)
+            .as("Expected points from all three users: %s", result)
             .isEqualTo(firstUserPoints + secondUserPoints + thirdUserPoints);
 
         final TeamSummary firstTeamSummary = getTeamFromCompetition(result, firstTeam.teamName());
         final TeamSummary secondTeamSummary = getTeamFromCompetition(result, secondTeam.teamName());
 
         assertThat(firstTeamSummary.teamPoints())
-            .as("Expected points for team for first and second user: " + firstTeamSummary)
+            .as("Expected points for team for first and second user: %s", firstTeamSummary)
             .isEqualTo(firstUserPoints + secondUserPoints);
 
         assertThat(secondTeamSummary.teamPoints())
-            .as("Expected no points for team for third user only: " + secondTeamSummary)
+            .as("Expected no points for team for third user only: %s", secondTeamSummary)
             .isEqualTo(thirdUserPoints);
 
         final UserSummary firstUserSummary = getActiveUserFromTeam(firstTeamSummary, firstUser.displayName());
@@ -221,33 +221,33 @@ class ResetTest {
         final UserSummary thirdUserSummary = getActiveUserFromTeam(secondTeamSummary, thirdUser.displayName());
 
         assertThat(firstUserSummary.points())
-            .as("Expected points for user: " + firstUserSummary)
+            .as("Expected points for user: %s", firstUserSummary)
             .isEqualTo(firstUserPoints);
 
         assertThat(secondUserSummary.points())
-            .as("Expected points for user: " + secondUserSummary)
+            .as("Expected points for user: %s", secondUserSummary)
             .isEqualTo(secondUserPoints);
 
         assertThat(thirdUserSummary.points())
-            .as("Expected points for user: " + thirdUserSummary)
+            .as("Expected points for user: %s", thirdUserSummary)
             .isEqualTo(thirdUserPoints);
 
         manuallyResetStats();
 
         final AllTeamsSummary resultAfterReset = TeamCompetitionStatsUtils.getStats();
         assertThat(resultAfterReset.competitionSummary().totalPoints())
-            .as("Expected no points in summary: " + result)
+            .as("Expected no points in summary: %s", result)
             .isZero();
 
         final TeamSummary firstTeamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, firstTeam.teamName());
         final TeamSummary secondTeamSummaryAfterReset = getTeamFromCompetition(resultAfterReset, secondTeam.teamName());
 
         assertThat(firstTeamSummaryAfterReset.teamPoints())
-            .as("Expected no points for team: " + firstTeamSummaryAfterReset)
+            .as("Expected no points for team: %s", firstTeamSummaryAfterReset)
             .isZero();
 
         assertThat(secondTeamSummaryAfterReset.teamPoints())
-            .as("Expected no points for team: " + secondTeamSummaryAfterReset)
+            .as("Expected no points for team: %s", secondTeamSummaryAfterReset)
             .isZero();
 
         final UserSummary firstUserSummaryAfterReset = getActiveUserFromTeam(firstTeamSummaryAfterReset, firstUser.displayName());
@@ -255,15 +255,15 @@ class ResetTest {
         final UserSummary thirdUserSummaryAfterReset = getActiveUserFromTeam(secondTeamSummaryAfterReset, thirdUser.displayName());
 
         assertThat(firstUserSummaryAfterReset.points())
-            .as("Expected no points for user: " + firstUserSummaryAfterReset)
+            .as("Expected no points for user: %s", firstUserSummaryAfterReset)
             .isZero();
 
         assertThat(secondUserSummaryAfterReset.points())
-            .as("Expected no points for user: " + secondUserSummaryAfterReset)
+            .as("Expected no points for user: %s", secondUserSummaryAfterReset)
             .isZero();
 
         assertThat(thirdUserSummaryAfterReset.points())
-            .as("Expected no points for user: " + thirdUserSummaryAfterReset)
+            .as("Expected no points for user: %s", thirdUserSummaryAfterReset)
             .isZero();
     }
 }

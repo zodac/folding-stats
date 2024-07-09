@@ -76,7 +76,7 @@ class UserChangeTest {
     void whenGettingAllUserChanges_givenNoneHaveBeenCreated_thenEmptyJsonResponseIsReturned_andHas200Status() throws FoldingRestException {
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.getAllWithoutPasskeys();
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<User> allUserChanges = UserResponseParser.getAll(response);
@@ -97,7 +97,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.getAllWithoutPasskeys();
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<UserChange> allUserChanges = UserChangeResponseParser.getAll(response);
@@ -122,7 +122,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.getAllWithPasskeys(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<UserChange> allUserChanges = UserChangeResponseParser.getAll(response);
@@ -149,7 +149,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
         assertThat(response.statusCode())
-            .as("Did not receive a 201_CREATED HTTP response: " + response.body())
+            .as("Did not receive a 201_CREATED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         final UserChange userChange = UserChangeResponseParser.create(response);
@@ -167,7 +167,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.get(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final UserChange retrievedUserChange = UserChangeResponseParser.get(response);
@@ -182,7 +182,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.reject(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final UserChange updatedUserChange = UserChangeResponseParser.update(response);
@@ -198,7 +198,7 @@ class UserChangeTest {
         final HttpResponse<String> response =
             USER_CHANGE_REQUEST_SENDER.approveNextMonth(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final UserChange updatedUserChange = UserChangeResponseParser.update(response);
@@ -220,7 +220,7 @@ class UserChangeTest {
         final HttpResponse<String> response =
             USER_CHANGE_REQUEST_SENDER.approveImmediately(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final UserChange updatedUserChange = UserChangeResponseParser.update(response);
@@ -246,13 +246,13 @@ class UserChangeTest {
         final HttpResponse<Void> deleteUserResponse =
             USER_REQUEST_SENDER.delete(userChange.previousUser().id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(deleteUserResponse.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + deleteUserResponse.body())
+            .as("Did not receive a 200_OK HTTP response: %s", deleteUserResponse.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final HttpResponse<String> response =
             USER_CHANGE_REQUEST_SENDER.approveImmediately(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -269,7 +269,7 @@ class UserChangeTest {
         final HttpResponse<String> response =
             USER_CHANGE_REQUEST_SENDER.getAllWithoutPasskeys(List.of(UserChangeState.REJECTED, UserChangeState.APPROVED_NEXT_MONTH));
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<UserChange> allUserChanges = UserChangeResponseParser.getAll(response);
@@ -297,7 +297,7 @@ class UserChangeTest {
         final HttpResponse<String> response =
             USER_CHANGE_REQUEST_SENDER.getAllWithoutPasskeys(List.of(UserChangeState.COMPLETED));
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<UserChange> allUserChanges = UserChangeResponseParser.getAll(response);
@@ -324,7 +324,7 @@ class UserChangeTest {
             USER_CHANGE_REQUEST_SENDER.getAllWithPasskeys(List.of(UserChangeState.REJECTED, UserChangeState.APPROVED_NEXT_MONTH),
                 ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<UserChange> allUserChanges = UserChangeResponseParser.getAll(response);
@@ -346,7 +346,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.reject(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final UserChange updatedUserChange = UserChangeResponseParser.update(response);
@@ -357,7 +357,7 @@ class UserChangeTest {
         final HttpResponse<String> secondResponse =
             USER_CHANGE_REQUEST_SENDER.approveImmediately(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(secondResponse.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + secondResponse.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", secondResponse.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -374,7 +374,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -391,7 +391,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -408,7 +408,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -425,7 +425,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -446,7 +446,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -459,7 +459,7 @@ class UserChangeTest {
         USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
         assertThat(response.statusCode())
-            .as("Did not receive a 409_CONFLICT HTTP response: " + response.body())
+            .as("Did not receive a 409_CONFLICT HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
 
@@ -471,7 +471,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -481,11 +481,11 @@ class UserChangeTest {
             USER_CHANGE_REQUEST_SENDER.get(TestConstants.NON_EXISTING_ID, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         assertThat(response.body())
-            .as("Did not receive an empty JSON response: " + response.body())
+            .as("Did not receive an empty JSON response: %s", response.body())
             .isEmpty();
     }
 
@@ -500,7 +500,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -510,7 +510,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.get(userChange.id(), ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final UserChange retrievedUserChange = UserChangeResponseParser.get(response);
@@ -541,7 +541,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -559,7 +559,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 415_UNSUPPORTED_MEDIA_TYPE HTTP response: " + response.body())
+            .as("Did not receive a 415_UNSUPPORTED_MEDIA_TYPE HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNSUPPORTED_TYPE);
     }
 
@@ -569,7 +569,7 @@ class UserChangeTest {
 
         final HttpResponse<String> response = USER_CHANGE_REQUEST_SENDER.create(userChangeRequest);
         assertThat(response.statusCode())
-            .as("Did not receive a 201_CREATED HTTP response: " + response.body())
+            .as("Did not receive a 201_CREATED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         return UserChangeResponseParser.create(response);

@@ -76,7 +76,7 @@ class HardwareTest {
     void whenGettingAllHardware_givenNoHardwareHasBeenCreated_thenEmptyJsonResponseIsReturned_andHas200Status() throws FoldingRestException {
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<Hardware> allHardware = HardwareResponseParser.getAll(response);
@@ -94,7 +94,7 @@ class HardwareTest {
         final Hardware hardware = HardwareUtils.create(DummyDataGenerator.generateHardware());
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.getAll();
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<Hardware> allHardware = HardwareResponseParser.getAll(response);
@@ -113,12 +113,12 @@ class HardwareTest {
         final HardwareRequest hardwareToCreate = DummyDataGenerator.generateHardware();
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 201_CREATED HTTP response: " + response.body())
+            .as("Did not receive a 201_CREATED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         final Hardware actual = HardwareResponseParser.create(response);
         assertThat(actual)
-            .as("Did not receive created object as JSON response: " + response.body())
+            .as("Did not receive created object as JSON response: %s", response.body())
             .extracting("hardwareName", "displayName", "multiplier")
             .containsExactly(hardwareToCreate.hardwareName(), hardwareToCreate.displayName(), hardwareToCreate.multiplier());
     }
@@ -129,12 +129,12 @@ class HardwareTest {
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareId);
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware hardware = HardwareResponseParser.get(response);
         assertThat(hardware.id())
-            .as("Did not receive the expected hardware: " + response.body())
+            .as("Did not receive the expected hardware: %s", response.body())
             .isEqualTo(hardwareId);
     }
 
@@ -144,12 +144,12 @@ class HardwareTest {
 
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(hardwareName);
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware hardware = HardwareResponseParser.get(response);
         assertThat(hardware.hardwareName())
-            .as("Did not receive the expected hardware: " + response.body())
+            .as("Did not receive the expected hardware: %s", response.body())
             .isEqualTo(hardwareName);
     }
 
@@ -170,12 +170,12 @@ class HardwareTest {
         final HttpResponse<String> response =
             HARDWARE_REQUEST_SENDER.update(createdHardware.id(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware actual = HardwareResponseParser.update(response);
         assertThat(actual.isEqualRequest(updatedHardware))
-            .as("Did not receive created object as JSON response: " + response.body())
+            .as("Did not receive created object as JSON response: %s", response.body())
             .isTrue();
 
         final int allHardwareAfterUpdate = HardwareUtils.getNumberOfHardware();
@@ -192,7 +192,7 @@ class HardwareTest {
 
         final HttpResponse<Void> response = HARDWARE_REQUEST_SENDER.delete(hardwareId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final HttpResponse<String> getResponse = HARDWARE_REQUEST_SENDER.get(hardwareId);
@@ -216,7 +216,7 @@ class HardwareTest {
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 409_CONFLICT HTTP response: " + response.body())
+            .as("Did not receive a 409_CONFLICT HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
 
@@ -225,11 +225,11 @@ class HardwareTest {
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get(TestConstants.NON_EXISTING_ID);
 
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         assertThat(response.body())
-            .as("Did not receive an empty JSON response: " + response.body())
+            .as("Did not receive an empty JSON response: %s", response.body())
             .isEmpty();
     }
 
@@ -238,11 +238,11 @@ class HardwareTest {
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.get("nonExistingName");
 
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         assertThat(response.body())
-            .as("Did not receive an empty JSON response: " + response.body())
+            .as("Did not receive an empty JSON response: %s", response.body())
             .isEmpty();
     }
 
@@ -256,11 +256,11 @@ class HardwareTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
+            .as("Did not receive valid error message: %s", response.body())
             .contains("not a valid format");
     }
 
@@ -277,7 +277,7 @@ class HardwareTest {
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareRequest, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
@@ -291,11 +291,11 @@ class HardwareTest {
         final HttpResponse<String> response =
             HARDWARE_REQUEST_SENDER.update(TestConstants.NON_EXISTING_ID, updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         assertThat(response.body())
-            .as("Did not receive an empty JSON response: " + response.body())
+            .as("Did not receive an empty JSON response: %s", response.body())
             .isEmpty();
     }
 
@@ -320,11 +320,11 @@ class HardwareTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
+            .as("Did not receive valid error message: %s", response.body())
             .contains("not a valid format");
     }
 
@@ -334,7 +334,7 @@ class HardwareTest {
             HARDWARE_REQUEST_SENDER.delete(TestConstants.NON_EXISTING_ID, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -349,11 +349,11 @@ class HardwareTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
+            .as("Did not receive valid error message: %s", response.body())
             .contains("not a valid format");
     }
 
@@ -374,7 +374,7 @@ class HardwareTest {
             HARDWARE_REQUEST_SENDER.update(createdHardware.id(), updatedHardware, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(updateResponse.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + updateResponse.body())
+            .as("Did not receive a 200_OK HTTP response: %s", updateResponse.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware actual = HardwareResponseParser.update(updateResponse);
@@ -391,7 +391,7 @@ class HardwareTest {
 
         final HttpResponse<Void> deleteHardwareResponse = HARDWARE_REQUEST_SENDER.delete(hardwareId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(deleteHardwareResponse.statusCode())
-            .as("Expected to fail due to a 409_CONFLICT: " + deleteHardwareResponse)
+            .as("Expected to fail due to a 409_CONFLICT: %s", deleteHardwareResponse)
             .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
 
@@ -451,7 +451,7 @@ class HardwareTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -476,7 +476,7 @@ class HardwareTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -493,7 +493,7 @@ class HardwareTest {
 
         final HttpResponse<Void> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -504,7 +504,7 @@ class HardwareTest {
         final HttpResponse<String> response =
             HARDWARE_REQUEST_SENDER.create(hardwareToCreate, INVALID_USERNAME.userName(), INVALID_USERNAME.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -515,7 +515,7 @@ class HardwareTest {
         final HttpResponse<String> response =
             HARDWARE_REQUEST_SENDER.create(hardwareToCreate, INVALID_PASSWORD.userName(), INVALID_PASSWORD.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -525,7 +525,7 @@ class HardwareTest {
         final HardwareRequest hardwareToCreate = DummyDataGenerator.generateHardware();
         final HttpResponse<String> response = HARDWARE_REQUEST_SENDER.create(hardwareToCreate, READ_ONLY_USER.userName(), READ_ONLY_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 403_FORBIDDEN HTTP response: " + response.body())
+            .as("Did not receive a 403_FORBIDDEN HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_FORBIDDEN);
     }
 
@@ -540,7 +540,7 @@ class HardwareTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -558,7 +558,7 @@ class HardwareTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -575,7 +575,7 @@ class HardwareTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 415_UNSUPPORTED_MEDIA_TYPE HTTP response: " + response.body())
+            .as("Did not receive a 415_UNSUPPORTED_MEDIA_TYPE HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNSUPPORTED_TYPE);
     }
 

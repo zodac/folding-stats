@@ -79,7 +79,7 @@ class MonthlyResultTest {
 
         final HttpResponse<String> response = MONTHLY_RESULT_REQUEST_SENDER.getCurrentMonthlyResult();
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -87,7 +87,7 @@ class MonthlyResultTest {
     void whenGettingMonthlyResult_andGivenMonthHasNoEntry_thenEmptyResultIsReturned_andResponseHas200Status() throws FoldingRestException {
         final HttpResponse<String> response = MONTHLY_RESULT_REQUEST_SENDER.getMonthlyResult(Year.of(1999), Month.APRIL);
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -102,7 +102,7 @@ class MonthlyResultTest {
 
         final HttpResponse<String> response = MONTHLY_RESULT_REQUEST_SENDER.getCurrentMonthlyResult();
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final MonthlyResult monthlyResult = MonthlyResultResponseParser.getMonthlyResult(response);
@@ -120,15 +120,15 @@ class MonthlyResultTest {
             .isEqualTo(10_000L);
 
         assertThat(monthlyResult.userCategoryLeaderboard().getOrDefault(Category.AMD_GPU, List.of()))
-            .as("Expected no results in " + Category.AMD_GPU + " category leaderboard")
+            .as("Expected no results in %s category leaderboard", Category.AMD_GPU)
             .isEmpty();
 
         assertThat(monthlyResult.userCategoryLeaderboard().getOrDefault(Category.WILDCARD, List.of()))
-            .as("Expected no results in " + Category.WILDCARD + " category leaderboard")
+            .as("Expected no results in %s category leaderboard", Category.WILDCARD)
             .isEmpty();
 
         assertThat(monthlyResult.userCategoryLeaderboard().getOrDefault(Category.NVIDIA_GPU, List.of()))
-            .as("Expected one result in " + Category.NVIDIA_GPU + " category leaderboard")
+            .as("Expected no results in %s category leaderboard", Category.NVIDIA_GPU)
             .hasSize(1);
 
         final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard()
@@ -167,7 +167,7 @@ class MonthlyResultTest {
 
         final HttpResponse<String> response = MONTHLY_RESULT_REQUEST_SENDER.getCurrentMonthlyResult();
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final MonthlyResult monthlyResult = MonthlyResultResponseParser.getMonthlyResult(response);
@@ -256,7 +256,7 @@ class MonthlyResultTest {
 
         final HttpResponse<String> response = MONTHLY_RESULT_REQUEST_SENDER.getCurrentMonthlyResult();
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final MonthlyResult monthlyResult = MonthlyResultResponseParser.getMonthlyResult(response);
@@ -274,15 +274,15 @@ class MonthlyResultTest {
             .isEqualTo(22_000L);
 
         assertThat(monthlyResult.userCategoryLeaderboard().get(Category.AMD_GPU))
-            .as("Expected no results in " + Category.AMD_GPU + " category leaderboard")
+            .as("Expected no results in %s category leaderboard", Category.AMD_GPU)
             .isEmpty();
 
         assertThat(monthlyResult.userCategoryLeaderboard().get(Category.WILDCARD))
-            .as("Expected no results in " + Category.WILDCARD + " category leaderboard")
+            .as("Expected no results in %s category leaderboard", Category.WILDCARD)
             .isEmpty();
 
         assertThat(monthlyResult.userCategoryLeaderboard().get(Category.NVIDIA_GPU))
-            .as("Expected one result in " + Category.NVIDIA_GPU + " category leaderboard")
+            .as("Expected no results in %s category leaderboard", Category.NVIDIA_GPU)
             .hasSize(1);
 
         final UserCategoryLeaderboardEntry userCategoryLeaderboardEntry = monthlyResult.userCategoryLeaderboard()
@@ -309,7 +309,7 @@ class MonthlyResultTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -323,7 +323,7 @@ class MonthlyResultTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -331,7 +331,7 @@ class MonthlyResultTest {
     void whenManualSaveOccurs_givenNoStatsExist_thenRequestSucceeds_andResponseHasA400Status() throws FoldingRestException {
         final HttpResponse<Void> response = MONTHLY_RESULT_REQUEST_SENDER.manualSave(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
     }
 
@@ -346,7 +346,7 @@ class MonthlyResultTest {
         final HttpResponse<Void> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 }

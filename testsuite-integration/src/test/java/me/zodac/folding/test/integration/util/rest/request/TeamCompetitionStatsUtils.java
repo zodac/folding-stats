@@ -164,7 +164,7 @@ public final class TeamCompetitionStatsUtils {
             TEAM_COMPETITION_REQUEST_SENDER.offset(user.id(), points, Math.round(points * user.hardware().multiplier()), 0,
                 ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
     }
 }

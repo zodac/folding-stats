@@ -77,7 +77,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<HistoricStats> results = HistoricStatsResponseParser.getHourlyTeamStats(response);
@@ -96,7 +96,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<HistoricStats> results = HistoricStatsResponseParser.getHourlyTeamStats(response);
@@ -117,7 +117,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final List<HistoricStats> results = new ArrayList<>(HistoricStatsResponseParser.getHourlyTeamStats(response));
@@ -147,7 +147,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final List<HistoricStats> results = new ArrayList<>(HistoricStatsResponseParser.getHourlyTeamStats(response));
@@ -181,7 +181,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final List<HistoricStats> results = new ArrayList<>(HistoricStatsResponseParser.getHourlyTeamStats(response));
@@ -208,7 +208,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final String eTag = HttpResponseHeaderUtils.getEntityTag(response);
@@ -229,7 +229,7 @@ class HistoricTeamStatsTest {
         final HttpResponse<String> response =
             HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(TestConstants.NON_EXISTING_ID, Year.parse("2020"), Month.of(4), 12);
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -244,11 +244,11 @@ class HistoricTeamStatsTest {
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
+            .as("Did not receive valid error message: %s", response.body())
             .contains("not a valid format");
     }
 
@@ -261,7 +261,7 @@ class HistoricTeamStatsTest {
         final HttpResponse<String> response =
             HISTORIC_STATS_REQUEST_SENDER.getHourlyTeamStats(team.id(), Year.parse("2020"), Month.of(4), invalidDay);
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -273,7 +273,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.id(), Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<HistoricStats> results = HistoricStatsResponseParser.getDailyTeamStats(response);
@@ -291,7 +291,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.id(), Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<HistoricStats> results = HistoricStatsResponseParser.getDailyTeamStats(response);
@@ -311,7 +311,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.id(), Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final List<HistoricStats> results = new ArrayList<>(HistoricStatsResponseParser.getDailyTeamStats(response));
@@ -339,7 +339,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.id(), Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final List<HistoricStats> results = new ArrayList<>(HistoricStatsResponseParser.getDailyTeamStats(response));
@@ -371,7 +371,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.id(), Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final List<HistoricStats> results = new ArrayList<>(HistoricStatsResponseParser.getDailyTeamStats(response));
@@ -398,7 +398,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(team.id(), Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final String eTag = HttpResponseHeaderUtils.getEntityTag(response);
@@ -419,7 +419,7 @@ class HistoricTeamStatsTest {
         final HttpResponse<String> response =
             HISTORIC_STATS_REQUEST_SENDER.getDailyTeamStats(TestConstants.NON_EXISTING_ID, Year.parse("2020"), Month.of(4));
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -434,11 +434,11 @@ class HistoricTeamStatsTest {
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
+            .as("Did not receive valid error message: %s", response.body())
             .contains("not a valid format");
     }
 
@@ -458,7 +458,7 @@ class HistoricTeamStatsTest {
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -470,7 +470,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.id(), Year.parse("2020"));
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<HistoricStats> results = HistoricStatsResponseParser.getMonthlyTeamStats(response);
@@ -489,7 +489,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.id(), Year.parse("2020"));
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<HistoricStats> results = HistoricStatsResponseParser.getMonthlyTeamStats(response);
@@ -509,7 +509,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.id(), Year.parse("2020"));
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final List<HistoricStats> results = new ArrayList<>(HistoricStatsResponseParser.getMonthlyTeamStats(response));
@@ -538,7 +538,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.id(), Year.parse("2020"));
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final List<HistoricStats> results = new ArrayList<>(HistoricStatsResponseParser.getMonthlyTeamStats(response));
@@ -570,7 +570,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.id(), Year.parse("2020"));
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final List<HistoricStats> results = new ArrayList<>(HistoricStatsResponseParser.getHourlyTeamStats(response));
@@ -597,7 +597,7 @@ class HistoricTeamStatsTest {
 
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(team.id(), Year.parse("2020"));
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final String eTag = HttpResponseHeaderUtils.getEntityTag(response);
@@ -616,7 +616,7 @@ class HistoricTeamStatsTest {
     void whenGettingMonthlyStats_givenNonExistingTeamId_thenResponseHas404Status() throws FoldingRestException {
         final HttpResponse<String> response = HISTORIC_STATS_REQUEST_SENDER.getMonthlyTeamStats(TestConstants.NON_EXISTING_ID, Year.parse("2020"));
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -631,11 +631,11 @@ class HistoricTeamStatsTest {
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
+            .as("Did not receive valid error message: %s", response.body())
             .contains("not a valid format");
     }
 
@@ -654,7 +654,7 @@ class HistoricTeamStatsTest {
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 }

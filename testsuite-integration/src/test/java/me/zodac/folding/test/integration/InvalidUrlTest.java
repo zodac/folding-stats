@@ -46,7 +46,7 @@ class InvalidUrlTest {
         final HttpResponse<Void> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
 
         assertThat(response.statusCode())
-            .as("Expected invalid URL to redirect: " + response.body() + ", " + response.headers())
+            .as("Expected invalid URL to redirect: %s, %s", response.body(), response.headers())
             .isEqualTo(HttpURLConnection.HTTP_SEE_OTHER);
 
         final String redirectLocation = response.headers()
@@ -54,7 +54,7 @@ class InvalidUrlTest {
             .orElseThrow(() -> new AssertionError("no location header"));
 
         assertThat(redirectLocation)
-            .as("Expected redirect to go to home page: " + response.body() + ", " + response.headers())
+            .as("Expected redirect to go to home page: %s, %s", response.body(), response.headers())
             .isEqualTo("https://127.0.0.1:81");
     }
 }

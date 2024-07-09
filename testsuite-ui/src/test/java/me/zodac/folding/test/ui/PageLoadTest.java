@@ -59,7 +59,7 @@ class PageLoadTest {
             driver.navigate().to(frontendLink.url());
 
             assertThat(driver.getTitle())
-                .as(String.format("Unexpected tab title for URL '%s'", frontendLink.url()))
+                .as("Unexpected tab title for URL '%s'", frontendLink.url())
                 .isEqualTo(EXPECTED_TAB_TITLE);
 
             final WebElement navigationBar = driver.findElement(NavigationBar.NAVIGATION_BAR);
@@ -67,7 +67,7 @@ class PageLoadTest {
             // Check navigation bar title
             final WebElement navigationBarTitle = navigationBar.findElement(NavigationBar.TITLE);
             assertThat(navigationBarTitle.getText())
-                .as(String.format("Unexpected navigation bar title for URL '%s'", frontendLink.url()))
+                .as("Unexpected navigation bar title for URL '%s'", frontendLink.url())
                 .isEqualTo(NavigationBar.EXPECTED_NAVIGATION_BAR_TITLE);
 
             final WebElement navigationBarLinksParent = navigationBar.findElement(NavigationBar.LINKS_PARENT);

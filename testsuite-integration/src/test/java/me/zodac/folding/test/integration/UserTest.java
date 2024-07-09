@@ -83,7 +83,7 @@ class UserTest {
     void whenGetAllUsers_givenNoUserHasBeenCreated_thenAnEmptyJsonResponseIsReturned_andHas200Status() throws FoldingRestException {
         final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithoutPasskeys();
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<User> allUsers = UserResponseParser.getAll(response);
@@ -103,7 +103,7 @@ class UserTest {
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithoutPasskeys();
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<User> allUsers = UserResponseParser.getAll(response);
@@ -127,7 +127,7 @@ class UserTest {
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.getAllWithPasskeys(ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Collection<User> allUsers = UserResponseParser.getAll(response);
@@ -151,12 +151,12 @@ class UserTest {
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 201_CREATED HTTP response: " + response.body())
+            .as("Did not receive a 201_CREATED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_CREATED);
 
         final User actual = UserResponseParser.create(response);
         assertThat(actual)
-            .as("Did not receive created object as JSON response: " + response.body())
+            .as("Did not receive created object as JSON response: %s", response.body())
             .extracting("foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "role")
             .containsExactly(userToCreate.foldingUserName(), userToCreate.displayName(), userToCreate.passkey(),
                 Category.get(userToCreate.category()), userToCreate.profileLink(), userToCreate.liveStatsLink(), Role.MEMBER);
@@ -168,12 +168,12 @@ class UserTest {
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.get(userId);
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final User user = UserResponseParser.get(response);
         assertThat(user.id())
-            .as("Did not receive the expected user: " + response.body())
+            .as("Did not receive the expected user: %s", response.body())
             .isEqualTo(userId);
         PasskeyChecker.assertPasskeyIsHidden(user.passkey());
     }
@@ -184,12 +184,12 @@ class UserTest {
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.getWithPasskey(userId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final User user = UserResponseParser.get(response);
         assertThat(user.id())
-            .as("Did not receive the expected user: " + response.body())
+            .as("Did not receive the expected user: %s", response.body())
             .isEqualTo(userId);
         PasskeyChecker.assertPasskeyIsShown(user.passkey());
     }
@@ -217,12 +217,12 @@ class UserTest {
         final HttpResponse<String> response =
             USER_REQUEST_SENDER.update(createdUser.id(), userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final User actual = UserResponseParser.update(response);
         assertThat(actual)
-            .as("Did not receive created object as JSON response: " + response.body())
+            .as("Did not receive created object as JSON response: %s", response.body())
             .extracting("id", "foldingUserName", "displayName", "passkey", "category", "profileLink", "liveStatsLink", "role")
             .containsExactly(createdUser.id(), createdUser.foldingUserName(), createdUser.displayName(), updatedPasskey,
                 createdUser.category(), createdUser.profileLink(), createdUser.liveStatsLink(), createdUser.role());
@@ -241,7 +241,7 @@ class UserTest {
 
         final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(userId, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final HttpResponse<String> getResponse = USER_REQUEST_SENDER.get(userId);
@@ -265,7 +265,7 @@ class UserTest {
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(user, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
@@ -281,7 +281,7 @@ class UserTest {
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(user, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -295,7 +295,7 @@ class UserTest {
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 409_CONFLICT HTTP response: " + response.body())
+            .as("Did not receive a 409_CONFLICT HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_CONFLICT);
     }
 
@@ -304,11 +304,11 @@ class UserTest {
         final HttpResponse<String> response = USER_REQUEST_SENDER.get(TestConstants.NON_EXISTING_ID);
 
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
 
         assertThat(response.body())
-            .as("Did not receive an empty JSON response: " + response.body())
+            .as("Did not receive an empty JSON response: %s", response.body())
             .isEmpty();
     }
 
@@ -322,11 +322,11 @@ class UserTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
+            .as("Did not receive valid error message: %s", response.body())
             .contains("not a valid format");
     }
 
@@ -338,7 +338,7 @@ class UserTest {
         final HttpResponse<String> response =
             USER_REQUEST_SENDER.update(TestConstants.NON_EXISTING_ID, updatedUser, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -370,11 +370,11 @@ class UserTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
+            .as("Did not receive valid error message: %s", response.body())
             .contains("not a valid format");
     }
 
@@ -384,7 +384,7 @@ class UserTest {
         final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(captainUser.id(), ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -393,7 +393,7 @@ class UserTest {
         final HttpResponse<Void> response = USER_REQUEST_SENDER.delete(TestConstants.NON_EXISTING_ID, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 404_NOT_FOUND HTTP response: " + response.body())
+            .as("Did not receive a 404_NOT_FOUND HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_NOT_FOUND);
     }
 
@@ -408,11 +408,11 @@ class UserTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
 
         assertThat(response.body())
-            .as("Did not receive valid error message: " + response.body())
+            .as("Did not receive valid error message: %s", response.body())
             .contains("not a valid format");
     }
 
@@ -435,7 +435,7 @@ class UserTest {
             USER_REQUEST_SENDER.update(createdUser.id(), userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
 
         assertThat(updateResponse.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + updateResponse.body())
+            .as("Did not receive a 200_OK HTTP response: %s", updateResponse.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final User actual = UserResponseParser.update(updateResponse);
@@ -527,7 +527,7 @@ class UserTest {
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -557,7 +557,7 @@ class UserTest {
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -575,7 +575,7 @@ class UserTest {
         final HttpResponse<Void> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.discarding());
 
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -587,7 +587,7 @@ class UserTest {
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, INVALID_USERNAME.userName(), INVALID_USERNAME.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -599,7 +599,7 @@ class UserTest {
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, INVALID_PASSWORD.userName(), INVALID_PASSWORD.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 401_UNAUTHORIZED HTTP response: " + response.body())
+            .as("Did not receive a 401_UNAUTHORIZED HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNAUTHORIZED);
     }
 
@@ -611,7 +611,7 @@ class UserTest {
 
         final HttpResponse<String> response = USER_REQUEST_SENDER.create(userToCreate, READ_ONLY_USER.userName(), READ_ONLY_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 403_FORBIDDEN HTTP response: " + response.body())
+            .as("Did not receive a 403_FORBIDDEN HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_FORBIDDEN);
     }
 
@@ -626,7 +626,7 @@ class UserTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -644,7 +644,7 @@ class UserTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 400_BAD_REQUEST HTTP response: " + response.body())
+            .as("Did not receive a 400_BAD_REQUEST HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_BAD_REQUEST);
     }
 
@@ -656,7 +656,7 @@ class UserTest {
 
         final User actual = UserUtils.get(userId);
         assertThat(actual)
-            .as("Empty optional value should not be returned: " + actual)
+            .as("A nullable value should not be returned: %s", actual)
             .extracting("liveStatsLink")
             .isNull();
     }
@@ -680,12 +680,12 @@ class UserTest {
         final HttpResponse<String> response =
             USER_REQUEST_SENDER.update(createdUser.id(), userToUpdate, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final User actual = UserUtils.get(createdUser.id());
         assertThat(actual)
-            .as("Empty optional value should not be returned: " + response.body())
+            .as("Empty optional value should not be returned: %s", response.body())
             .extracting("liveStatsLink")
             .isNull();
     }
@@ -713,7 +713,7 @@ class UserTest {
         final HttpResponse<String> response =
             HardwareUtils.HARDWARE_REQUEST_SENDER.update(hardware.id(), hardwareUpdateRequest, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Hardware updatedHardware = HardwareResponseParser.update(response);
@@ -736,7 +736,7 @@ class UserTest {
         }
 
         assertThat(foundUser)
-            .as("Could not find updated user after hardware was updated: " + usersAfterUpdate)
+            .as("Could not find updated user after hardware was updated: %s", usersAfterUpdate)
             .isNotNull();
     }
 
@@ -756,7 +756,7 @@ class UserTest {
         final HttpResponse<String> response =
             TeamUtils.TEAM_REQUEST_SENDER.update(team.id(), teamUpdateRequest, ADMIN_USER.userName(), ADMIN_USER.password());
         assertThat(response.statusCode())
-            .as("Did not receive a 200_OK HTTP response: " + response.body())
+            .as("Did not receive a 200_OK HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_OK);
 
         final Team updatedTeam = TeamResponseParser.update(response);
@@ -909,7 +909,7 @@ class UserTest {
 
         final HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         assertThat(response.statusCode())
-            .as("Did not receive a 415_UNSUPPORTED_MEDIA_TYPE HTTP response: " + response.body())
+            .as("Did not receive a 415_UNSUPPORTED_MEDIA_TYPE HTTP response: %s", response.body())
             .isEqualTo(HttpURLConnection.HTTP_UNSUPPORTED_TYPE);
     }
 
