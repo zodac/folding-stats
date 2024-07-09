@@ -480,15 +480,13 @@ class PostgresDbManagerTest {
 
         final Optional<MonthlyResult> firstResultOutput = POSTGRES_DB_MANAGER.getMonthlyResult(firstResultMonth, firstResultYear);
         assertThat(firstResultOutput)
-            .isPresent();
-        assertThat(firstResultOutput.get())
-            .isEqualTo(firstResult);
+            .isPresent()
+            .contains(firstResult);
 
         final Optional<MonthlyResult> secondResultOutput = POSTGRES_DB_MANAGER.getMonthlyResult(secondResultMonth, secondResultYear);
         assertThat(secondResultOutput)
-            .isPresent();
-        assertThat(secondResultOutput.get())
-            .isEqualTo(secondResult);
+            .isPresent()
+            .contains(secondResult);
 
         final Optional<MonthlyResult> invalidResultOutput = POSTGRES_DB_MANAGER.getMonthlyResult(Month.JUNE, Year.of(1999));
         assertThat(invalidResultOutput)

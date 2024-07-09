@@ -110,7 +110,7 @@ public record TeamSummary(Team team,
         // Their rank is their index in the sorted list
         final Collection<UserSummary> rankedActiveUsers = RankableSummary.rank(activeUsers)
             .stream()
-            .map(rankableSummary -> (UserSummary) rankableSummary)
+            .map(UserSummary.class::cast)
             .toList();
 
         // Create new RetiredUserSummary instances for each retired user, with the new rank
@@ -119,7 +119,7 @@ public record TeamSummary(Team team,
         final int numberOfActiveUsers = activeUsers.size();
         final Collection<RetiredUserSummary> rankedRetiredUsers = RankableSummary.rank(retiredUsers, numberOfActiveUsers)
             .stream()
-            .map(rankableSummary -> (RetiredUserSummary) rankableSummary)
+            .map(RetiredUserSummary.class::cast)
             .toList();
 
         // Not ranked to begin with, will be updated by the calling class

@@ -33,7 +33,7 @@ public class InvalidMonthException extends RuntimeException {
     /**
      * The invalid month.
      */
-    private final String month;
+    private final transient String month;
 
     /**
      * Basic constructor.

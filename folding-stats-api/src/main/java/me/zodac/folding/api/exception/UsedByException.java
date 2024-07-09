@@ -18,7 +18,6 @@
 package me.zodac.folding.api.exception;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.Collection;
 import lombok.Getter;
 import me.zodac.folding.api.ResponsePojo;
@@ -35,7 +34,7 @@ public class UsedByException extends RuntimeException {
     /**
      * The actual failure to be returned.
      */
-    private final UsedByFailure usedByFailure;
+    private final transient UsedByFailure usedByFailure;
 
     /**
      * Constructor with failing object and objects using it.
@@ -51,7 +50,7 @@ public class UsedByException extends RuntimeException {
     /**
      * Failure POJO used for REST response.
      */
-    public record UsedByFailure(ResponsePojo invalidObject, Collection<? extends ResponsePojo> usedBy) implements Serializable {
+    public record UsedByFailure(ResponsePojo invalidObject, Collection<? extends ResponsePojo> usedBy) {
 
     }
 }

@@ -51,7 +51,7 @@ public record AllTeamsSummary(CompetitionSummary competitionSummary, Collection<
 
         final Collection<TeamSummary> rankedTeams = RankableSummary.rank(teams)
             .stream()
-            .map(rankableSummary -> (TeamSummary) rankableSummary)
+            .map(TeamSummary.class::cast)
             .toList();
 
         final CompetitionSummary competitionSummary = new CompetitionSummary(totalPoints, totalMultipliedPoints, totalUnits);

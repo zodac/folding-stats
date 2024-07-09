@@ -33,7 +33,7 @@ public class InvalidLoginCredentialsException extends RuntimeException {
     /**
      * The invalid {@link LoginCredentials}.
      */
-    private final LoginCredentials loginCredentials;
+    private final transient LoginCredentials loginCredentials;
 
     /**
      * Basic constructor.

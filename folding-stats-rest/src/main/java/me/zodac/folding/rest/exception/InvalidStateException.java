@@ -33,12 +33,12 @@ public class InvalidStateException extends RuntimeException {
     /**
      * The current {@link UserChangeState} being changed.
      */
-    private final UserChangeState fromState;
+    private final transient UserChangeState fromState;
 
     /**
      * The wanted {@link UserChangeState} to which we would like to change.
      */
-    private final UserChangeState toState;
+    private final transient UserChangeState toState;
 
     /**
      * Basic constructor.

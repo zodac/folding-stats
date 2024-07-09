@@ -25,6 +25,7 @@
         <!-- Lint Properties -->
         <!-- All disabled by default, activated through profiles -->
         <skip-linters>true</skip-linters>
+        <skip-sonarqube>true</skip-sonarqube>
 
         <!-- Test Properties -->
         <!-- All disabled by default, activated through profiles -->
@@ -96,6 +97,7 @@
         <maven-javadoc-plugin.version>3.7.0</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.23.0</maven-pmd-plugin.version>
         <pitest-maven.version>1.16.1</pitest-maven.version>
+        <!--        <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>-->
         <spotbugs-maven-plugin.version>4.8.6.2</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
@@ -107,6 +109,14 @@
         <license-header-definition-file>${ci-config-directory}/license-header-definition.txt</license-header-definition-file>
         <pitest-test-strength-threshold>100</pitest-test-strength-threshold>
         <pmd-ruleset>${ci-config-directory}/pmd-ruleset.xml</pmd-ruleset>
+        <!--        <sonar.exclusions>src/test</sonar.exclusions>-->
+        <!--        <sonar.java.checkstyle.reportPaths>${project.build.directory}/checkstyle-result.xml</sonar.java.checkstyle.reportPaths>-->
+        <!--        <sonar.java.pmd.reportPaths>${project.build.directory}/pmd.xml</sonar.java.pmd.reportPaths>-->
+        <!--        <sonar.java.spotbugs.reportPaths>${project.build.directory}/spotbugsXml.xml</sonar.java.spotbugs.reportPaths>-->
+        <!--        <sonar.projectKey>folding-stats_2</sonar.projectKey>-->
+        <!--        <sonar.projectName>${project.artifactId}</sonar.projectName>-->
+        <!--        &lt;!&ndash;suppress UnresolvedMavenProperty, injected by environment variable &ndash;&gt;-->
+        <!--        <sonar.token>${env.SONARQUBE_PAT}</sonar.token>-->
         <spotbugs-include-file>${ci-config-directory}/spotbugs-include-filter-file.xml</spotbugs-include-file>
         <spotbugs-exclude-file>${ci-config-directory}/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
 
@@ -633,7 +643,7 @@
                     <version>${dependency-check-maven.version}</version>
                     <configuration>
                         <failBuildOnCVSS>0</failBuildOnCVSS>
-                        <!--suppress UnresolvedMavenProperty -->
+                        <!--suppress UnresolvedMavenProperty, injected by environment variable -->
                         <nvdApiServerId>${env.NVD_API_KEY}</nvdApiServerId>
                         <skip>${skip-linters}</skip>
                         <skipProvidedScope>true</skipProvidedScope>
@@ -933,6 +943,25 @@
                     </executions>
                 </plugin>
 
+<!--                &lt;!&ndash; Manual execution: &ndash;&gt;-->
+<!--                &lt;!&ndash; mvn sonar:sonar -Dsonarqube &ndash;&gt;-->
+<!--                <plugin>-->
+<!--                    <groupId>org.sonarsource.scanner.maven</groupId>-->
+<!--                    <artifactId>sonar-maven-plugin</artifactId>-->
+<!--                    <version>${sonar-maven-plugin.version}</version>-->
+<!--                    <configuration>-->
+<!--                        <sonar.skip>${skip-sonarqube}</sonar.skip>-->
+<!--                    </configuration>-->
+<!--                    <executions>-->
+<!--                        <execution>-->
+<!--                            <phase>install</phase>-->
+<!--                            <goals>-->
+<!--                                <goal>sonar</goal>-->
+<!--                            </goals>-->
+<!--                        </execution>-->
+<!--                    </executions>-->
+<!--                </plugin>-->
+
                 <!-- Manual execution: -->
                 <!-- mvn spotbugs:spotbugs -Dlint -->
                 <plugin>
@@ -1011,6 +1040,10 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
             </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.sonarsource.scanner.maven</groupId>-->
+<!--                <artifactId>sonar-maven-plugin</artifactId>-->
+<!--            </plugin>-->
         </plugins>
     </build>
 
@@ -1170,6 +1203,20 @@
                 <skip-performance-tests>false</skip-performance-tests>
             </properties>
         </profile>
+
+<!--        &lt;!&ndash; Profile used to execute SonarQube analysis on the project &ndash;&gt;-->
+<!--        &lt;!&ndash; Using a separate profile to linters since we only want GitHub to execute this analysis on push &ndash;&gt;-->
+<!--        <profile>-->
+<!--            <id>activate_sonarqube</id>-->
+<!--            <activation>-->
+<!--                <property>-->
+<!--                    <name>sonarqube</name>-->
+<!--                </property>-->
+<!--            </activation>-->
+<!--            <properties>-->
+<!--                <skip-sonarqube>false</skip-sonarqube>-->
+<!--            </properties>-->
+<!--        </profile>-->
 
         <!-- Profile used to execute each module's UI testsuite (if any) -->
         <profile>

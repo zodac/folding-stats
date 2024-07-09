@@ -18,7 +18,6 @@
 package me.zodac.folding.api.exception;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import lombok.Getter;
@@ -37,7 +36,7 @@ public class ValidationException extends RuntimeException {
     /**
      * The actual failure to be returned.
      */
-    private final ValidationFailure validationFailure;
+    private final transient ValidationFailure validationFailure;
 
     /**
      * Constructor with failing {@link ResponsePojo} and a single error.
@@ -87,7 +86,7 @@ public class ValidationException extends RuntimeException {
     /**
      * Failure POJO used for REST response.
      */
-    public record ValidationFailure(Object invalidObject, Collection<String> errors) implements Serializable {
+    public record ValidationFailure(Object invalidObject, Collection<String> errors) {
 
     }
 }

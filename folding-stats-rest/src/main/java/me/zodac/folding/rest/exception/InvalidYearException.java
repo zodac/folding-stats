@@ -33,7 +33,7 @@ public class InvalidYearException extends RuntimeException {
     /**
      * The invalid year.
      */
-    private final String year;
+    private final transient String year;
 
     /**
      * Basic constructor.

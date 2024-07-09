@@ -133,11 +133,11 @@ class MonthlyResultTest {
             totalEmptyTeamUnits += teamLeaderboardEntry.teamUnits();
         }
         assertThat(totalEmptyTeamPoints)
-            .isEqualTo(0L);
+            .isZero();
         assertThat(totalEmptyTeamMultipliedPoints)
-            .isEqualTo(0L);
+            .isZero();
         assertThat(totalEmptyTeamUnits)
-            .isEqualTo(0);
+            .isZero();
     }
 
     @Test

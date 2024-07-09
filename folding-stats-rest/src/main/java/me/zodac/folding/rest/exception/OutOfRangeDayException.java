@@ -32,17 +32,17 @@ public class OutOfRangeDayException extends RuntimeException {
     /**
      * The year for the day.
      */
-    private final int year;
+    private final transient int year;
 
     /**
      * The month for the day.
      */
-    private final int month;
+    private final transient int month;
 
     /**
      * The out of range day.
      */
-    private final int day;
+    private final transient int day;
 
     /**
      * Basic constructor.

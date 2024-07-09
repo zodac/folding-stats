@@ -18,7 +18,6 @@
 package me.zodac.folding.api.exception;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import lombok.Getter;
@@ -37,7 +36,7 @@ public class ConflictException extends RuntimeException {
     /**
      * The actual failure to be returned.
      */
-    private final ConflictFailure conflictFailure;
+    private final transient ConflictFailure conflictFailure;
 
     /**
      * Constructor with failing {@link RequestPojo}, the {@link ResponsePojo} it conflicts with and the attributes they conflict on.
@@ -65,10 +64,7 @@ public class ConflictException extends RuntimeException {
     /**
      * Failure POJO used for REST response.
      */
-    public record ConflictFailure(RequestPojo invalidObject,
-                                  ResponsePojo conflictingObject,
-                                  Collection<String> conflictingAttributes
-    ) implements Serializable {
+    public record ConflictFailure(RequestPojo invalidObject, ResponsePojo conflictingObject, Collection<String> conflictingAttributes) {
 
     }
 }

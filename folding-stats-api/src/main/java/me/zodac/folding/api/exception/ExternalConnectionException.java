@@ -32,7 +32,7 @@ public class ExternalConnectionException extends Exception {
     /**
      * The URL that was unable to be connected to.
      */
-    private final String url;
+    private final transient String url;
 
     /**
      * Constructor taking in the failing URL and an error message.

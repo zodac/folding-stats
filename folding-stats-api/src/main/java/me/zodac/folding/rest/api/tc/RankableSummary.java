@@ -49,7 +49,7 @@ public sealed interface RankableSummary permits RetiredUserSummary, TeamSummary,
      * @param objectsToRank the {@link RankableSummary} instances to rank
      * @return the {@link Collection} of {@link RankableSummary} with the rank values updated
      */
-    static Collection<? extends RankableSummary> rank(final Collection<? extends RankableSummary> objectsToRank) {
+    static Collection<RankableSummary> rank(final Collection<? extends RankableSummary> objectsToRank) {
         return rank(objectsToRank, 0);
     }
 
@@ -60,7 +60,7 @@ public sealed interface RankableSummary permits RetiredUserSummary, TeamSummary,
      * @param rankOffset    an offset to be applied to the final rank
      * @return the {@link Collection} of {@link RankableSummary} with the rank values updated
      */
-    static Collection<? extends RankableSummary> rank(final Collection<? extends RankableSummary> objectsToRank, final int rankOffset) {
+    static Collection<RankableSummary> rank(final Collection<? extends RankableSummary> objectsToRank, final int rankOffset) {
         final List<? extends RankableSummary> sortedObjectsToRank = objectsToRank
             .stream()
             .sorted(Comparator.comparingLong(RankableSummary::getRankableValue).reversed())

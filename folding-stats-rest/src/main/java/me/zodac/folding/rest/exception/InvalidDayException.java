@@ -32,7 +32,7 @@ public class InvalidDayException extends RuntimeException {
     /**
      * The invalid day.
      */
-    private final String day;
+    private final transient String day;
 
     /**
      * Basic constructor.
