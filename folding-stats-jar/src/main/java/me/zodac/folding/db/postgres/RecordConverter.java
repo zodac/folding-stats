@@ -68,6 +68,8 @@ final class RecordConverter {
         .disableHtmlEscaping()
         .create();
 
+    private static final String PASSWORD_MATCH_FIELD_NAME = "is_password_match";
+
     private RecordConverter() {
 
     }
@@ -276,8 +278,6 @@ final class RecordConverter {
     }
 
     private static boolean isMatchingPassword(final Record systemUsersRecord) {
-        final String passwordMatchFieldName = "is_password_match";
-        return systemUsersRecord.get(passwordMatchFieldName) != null
-            && systemUsersRecord.get(passwordMatchFieldName, boolean.class);
+        return systemUsersRecord.get(PASSWORD_MATCH_FIELD_NAME) != null && systemUsersRecord.get(PASSWORD_MATCH_FIELD_NAME, boolean.class);
     }
 }
