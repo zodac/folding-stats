@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 /**
  * REST endpoints for {@code Team Competition} {@link Hardware}s.
  */
+// TODO: Finish Swagger docs
 @Tag(name = "Hardware Endpoints", description = "REST endpoints to create, read, update and delete hardware on the system")
 public interface HardwareEndpoint {
 
