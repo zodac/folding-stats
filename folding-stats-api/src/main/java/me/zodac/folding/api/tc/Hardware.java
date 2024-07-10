@@ -45,7 +45,7 @@ import me.zodac.folding.rest.api.tc.request.HardwareRequest;
 @Accessors(fluent = true)
 @ToString(doNotUseGetters = true)
 @EqualsAndHashCode
-public final class Hardware implements ResponsePojo {
+public final class Hardware implements Comparable<Hardware>, ResponsePojo {
 
     /**
      * The default {@link Hardware} ID. Since the REST request would not know the ID until the DB has created the object,
@@ -151,5 +151,23 @@ public final class Hardware implements ResponsePojo {
             && Objects.equals(hardwareMake.toString(), hardwareRequest.hardwareMake())
             && Objects.equals(hardwareType.toString(), hardwareRequest.hardwareType())
             && averagePpd == hardwareRequest.averagePpd();
+    }
+
+    @Override
+    public int compareTo(final Hardware other) {
+        // First, compare displayName
+        final int displayNameComparison = displayName.compareTo(other.displayName);
+        if (displayNameComparison != 0) {
+            return displayNameComparison;
+        }
+
+        // If displayName is the same, compare hardwareName
+        final int hardwareNameComparison = hardwareName.compareTo(other.hardwareName);
+        if (hardwareNameComparison != 0) {
+            return hardwareNameComparison;
+        }
+
+        // If both displayName and hardwareName are the same, compare id
+        return Integer.compare(id, other.id);
     }
 }
