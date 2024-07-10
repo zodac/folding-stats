@@ -26,6 +26,7 @@ import me.zodac.folding.test.ui.util.SwaggerLink;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 /**
  * Verifies that each page of the Swagger UI can be loaded.
@@ -41,7 +42,10 @@ class SwaggerUiTest {
 
         executeWithDriver(browserType, driver -> {
             driver.navigate().to(SwaggerLink.SWAGGER_DOCS_URL.url());
-            driver.findElement(By.xpath("//*[contains(text(),'OpenAPI definition')]"));
+            final WebElement element = driver.findElement(By.xpath("//*[contains(text(),'OpenAPI definition')]"));
+            assertThat(element)
+                .as("Could not find element with matching text")
+                .isNotNull();
         });
     }
 
@@ -52,7 +56,10 @@ class SwaggerUiTest {
 
         executeWithDriver(browserType, driver -> {
             driver.navigate().to(SwaggerLink.SWAGGER_DOCS_PROJECT_URL.url());
-            driver.findElement(By.xpath("//*[contains(text(),\"REST API for the 'folding-stats' project\")]"));
+            final WebElement element = driver.findElement(By.xpath("//*[contains(text(),\"REST API for the 'folding-stats' project\")]"));
+            assertThat(element)
+                .as("Could not find element with matching text")
+                .isNotNull();
         });
     }
 

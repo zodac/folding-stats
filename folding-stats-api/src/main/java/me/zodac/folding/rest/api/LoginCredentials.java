@@ -17,7 +17,6 @@
 
 package me.zodac.folding.rest.api;
 
-import java.io.Serializable;
 import me.zodac.folding.api.util.EncodingUtils;
 
 /**
@@ -28,7 +27,7 @@ import me.zodac.folding.api.util.EncodingUtils;
  *     <li>Prefix the encoded result with "Basic " (note the space)</li>
  * </ol>
  */
-public record LoginCredentials(String encodedUserNameAndPassword) implements Serializable {
+public record LoginCredentials(String encodedUserNameAndPassword) {
 
     /**
      * Creates an instance of {@link LoginCredentials} given a {@link java.util.Base64}-encoded username/password credentials.
