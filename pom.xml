@@ -911,15 +911,6 @@
                     <artifactId>pitest-maven</artifactId>
                     <version>${pitest-maven.version}</version>
                     <configuration>
-                        <excludedClasses>
-                            <!-- folding-stats-api: False positives -->
-                            <param>*UserStats</param>
-                        </excludedClasses>
-                        <!-- TODO: Review these once classes are converted to records -->
-                        <excludedMethods>
-                            <param>equals</param>
-                            <param>hashCode</param>
-                        </excludedMethods>
                         <excludedTestClasses>
                             <param>*PostgresDbManagerTest</param>
                         </excludedTestClasses>
