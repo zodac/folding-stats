@@ -19,157 +19,77 @@ package me.zodac.folding.api.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * Unit tests for {@link StringUtils}.
  */
 class StringUtilsTest {
 
-    @Test
-    void whenIsBlankOrValidUrl_givenInputIsNull_thenTrueIsReturned() {
-        final boolean result = StringUtils.isBlankOrValidUrl(null);
+    @ParameterizedTest
+    @CsvSource({
+        "http://www.google.com,true",               // Valid HTTP URL
+        "https://www.google.com,true",              // Valid HTTPS URL
+        "file://www.google.com,false",              // Invalid URL protocol
+        "http://www.google.com/q?s=^query,false",   // Invalid URL
+        "'',true",                                  // Blank URL
+        ",true",                                    // Null URL
+    })
+    void testIsBlankOrValidUrl(final String input, final boolean expected) {
+        final boolean result = StringUtils.isBlankOrValidUrl(input);
         assertThat(result)
-            .isTrue();
+            .isEqualTo(expected);
     }
 
-    @Test
-    void whenIsBlankOrValidUrl_givenInputIsEmptyString_thenTrueIsReturned() {
-        final boolean result = StringUtils.isBlankOrValidUrl("");
+    @ParameterizedTest
+    @CsvSource({
+        "validString,false",    // Valid String
+        "'     ',true",         // Blank, multiple whitespaces
+        "'',true",              // Blank
+        ",true",                // Null
+    })
+    void testIsBlank(final String input, final boolean expected) {
+        final boolean result = StringUtils.isBlank(input);
         assertThat(result)
-            .isTrue();
+            .isEqualTo(expected);
     }
 
-    @Test
-    void whenIsBlankOrValidUrl_givenInputIsValidHttpUrl_thenTrueIsReturned() {
-        final boolean result = StringUtils.isBlankOrValidUrl("http://www.google.com");
+    @ParameterizedTest
+    @CsvSource({
+        "validString,true", // Valid String
+        "'     ',false",    // Blank, multiple whitespaces
+        "'',false",         // Blank
+        ",false",           // Null
+    })
+    void testIsNotBlank(final String input, final boolean expected) {
+        final boolean result = StringUtils.isNotBlank(input);
         assertThat(result)
-            .isTrue();
+            .isEqualTo(expected);
     }
 
-    @Test
-    void whenIsBlankOrValidUrl_givenInputIsValidHttpsUrl_thenTrueIsReturned() {
-        final boolean result = StringUtils.isBlankOrValidUrl("https://www.google.com");
+    @ParameterizedTest
+    @CsvSource({
+        "value,value,true", // Both not blank
+        "value,,false",     // First not blank, second null
+        ",value,false",     // First null, second not blank
+        ",,false",          // Both null
+    })
+    void testIsNeitherBlank(final String first, final String second, final boolean expected) {
+        final boolean result = StringUtils.isNeitherBlank(first, second);
         assertThat(result)
-            .isTrue();
+            .isEqualTo(expected);
     }
 
-    @Test
-    void whenIsBlankOrValidUrl_givenInputIsInvalidUrlScheme_thenFalseIsReturned() {
-        final boolean result = StringUtils.isBlankOrValidUrl("file://www.google.com");
+    @ParameterizedTest
+    @CsvSource({
+        "hello%20world,hello world",    // Escaped HTML
+        "hello world,hello world",      // Unescaped HTML
+        ",''",                          // Null
+    })
+    void testUnescapeHtml(final String input, final String expected) {
+        final String result = StringUtils.unescapeHtml(input);
         assertThat(result)
-            .isFalse();
-    }
-
-    @Test
-    void whenIsBlankOrValidUrl_givenInputIsInvalidUrl_thenFalseIsReturned() {
-        final boolean result = StringUtils.isBlankOrValidUrl("http://www.google.com/q?s=^query");
-        assertThat(result)
-            .isFalse();
-    }
-
-    @Test
-    void whenIsBlankString_givenInputIsNull_thenTrueIsReturned() {
-        final boolean result = StringUtils.isBlank(null);
-        assertThat(result)
-            .isTrue();
-    }
-
-    @Test
-    void whenIsBlankString_givenInputIsEmptyString_thenTrueIsReturned() {
-        final boolean result = StringUtils.isBlank("");
-        assertThat(result)
-            .isTrue();
-    }
-
-    @Test
-    void whenIsBlankString_givenInputIsStringOfWhitespace_thenTrueIsReturned() {
-        final boolean result = StringUtils.isBlank("    ");
-        assertThat(result)
-            .isTrue();
-    }
-
-    @Test
-    void whenIsBlankString_givenInputIsValidString_thenFalseIsReturned() {
-        final boolean result = StringUtils.isBlank("validString");
-        assertThat(result)
-            .isFalse();
-    }
-
-    @Test
-    void whenIsNotBlankString_givenInputIsNull_thenFalseIsReturned() {
-        final boolean result = StringUtils.isNotBlank(null);
-        assertThat(result)
-            .isFalse();
-    }
-
-    @Test
-    void whenIsNotBlankString_givenInputIsEmptyString_thenFalseIsReturned() {
-        final boolean result = StringUtils.isNotBlank("");
-        assertThat(result)
-            .isFalse();
-    }
-
-    @Test
-    void whenIsNotBlankString_givenInputIsStringOfWhitespace_thenFalseIsReturned() {
-        final boolean result = StringUtils.isNotBlank("    ");
-        assertThat(result)
-            .isFalse();
-    }
-
-    @Test
-    void whenIsNotBlankString_givenInputIsValidString_thenTrueIsReturned() {
-        final boolean result = StringUtils.isNotBlank("validString");
-        assertThat(result)
-            .isTrue();
-    }
-
-    @Test
-    void whenIsNeitherBlank_givenFirstInputIsNotBlank_andSecondInputIsNotBlank_thenTrueIsReturned() {
-        final boolean result = StringUtils.isNeitherBlank("value", "value");
-        assertThat(result)
-            .isTrue();
-    }
-
-    @Test
-    void whenIsNeitherBlank_givenFirstInputIsBlank_andSecondInputIsBlank_thenFalseIsReturned() {
-        final boolean result = StringUtils.isNeitherBlank(null, null);
-        assertThat(result)
-            .isFalse();
-    }
-
-    @Test
-    void whenIsNeitherBlank_givenFirstInputIsNotBlank_andSecondInputIsBlank_thenFalseIsReturned() {
-        final boolean result = StringUtils.isNeitherBlank("value", null);
-        assertThat(result)
-            .isFalse();
-    }
-
-    @Test
-    void whenIsNeitherBlank_givenFirstInputIsBlank_andSecondInputIsNotBlank_thenFalseIsReturned() {
-        final boolean result = StringUtils.isNeitherBlank(null, "value");
-        assertThat(result)
-            .isFalse();
-    }
-
-    @Test
-    void whenUnescapeHtml_givenEscapedHtml_thenUnescapedHtmlIsReturned() {
-        final String result = StringUtils.unescapeHtml("hello%20world");
-        assertThat(result)
-            .isEqualTo("hello world");
-    }
-
-    @Test
-    void whenUnescapeHtml_givenUnescapedHtml_thenInputIsReturned() {
-        final String result = StringUtils.unescapeHtml("hello world");
-        assertThat(result)
-            .isEqualTo("hello world");
-    }
-
-    @Test
-    void whenUnescapeHtml_givenNullInput_thenEmptyStringIsReturned() {
-        final String result = StringUtils.unescapeHtml(null);
-        assertThat(result)
-            .isEmpty();
+            .isEqualTo(expected);
     }
 }

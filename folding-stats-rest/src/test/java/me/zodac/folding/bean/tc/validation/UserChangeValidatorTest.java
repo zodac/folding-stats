@@ -43,7 +43,6 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link UserChangeValidator}.
  */
-// TODO: Parameterize this test, 1 positive, 1 negative
 class UserChangeValidatorTest {
 
     private static final String DUMMY_PASSKEY = "DummyPasskey12345678901234567890";
