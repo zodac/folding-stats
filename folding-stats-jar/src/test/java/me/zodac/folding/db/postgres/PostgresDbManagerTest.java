@@ -544,6 +544,10 @@ class PostgresDbManagerTest {
         assertThat(allUserChanges)
             .hasSize(1);
 
+        final Collection<UserChange> allUserChangesForMonths = POSTGRES_DB_MANAGER.getAllUserChanges(UserChangeState.getAllValues(), 3L);
+        assertThat(allUserChangesForMonths)
+            .hasSize(1);
+
         final Optional<UserChange> optionalRetrievedUserChange = POSTGRES_DB_MANAGER.getUserChange(createdUserChange.id());
         assertThat(optionalRetrievedUserChange)
             .isPresent();
