@@ -27,6 +27,7 @@ import me.zodac.folding.api.tc.lars.LarsRetriever;
 import me.zodac.folding.api.util.EnvironmentVariableUtils;
 import me.zodac.folding.api.util.LoggerName;
 import me.zodac.folding.bean.api.FoldingRepository;
+import me.zodac.folding.db.postgres.DatabaseConnectionException;
 import me.zodac.folding.lars.HardwareSplitter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -113,7 +114,7 @@ public class LarsHardwareUpdater {
             try {
                 foldingRepository.deleteHardware(hardware);
                 LARS_LOGGER.info("Deleted GPU hardware '{}' (ID: {})", hardware.hardwareName(), hardware.id());
-            } catch (final Exception e) {
+            } catch (final DatabaseConnectionException e) {
                 LARS_LOGGER.warn("Unexpected error deleting GPU hardware {}", hardware, e);
             }
         }
@@ -121,7 +122,7 @@ public class LarsHardwareUpdater {
         for (final Map.Entry<Hardware, Hardware> entry : HardwareSplitter.toUpdate(larsGpus, existing).entrySet()) {
             try {
                 updateHardware(entry);
-            } catch (final Exception e) {
+            } catch (final DatabaseConnectionException e) {
                 LARS_LOGGER.warn("Unexpected error connecting to Folding@Home stats to verify new GPU hardware", e);
             }
         }
@@ -130,7 +131,7 @@ public class LarsHardwareUpdater {
             try {
                 final Hardware createdHardware = foldingRepository.createHardware(hardware);
                 LARS_LOGGER.info("Created GPU hardware '{}' (ID: {})", createdHardware.hardwareName(), createdHardware.id());
-            } catch (final Exception e) {
+            } catch (final DatabaseConnectionException e) {
                 LARS_LOGGER.warn("Unexpected error creating GPU hardware {}", hardware, e);
             }
         }

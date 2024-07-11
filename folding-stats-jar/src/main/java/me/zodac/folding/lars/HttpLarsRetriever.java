@@ -70,7 +70,7 @@ public final class HttpLarsRetriever implements LarsRetriever {
 
         try {
             return retrieveResponseAndParseGpus(gpuApiUrl);
-        } catch (final Exception e) {
+        } catch (final ExternalConnectionException e) {
             LARS_LOGGER.warn("Error retrieving data from LARS GPU DB", e);
             return Set.of();
         }

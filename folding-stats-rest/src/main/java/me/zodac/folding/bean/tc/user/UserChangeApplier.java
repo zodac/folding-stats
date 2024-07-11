@@ -22,6 +22,8 @@ import me.zodac.folding.api.tc.User;
 import me.zodac.folding.api.tc.change.UserChange;
 import me.zodac.folding.api.tc.change.UserChangeState;
 import me.zodac.folding.bean.api.FoldingRepository;
+import me.zodac.folding.db.postgres.DatabaseConnectionException;
+import me.zodac.folding.rest.exception.NotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +64,12 @@ public class UserChangeApplier {
         for (final UserChange userChange : nextMonthUserChanges) {
             try {
                 apply(userChange);
+            } catch (final NotFoundException e) {
+                LOGGER.warn("User does not exist for change '{}'", userChange, e);
+            } catch (final DatabaseConnectionException e) {
+                LOGGER.warn("Error updating user change '{}'", userChange, e);
             } catch (final Exception e) {
-                LOGGER.warn("Error occurred applying user change '{}'", userChange, e);
+                LOGGER.warn("Unexpected error occurred applying user change '{}'", userChange, e);
             }
         }
     }

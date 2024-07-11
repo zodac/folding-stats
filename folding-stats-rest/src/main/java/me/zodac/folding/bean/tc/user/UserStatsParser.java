@@ -29,6 +29,7 @@ import me.zodac.folding.api.tc.stats.OffsetTcStats;
 import me.zodac.folding.api.tc.stats.Stats;
 import me.zodac.folding.api.tc.stats.UserStats;
 import me.zodac.folding.bean.StatsRepository;
+import me.zodac.folding.db.postgres.DatabaseConnectionException;
 import me.zodac.folding.state.ParsingStateManager;
 import me.zodac.folding.state.SystemStateManager;
 import org.apache.logging.log4j.LogManager;
@@ -87,8 +88,10 @@ public class UserStatsParser {
         for (final User user : users) {
             try {
                 updateTcStatsForUser(user);
-            } catch (final Exception e) {
+            } catch (final DatabaseConnectionException e) {
                 LOGGER.error("Error updating TC stats for user '{}' (ID: {})", user.displayName(), user.id(), e);
+            } catch (final Exception e) {
+                LOGGER.error("Unexpected error updating TC stats for user '{}' (ID: {})", user.displayName(), user.id(), e);
             }
         }
 

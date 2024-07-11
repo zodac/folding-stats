@@ -37,6 +37,7 @@ import me.zodac.folding.api.tc.stats.UserTcStats;
 import me.zodac.folding.api.util.DecodedLoginCredentials;
 import me.zodac.folding.bean.api.FoldingRepository;
 import me.zodac.folding.bean.tc.user.UserStatsParser;
+import me.zodac.folding.db.postgres.DatabaseConnectionException;
 import me.zodac.folding.rest.exception.NotFoundException;
 import me.zodac.folding.state.ParsingStateManager;
 import org.apache.logging.log4j.LogManager;
@@ -441,7 +442,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
     public Collection<UserChange> getAllUserChangesForNextMonth() {
         try {
             return storage.getAllUserChanges(List.of(UserChangeState.APPROVED_NEXT_MONTH), 0L);
-        } catch (final Exception e) {
+        } catch (final DatabaseConnectionException e) {
             LOGGER.warn("Error retrieving all user changes for next month", e);
             return List.of();
         }

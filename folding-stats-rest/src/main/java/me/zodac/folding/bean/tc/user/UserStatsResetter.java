@@ -21,6 +21,7 @@ import java.util.Collection;
 import me.zodac.folding.api.tc.User;
 import me.zodac.folding.bean.StatsRepository;
 import me.zodac.folding.bean.api.FoldingRepository;
+import me.zodac.folding.db.postgres.DatabaseConnectionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,8 @@ public class UserStatsResetter {
         try {
             LOGGER.info("Resetting Team Competition stats");
             statsRepository.resetAllTeamCompetitionUserStats();
+        } catch (final DatabaseConnectionException e) {
+            LOGGER.warn("Error manually resetting TC stats", e);
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error manually resetting TC stats", e);
         }
@@ -88,6 +91,8 @@ public class UserStatsResetter {
 
             LOGGER.info("Resetting Team Competition stats for start of a new month");
             statsRepository.resetAllTeamCompetitionUserStats();
+        } catch (final DatabaseConnectionException e) {
+            LOGGER.warn("Error manually resetting TC stats for new month", e);
         } catch (final Exception e) {
             LOGGER.warn("Unexpected error manually resetting TC stats for new month", e);
         }
