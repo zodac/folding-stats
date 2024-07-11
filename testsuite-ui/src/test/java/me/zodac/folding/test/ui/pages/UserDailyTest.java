@@ -41,7 +41,7 @@ class UserDailyTest {
 
     @ParameterizedTest
     @EnumSource(BrowserType.class)
-    void loadUserDailyPage(final BrowserType browserType) {
+    void testLoadUserDailyPage(final BrowserType browserType) {
         log("Loading '%s' browser at '%s'", browserType.displayName(), FRONTEND_LINK.url());
 
         executeWithDriver(browserType, driver -> {

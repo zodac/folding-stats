@@ -66,7 +66,7 @@ class PostgresDbManagerTest {
 
     @Test
     @Order(1)
-    void hardwareTest() {
+    void testHardware() {
         final Hardware hardware = generateHardware();
         final Hardware createdHardware = POSTGRES_DB_MANAGER.createHardware(hardware);
         assertThat(createdHardware.id())
@@ -116,7 +116,7 @@ class PostgresDbManagerTest {
 
     @Test
     @Order(2)
-    void teamTest() {
+    void testTeam() {
         final Team team = generateTeam();
         final Team createdTeam = POSTGRES_DB_MANAGER.createTeam(team);
 
@@ -164,7 +164,7 @@ class PostgresDbManagerTest {
 
     @Test
     @Order(3)
-    void userTest() {
+    void testUser() {
         final User user = generateUser();
         final User createdUser = POSTGRES_DB_MANAGER.createUser(user);
 
@@ -217,7 +217,7 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void initialUserStatsTest() {
+    void testInitialUserStats() {
         final int userId = createUser().id();
 
         assertThat(POSTGRES_DB_MANAGER.getInitialStats(userId))
@@ -237,7 +237,7 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void totalStatsTest() {
+    void testTotalStats() {
         final int userId = createUser().id();
 
         assertThat(POSTGRES_DB_MANAGER.getTotalStats(userId))
@@ -257,7 +257,7 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void retiredUserStatsTest() {
+    void testTetiredUserStats() {
         final User userToRetire = createUser();
         final Team team = userToRetire.team();
 
@@ -294,7 +294,7 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void offsetStatsTest() {
+    void testOffsetStats() {
         final int userId = createUser().id();
 
         assertThat(POSTGRES_DB_MANAGER.getOffsetStats(userId))
@@ -344,7 +344,7 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void hourlyTcStatsTest() {
+    void testHourlyTcStats() {
         final int userId = createUser().id();
         assertThat(POSTGRES_DB_MANAGER.getHourlyTcStats(userId))
             .isEmpty();
@@ -365,7 +365,7 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void historicTest() {
+    void testHistoricStats() {
         final int userId = createUser().id();
 
         final Year year = Year.of(2020);
@@ -413,7 +413,7 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void monthlyResultTest() {
+    void testMonthlyResult() {
         final Year firstResultYear = Year.of(2020);
         final Month firstResultMonth = Month.APRIL;
         final MonthlyResult firstResult = MonthlyResult.create(
@@ -494,7 +494,7 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void systemUserTest() {
+    void testSystemUser() {
         final UserAuthenticationResult invalidUserName =
             POSTGRES_DB_MANAGER.authenticateSystemUser(new DecodedLoginCredentials("invalidUserName", "ADMIN_PASSWORD"));
         assertThat(invalidUserName.userExists())
@@ -533,7 +533,7 @@ class PostgresDbManagerTest {
     }
 
     @Test
-    void userChangeTest() {
+    void testUserChange() {
         final UserChange userChange = generateUserChange();
         final UserChange createdUserChange = POSTGRES_DB_MANAGER.createUserChange(userChange);
 

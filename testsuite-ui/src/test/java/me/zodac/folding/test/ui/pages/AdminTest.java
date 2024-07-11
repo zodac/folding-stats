@@ -41,7 +41,7 @@ class AdminTest {
 
     @ParameterizedTest
     @EnumSource(BrowserType.class)
-    void loadAdminPage(final BrowserType browserType) {
+    void testLoadAdminPage(final BrowserType browserType) {
         log("Loading '%s' browser at '%s'", browserType.displayName(), FRONTEND_LINK.url());
 
         executeWithDriver(browserType, driver -> {

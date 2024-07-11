@@ -41,7 +41,7 @@ class UserHourlyTest {
 
     @ParameterizedTest
     @EnumSource(BrowserType.class)
-    void loadUserHourlyPage(final BrowserType browserType) {
+    void testLoadUserHourlyPage(final BrowserType browserType) {
         log("Loading '%s' browser at '%s'", browserType.displayName(), FRONTEND_LINK.url());
 
         executeWithDriver(browserType, driver -> {

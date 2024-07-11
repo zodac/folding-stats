@@ -635,8 +635,7 @@ public record PostgresDbManager(DataSource dataSource) implements DbManager {
                 return userStats;
             }
         } catch (final DatabaseConnectionException e) {
-            SQL_LOGGER.warn("Unable to get the stats for the first hour of {}/{}/{} for user {}", year, formatMonth(month), day,
-                userId);
+            SQL_LOGGER.warn("Unable to get the stats for the first hour of {}/{}/{} for user {}", year, formatMonth(month), day, userId);
             throw e;
         } catch (final SQLException e) {
             throw new DatabaseConnectionException("Error opening connection to the DB", e);

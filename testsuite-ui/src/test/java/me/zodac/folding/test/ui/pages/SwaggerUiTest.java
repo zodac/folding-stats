@@ -37,7 +37,7 @@ class SwaggerUiTest {
 
     @ParameterizedTest
     @EnumSource(BrowserType.class)
-    void loadSwaggerDocsPage(final BrowserType browserType) {
+    void testLoadSwaggerDocsPage(final BrowserType browserType) {
         log("Loading '%s' browser at '%s'", browserType.displayName(), SwaggerLink.SWAGGER_DOCS_URL.url());
 
         executeWithDriver(browserType, driver -> {
@@ -51,7 +51,7 @@ class SwaggerUiTest {
 
     @ParameterizedTest
     @EnumSource(BrowserType.class)
-    void loadSwaggerDocsProjectPage(final BrowserType browserType) {
+    void testLoadSwaggerDocsProjectPage(final BrowserType browserType) {
         log("Loading '%s' browser at '%s'", browserType.displayName(), SwaggerLink.SWAGGER_DOCS_PROJECT_URL.url());
 
         executeWithDriver(browserType, driver -> {
@@ -65,7 +65,7 @@ class SwaggerUiTest {
 
     @ParameterizedTest
     @EnumSource(BrowserType.class)
-    void loadSwaggerUiPage(final BrowserType browserType) {
+    void testLoadSwaggerUiPage(final BrowserType browserType) {
         log("Loading '%s' browser at '%s'", browserType.displayName(), SwaggerLink.SWAGGER_UI_URL.url());
 
         executeWithDriver(browserType, driver -> {

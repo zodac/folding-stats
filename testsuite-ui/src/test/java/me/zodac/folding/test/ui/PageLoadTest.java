@@ -52,7 +52,7 @@ class PageLoadTest {
 
     @ParameterizedTest
     @MethodSource("browserAndFrontendLinkProvider")
-    void loadAllPages(final BrowserType browserType, final FrontendLink frontendLink) {
+    void testLoadingAllPages(final BrowserType browserType, final FrontendLink frontendLink) {
         log("Loading '%s' browser at '%s'", browserType.displayName(), frontendLink.url());
 
         executeWithDriver(browserType, driver -> {

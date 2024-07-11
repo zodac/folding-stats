@@ -43,7 +43,7 @@ class IndexTest {
 
     @ParameterizedTest
     @EnumSource(BrowserType.class)
-    void loadIndexPage(final BrowserType browserType) {
+    void testLoadIndexPage(final BrowserType browserType) {
         log("Loading '%s' browser at '%s'", browserType.displayName(), FRONTEND_LINK.url());
 
         executeWithDriver(browserType, driver -> {
