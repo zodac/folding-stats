@@ -33,7 +33,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Initializes the CodeQL tools for scanning.
+      # CodeQL Analysis
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3.25.11
         with:
@@ -41,3 +41,22 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3.25.11
+
+      # SonarQube Analysis
+      - name: Set up Node.js
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: '22.4.0'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: SonarQube Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_PAT }}
+        run: |
+          npx sonar-scanner \
+            -Dsonar.projectKey=folding-stats-js  \
+            -Dsonar.sources=docker/frontend/js \
+            -Dsonar.host.url=https://sonarqube.zodac.me \
+            -Dsonar.login=${{ secrets.SONARQUBE_PAT }}
