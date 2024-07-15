@@ -41,20 +41,19 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3.2.0
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
+          username: ${{ env.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Deploy with Docker Compose
         id: deploy
-        run: docker-compose --file docker-compose-dev.yml up --build --detach
+        run: docker compose --file docker-compose-dev.yml up --build --detach
 
-      - name: Run linters and unit tests (including SonarQube)
+      - name: Run linters and unit/integration tests, then publish results to SonarQube
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
           SONARQUBE_PAT: ${{ secrets.SONARQUBE_PAT }}
         run: mvn clean install -Dall -Dsonarqube
-        if: steps.deploy.outcome == 'success'
 
       - name: Shut down Docker Compose
+        run: docker compose --file docker-compose-dev.yml down
         if: steps.deploy.outcome == 'success'
-        run: docker-compose --file docker-compose-dev.yml down
