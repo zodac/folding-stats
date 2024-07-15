@@ -3,6 +3,10 @@ name: Java CI
 on:
   push:
     branches: [ master ]
+    paths-ignore:
+      - '.github/workflows/javascript.yml'
+      - 'CONTRIBUTING.md'
+      - 'README.md'
   schedule:
     # Run once a week to check for new CVEs
     - cron: '0 0 * * 0'
