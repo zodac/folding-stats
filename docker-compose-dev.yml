@@ -27,7 +27,7 @@ services:
       - development
     ports:
       - "81:443"
-    restart: no
+    restart: "no"
     volumes_from:
       - backend_dev
 
@@ -80,7 +80,7 @@ services:
       - development
     ports:
       - "8079:8443"
-    restart: no
+    restart: "no"
     volumes:
       - /usr/local/certs/stats/
 
@@ -114,7 +114,7 @@ services:
       - development
     ports:
       - "5433:5432"
-    restart: no
+    restart: "no"
 
   selenium_chrome:
     image: selenium/standalone-chrome:126.0
@@ -126,7 +126,7 @@ services:
       - development
     ports:
       - "4444:4444"
-    restart: no
+    restart: "no"
 
   selenium_firefox:
     image: selenium/standalone-firefox:127.0
@@ -138,4 +138,4 @@ services:
       - development
     ports:
       - "4445:4444"
-    restart: no
+    restart: "no"

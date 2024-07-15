@@ -29,7 +29,7 @@ services:
       - production
     ports:
       - "${HTTPS_FRONTEND_PORT}:443"
-    restart: unless-stopped
+    restart: "unless-stopped"
     volumes_from:
       - backend:ro
 
@@ -84,7 +84,7 @@ services:
       - production
     ports:
       - "${HTTPS_BACKEND_PORT}:8443"
-    restart: unless-stopped
+    restart: "unless-stopped"
     volumes:
       - backend_certs:/usr/local/certs/stats/
       - backend_logs:/var/backend/logs/
@@ -119,7 +119,7 @@ services:
       - production
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
-    restart: unless-stopped
+    restart: "unless-stopped"
     volumes:
       - database_content:/var/lib/postgresql/data
 
