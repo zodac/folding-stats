@@ -35,7 +35,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4.2.1
         with:
-          java-distribution: 'temurin'
+          distribution: 'temurin'
           java-version: '22'
 
       - name: Cache SonarQube analyzers
