@@ -9,7 +9,7 @@ on:
 
 jobs:
   analyze:
-    name: Analyze
+    name: Javascript Analysis
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -32,20 +32,29 @@ jobs:
         uses: github/codeql-action/analyze@v3.25.11
 
       # SonarQube Analysis
-      - name: Set up Node.js
-        uses: actions/setup-node@v4.0.3
+      - name: Set up JDK
+        uses: actions/setup-java@v4.2.1
         with:
-          node-version: '22.4.0'
+          java-version: '11'
 
-      - name: Install dependencies
-        run: npm i npx sonarqube-scanner
+      - name: Cache Sonar analyzers
+        uses: actions/cache@v4.0.2
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar-${{ hashFiles('docker/frontend/js/**') }}
+          restore-keys: |
+            ${{ runner.os }}-sonar-
 
       - name: SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONARQUBE_PAT }}
         run: |
-          npx sonar-scanner \
+          docker run \
+          --rm \
+          -e SONAR_HOST_URL="https://sonarqube.zodac.me" \
+          -e SONAR_LOGIN=${{ secrets.SONARQUBE_PAT }} \
+          -v ~/.sonar/cache:/opt/sonar-scanner/.sonar/cache \
+          -v "$(pwd):/" \
+          sonarsource/sonar-scanner-cli:10.0 \
             -Dsonar.projectKey=folding-stats-js  \
-            -Dsonar.sources=docker/frontend/js \
-            -Dsonar.host.url=https://sonarqube.zodac.me \
-            -Dsonar.login=${{ secrets.SONARQUBE_PAT }}
+            -Dsonar.sources=docker/frontend/js
