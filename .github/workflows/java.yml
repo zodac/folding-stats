@@ -40,7 +40,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Setup Maven Action
+      - name: Set up maven
         uses: s4u/setup-maven-action@v1.14.0
         with:
           java-distribution: 'temurin'
@@ -53,7 +53,7 @@ jobs:
           username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Deploy with Docker Compose
+      - name: Deploy docker containers
         id: deploy
         run: docker compose --file docker-compose-dev.yml up --build --detach
 
@@ -63,6 +63,6 @@ jobs:
           SONARQUBE_PAT: ${{ secrets.SONARQUBE_PAT }}
         run: mvn clean install -Dall -Dsonarqube
 
-      - name: Shut down Docker Compose
+      - name: Shut down docker containers
         run: docker compose --file docker-compose-dev.yml down
         if: steps.deploy.outcome == 'success'
