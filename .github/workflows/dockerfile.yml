@@ -41,24 +41,24 @@ jobs:
           format: json
           no-fail: true
 
-      - name: Convert Hadolint report to SonarQube generic issue format
-        run: |
-          jq -n '[inputs | .[] | {
-            engineId: "Hadolint",
-            ruleId: .code,
-            severity: if .level == "error" then "CRITICAL"
-                      elif .level == "warning" then "MAJOR"
-                      else "MINOR" end,
-            type: "CODE_SMELL",
-            primaryLocation: {
-              message: .message,
-              filePath: .file,
-              textRange: {
-                startLine: .line,
-                endLine: .line
-              }
-            }
-          }] | { issues: . }' hadolint-report.json > sonar-hadolint-report.json
+#      - name: Convert Hadolint report to SonarQube generic issue format
+#        run: |
+#          jq -n '[inputs | .[] | {
+#            engineId: "Hadolint",
+#            ruleId: .code,
+#            severity: if .level == "error" then "CRITICAL"
+#                      elif .level == "warning" then "MAJOR"
+#                      else "MINOR" end,
+#            type: "CODE_SMELL",
+#            primaryLocation: {
+#              message: .message,
+#              filePath: .file,
+#              textRange: {
+#                startLine: .line,
+#                endLine: .line
+#              }
+#            }
+#          }] | { issues: . }' hadolint-report.json > sonar-hadolint-report.json
 
       # SonarQube Analysis
       - name: Set up JDK
@@ -79,4 +79,4 @@ jobs:
             -Dsonar.projectKey=folding-stats-docker  \
             -Dsonar.sources=/usr/src/docker/backend/Dockerfile,/usr/src/docker/database/Dockerfile,/usr/src/docker/frontend/Dockerfile \
             -Dsonar.token=${{ secrets.SONARQUBE_PAT }} \
-            -Dsonar.docker.hadolint.reportPaths=sonar-hadolint-report.json
+            -Dsonar.docker.hadolint.reportPaths=hadolint-report.json
