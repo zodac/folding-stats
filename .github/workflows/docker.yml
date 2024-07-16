@@ -1,0 +1,67 @@
+name: DockerFile CI
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'docker/backend/Dockerfile'
+      - 'docker/database/Dockerfile'
+      - 'docker/frontend/Dockerfile'
+
+jobs:
+  analyze:
+    name: Docker Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.7
+        with:
+          fetch-depth: 0
+
+      # SonarQube Analysis
+      - name: Set up JDK
+        uses: actions/setup-java@v4.2.1
+        with:
+          distribution: 'temurin'
+          java-version: '22'
+
+      - name: Run Hadolint and generate report
+        run: find . -name 'Dockerfile' | xargs hadolint -f json > hadolint-report.json
+
+      - name: Convert Hadolint report to SonarQube generic issue format
+        run: |
+          jq -n '[inputs | .[] | {
+            engineId: "Hadolint",
+            ruleId: .code,
+            severity: if .level == "error" then "CRITICAL"
+                      elif .level == "warning" then "MAJOR"
+                      else "MINOR" end,
+            type: "CODE_SMELL",
+            primaryLocation: {
+              message: .message,
+              filePath: .file,
+              textRange: {
+                startLine: .line,
+                endLine: .line
+              }
+            }
+          }] | { issues: . }' hadolint-report.json > sonar-hadolint-report.json
+
+      - name: Execute SonarQube Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARQUBE_PAT }}
+        run: |
+          docker run \
+          --rm \
+          -e SONAR_HOST_URL="https://sonarqube.zodac.me" \
+          -v "$(pwd):/usr/src/" \
+          sonarsource/sonar-scanner-cli:10.0 \
+            -Dsonar.projectKey=folding-stats-docker  \
+            -Dsonar.sources=/usr/src/docker/backend/Dockerfile,/usr/src/docker/database/Dockerfile,/usr/src/docker/frontend/Dockerfile \
+            -Dsonar.token=${{ secrets.SONARQUBE_PAT }} \
+            -Dsonar.externalIssuesReportPaths=sonar-hadolint-report.json
