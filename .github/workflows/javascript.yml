@@ -47,6 +47,6 @@ jobs:
           -e SONAR_HOST_URL="https://sonarqube.zodac.me" \
           -v "$(pwd):/usr/src/" \
           sonarsource/sonar-scanner-cli:10.0 \
-            -Dsonar.projectKey=folding-stats-js  \
+            -Dsonar.projectKey=folding-stats  \
             -Dsonar.sources=/usr/src/docker/frontend/js \
             -Dsonar.token=${{ secrets.SONARQUBE_PAT }}

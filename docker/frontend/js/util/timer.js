@@ -1,6 +1,6 @@
 const NUMBER_OF_UPDATES_PROPERTY_NAME = "numberOfUpdates"
 
-const UPDATE_ENABLED = %UPDATE_ENABLED%
+const UPDATE_ENABLED = "%UPDATE_ENABLED%"
 const FIRST_DAY_OF_MONTH = 3
 const UPDATE_MINUTE = 55
 
@@ -39,7 +39,7 @@ function calculateNumberOfUpdates() {
 
 // https://stackoverflow.com/questions/37179899/countdown-timer-every-hour-but-on-30-minute-marks
 function updateTimer() {
-    if(!UPDATE_ENABLED) {
+    if(UPDATE_ENABLED == "false") {
         // Do not set up a timer if updating is disabled, and hide updates from the webpage
         hide("update_timer")
         return
