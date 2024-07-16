@@ -39,6 +39,7 @@ jobs:
           dockerfile: docker/backend/Dockerfile
           output-file: hadolint-report.json
           format: json
+          no-fail: true
 
       - name: Convert Hadolint report to SonarQube generic issue format
         run: |
