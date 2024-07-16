@@ -71,4 +71,4 @@ jobs:
             -Dsonar.projectKey=folding-stats-docker  \
             -Dsonar.sources=/usr/src/docker/backend/Dockerfile,/usr/src/docker/database/Dockerfile,/usr/src/docker/frontend/Dockerfile \
             -Dsonar.token=${{ secrets.SONARQUBE_PAT }} \
-            -Dsonar.externalIssuesReportPaths=sonar-hadolint-report.json
+            -Dsonar.docker.hadolint.reportPaths=sonar-hadolint-report.json
