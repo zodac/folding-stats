@@ -87,15 +87,7 @@ function getHardwareTypeFrontend(value) {
 }
 
 function getHardwareTypeBackend(value) {
-    if (value.toLowerCase() === "gpu") {
-        return "GPU"
-    }
-
-    if (value.toLowerCase() === "cpu") {
-        return "CPU"
-    }
-
-    return value
+    return getHardwareTypeFrontend(value)
 }
 
 function getUserChangeStateFrontend(value) {
