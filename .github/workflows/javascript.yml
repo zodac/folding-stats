@@ -38,14 +38,6 @@ jobs:
           distribution: 'temurin'
           java-version: '22'
 
-      - name: Cache SonarQube analyzers
-        uses: actions/cache@v4.0.2
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar-${{ hashFiles('docker/frontend/js/**') }}
-          restore-keys: |
-            ${{ runner.os }}-sonar-
-
       - name: Execute SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONARQUBE_PAT }}
@@ -54,7 +46,6 @@ jobs:
           --rm \
           -e SONAR_HOST_URL="https://sonarqube.zodac.me" \
           -e SONAR_LOGIN=${{ secrets.SONARQUBE_PAT }} \
-          -v ~/.sonar/cache:/opt/sonar-scanner/.sonar/cache \
           -v "$(pwd):/usr/src/" \
           sonarsource/sonar-scanner-cli:10.0 \
             -Dsonar.projectKey=folding-stats-js  \
