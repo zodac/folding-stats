@@ -29,8 +29,8 @@ function populateUserDropdown(dropdownId) {
     })
 }
 
-function populateTeamDropdown(dropdownId) {
-    var dropdown = document.getElementById(dropdownId)
+function populateTeamDropdown() {
+    var dropdown = document.getElementById('team_dropdown')
     while (dropdown.firstChild) {
         dropdown.removeChild(dropdown.lastChild)
     }
@@ -40,7 +40,7 @@ function populateTeamDropdown(dropdownId) {
         return response.json()
     })
     .then(function(jsonResponse) {
-        teamDropDownDiv = document.getElementById(dropdownId)
+        teamDropDownDiv = document.getElementById('team_dropdown')
 
         jsonResponse.forEach(function(teamItem, i){
             teamButton = document.createElement("button")

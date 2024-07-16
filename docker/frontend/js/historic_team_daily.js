@@ -105,7 +105,7 @@ function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
-    populateTeamDropdown("team_dropdown")
+    populateTeamDropdown()
     populateMonthDropdown("month_dropdown", "getTeamHistoricStats")
     populateYearDropdown("year_dropdown", "getTeamHistoricStats")
     updateTimer()

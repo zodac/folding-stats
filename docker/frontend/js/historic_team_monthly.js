@@ -4,31 +4,6 @@ var selectedUserId = 0
 var selectedUser = ""
 var selectedYear = new Date().getUTCFullYear()
 
-function populateTeamDropdown() {
-    var dropdown = document.getElementById('team_dropdown')
-    while (dropdown.firstChild) {
-        dropdown.removeChild(dropdown.lastChild)
-    }
-
-    fetch(REST_ENDPOINT_URL+"/teams")
-    .then(response => {
-        return response.json()
-    })
-    .then(function(jsonResponse) {
-        teamDropDownDiv = document.getElementById("team_dropdown")
-
-        jsonResponse.forEach(function(teamItem, i){
-            teamButton = document.createElement("button")
-            teamButton.setAttribute("class", "dropdown-item")
-            teamButton.setAttribute("type", "button")
-            teamButton.setAttribute("onclick", "getTeamHistoricStats("+teamItem["id"]+",'"+teamItem["teamName"]+"')")
-            teamButton.innerHTML = teamItem['teamName']
-
-            teamDropDownDiv.append(teamButton)
-        })
-    })
-}
-
 function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
     if(teamId != 0){
         selectedTeamId = teamId
@@ -122,7 +97,7 @@ function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
-    populateTeamDropdown("team_dropdown")
+    populateTeamDropdown()
     populateYearDropdown("year_dropdown", "getTeamHistoricStats")
     updateTimer()
 })
