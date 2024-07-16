@@ -4,6 +4,7 @@ on:
   push:
     branches: [ master ]
     paths:
+      - '.github/workflows/dockerfile.yml'
       - 'docker/backend/Dockerfile'
       - 'docker/database/Dockerfile'
       - 'docker/frontend/Dockerfile'
