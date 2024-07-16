@@ -30,7 +30,7 @@ jobs:
 #          wget -O /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/download/v2.7.0/hadolint-Linux-x86_64
 #          chmod +x /usr/local/bin/hadolint
 #
-#      - name: Run Hadolint and generate report
+#      - name: Run Hadolint and generate report 
 #        run: find . -name 'Dockerfile' | xargs hadolint -f json > hadolint-report.json
 #
 #      - name: Convert Hadolint report to SonarQube generic issue format
