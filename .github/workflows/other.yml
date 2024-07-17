@@ -38,7 +38,7 @@ jobs:
         run: npm install -g stylelint stylelint-config-standard
 
       - name: Run StyleLint
-        run: stylelint "docker/frontend/css/*.css"
+        run: stylelint --config ./ci/other/.stylelintrc.json --formatter json --output stylelint-report.json "docker/frontend/css/*.css"
 
       # Additional Docker Analysis
       - name: Run Hadolint and generate report
@@ -71,4 +71,5 @@ jobs:
             -Dsonar.projectKey=folding-stats-other  \
             -Dsonar.sources=/usr/src/docker/frontend/css/,/usr/src/docker/frontend/pages/,/usr/src/docker/frontend/js,/usr/src/docker/backend/Dockerfile,/usr/src/docker/database/Dockerfile,/usr/src/docker/frontend/Dockerfile \
             -Dsonar.token=${{ secrets.SONARQUBE_PAT }} \
-            -Dsonar.docker.hadolint.reportPaths=hadolint-report.json
+            -Dsonar.docker.hadolint.reportPaths=hadolint-report.json \
+            -Dsonar.css.stylelint.reportPaths=stylelint-report.json
