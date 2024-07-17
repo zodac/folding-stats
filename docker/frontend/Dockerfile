@@ -35,9 +35,9 @@ RUN grep -rl '%REST_ENDPOINT_URL%' . | xargs sed -i "s|%REST_ENDPOINT_URL%|${RES
     grep -rl '%UPDATE_ENABLED%' . | xargs sed -i "s|%UPDATE_ENABLED%|${UPDATE_ENABLED}|g"
 
 # Minify JS and CSS files, then rename to end with *.min.*
-RUN minify --verbose --match=\.*.css$ --type=css --output /docker/apache/site/res/css/ /docker/apache/css/ && \
-    minify --verbose --match=\.*.js$ --type=js --output /docker/apache/site/res/js/ /docker/apache/js/ && \
-    minify --verbose --match=\.*.js$ --type=js --output /docker/apache/site/res/js/ /docker/apache/js/util && \
+RUN minify --recursive --verbose --type=css --output /docker/apache/site/res/css/ /docker/apache/css/ && \
+    minify --recursive --verbose --type=js --output /docker/apache/site/res/js/ /docker/apache/js/ && \
+    minify --recursive --verbose --type=js --output /docker/apache/site/res/js/ /docker/apache/js/util && \
     find /docker/apache/site/res/ -iname "*.css" | sed 's|....$||' | xargs -I mv {}.css {}.min.css && \
     find /docker/apache/site/res/ -iname "*.js" | sed 's|...$||' | xargs -I mv {}.js {}.min.js
 
