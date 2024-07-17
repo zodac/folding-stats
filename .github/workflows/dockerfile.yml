@@ -5,6 +5,7 @@ on:
     branches: [ master ]
     paths:
       - '.github/workflows/dockerfile.yml'
+      - 'ci/.hadolint.yaml'
       - 'docker/backend/Dockerfile'
       - 'docker/database/Dockerfile'
       - 'docker/frontend/Dockerfile'
@@ -28,9 +29,8 @@ jobs:
       - name: Run Hadolint and generate report
         uses: hadolint/hadolint-action@v3.1.0
         with:
+          config: ./ci/.hadolint.yaml
           dockerfile: Dockerfile
-          format: json
-          no-fail: true
           output-file: hadolint-report.json
           recursive: true
 
