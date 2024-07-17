@@ -5,7 +5,12 @@ on:
     branches: [ master ]
     paths:
       - '.github/workflows/other.yml'
+      - 'ci/.hadolint.yaml'
+      - 'docker/backend/Dockerfile'
+      - 'docker/database/Dockerfile'
+      - 'docker/frontend/Dockerfile'
       - 'docker/frontend/css/**'
+      - 'docker/frontend/js/**'
       - 'docker/frontend/pages/**'
 
 jobs:
@@ -23,46 +28,47 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Git
-        run: git config --global user.name 'github-actions' && git config --global user.email 'github-actions@github.com'
+      # Additional CSS Analysis
+      - name: Set up Node.js
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: '22.4.0'
 
-      - name: Initialize variable
-        id: init_sources
-        run: echo "SOURCES=" >> $GITHUB_ENV
+      - name: Install StyleLint
+        run: npm install -g stylelint stylelint-config-standard
 
-      - name: Check if there are CSS changes
-        id: check_css
-        run: |
-          echo "CSS diff:" && \
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^.*/frontend/css/';
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^.*/frontend/css/'; then
-            echo "::set-output name=changed::true"
-            echo "SOURCES=$SOURCES,/usr/src/docker/frontend/css/" >> $GITHUB_ENV
-          else
-            echo "::set-output name=changed::false"
-          fi
+      - name: Run StyleLint
+        run: stylelint "docker/frontend/css/*.css"
 
-      - name: Check if there are HTML changes
-        id: check_html
-        run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^.*/frontend/pages/'; then
-            echo "::set-output name=changed::true"
-            echo "SOURCES=$SOURCES,/usr/src/docker/frontend/pages/" >> $GITHUB_ENV
-          else
-            echo "::set-output name=changed::false"
-          fi
+      # Additional Docker Analysis
+      - name: Run Hadolint and generate report
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          config: ./ci/other/.hadolint.yaml
+          dockerfile: Dockerfile
+          output-file: hadolint-report.json
+          recursive: true
 
-        # SonarQube Analysis
+      # Additional JavaScript Analysis
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3.25.11
+        with:
+          languages: 'javascript'
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3.25.11
+
+        # SonarQube Analysis (CSS, Docker, HTML, JavaScript)
       - name: Execute SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONARQUBE_PAT }}
         run: |
-          echo "Output: $SOURCES" && \
           docker run \
           --rm \
           -e SONAR_HOST_URL="https://sonarqube.zodac.me" \
           -v "$(pwd):/usr/src/" \
           sonarsource/sonar-scanner-cli:10.0 \
             -Dsonar.projectKey=folding-stats-other  \
-            -Dsonar.sources="$SOURCES" \
-            -Dsonar.token=${{ secrets.SONARQUBE_PAT }}
+            -Dsonar.sources=/usr/src/docker/frontend/css/,/usr/src/docker/frontend/pages/,/usr/src/docker/frontend/js,/usr/src/docker/backend/Dockerfile,/usr/src/docker/database/Dockerfile,/usr/src/docker/frontend/Dockerfile \
+            -Dsonar.token=${{ secrets.SONARQUBE_PAT }} \
+            -Dsonar.docker.hadolint.reportPaths=hadolint-report.json

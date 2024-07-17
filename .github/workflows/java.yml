@@ -4,10 +4,9 @@ on:
   push:
     branches: [ master ]
     paths-ignore:
-      - '.github/workflows/dockerfile.yml'
-      - '.github/workflows/javascript.yml'
       - '.github/workflows/other.yml'
       - 'ci/.hadolint.yaml'
+      - 'ci/other/**'
       - 'CONTRIBUTING.md'
       - 'LICENSE'
       - 'README.md'
