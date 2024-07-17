@@ -6,8 +6,10 @@ on:
     paths-ignore:
       - '.github/workflows/dockerfile.yml'
       - '.github/workflows/javascript.yml'
+      - '.github/workflows/other.yml'
       - 'ci/.hadolint.yaml'
       - 'CONTRIBUTING.md'
+      - 'LICENSE'
       - 'README.md'
   schedule:
     # Run once a week to check for new CVEs
