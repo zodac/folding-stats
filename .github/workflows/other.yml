@@ -37,7 +37,7 @@ jobs:
           git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^.*/frontend/css/';
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^.*/frontend/css/'; then
             echo "::set-output name=changed::true"
-            echo "SOURCES=$SOURCES,/usr/src/frontend/css/" >> $GITHUB_ENV
+            echo "SOURCES=$SOURCES,/usr/src/docker/frontend/css/" >> $GITHUB_ENV
           else
             echo "::set-output name=changed::false"
           fi
@@ -47,7 +47,7 @@ jobs:
         run: |
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^.*/frontend/pages/'; then
             echo "::set-output name=changed::true"
-            echo "SOURCES=$SOURCES,/usr/src/frontend/pages/" >> $GITHUB_ENV
+            echo "SOURCES=$SOURCES,/usr/src/docker/frontend/pages/" >> $GITHUB_ENV
           else
             echo "::set-output name=changed::false"
           fi
