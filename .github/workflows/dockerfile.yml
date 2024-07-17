@@ -35,12 +35,6 @@ jobs:
           recursive: true
 
       # SonarQube Analysis
-      - name: Set up JDK
-        uses: actions/setup-java@v4.2.1
-        with:
-          distribution: 'temurin'
-          java-version: '22'
-
       - name: Execute SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONARQUBE_PAT }}
@@ -51,6 +45,6 @@ jobs:
           -v "$(pwd):/usr/src/" \
           sonarsource/sonar-scanner-cli:10.0 \
             -Dsonar.projectKey=folding-stats-docker  \
-            -Dsonar.sources=,/usr/src/docker/backend/Dockerfile,/usr/src/docker/database/Dockerfile,/usr/src/docker/frontend/Dockerfile \
+            -Dsonar.sources=/usr/src/docker/backend/Dockerfile,/usr/src/docker/database/Dockerfile,/usr/src/docker/frontend/Dockerfile \
             -Dsonar.token=${{ secrets.SONARQUBE_PAT }} \
             -Dsonar.docker.hadolint.reportPaths=hadolint-report.json
