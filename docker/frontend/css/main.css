@@ -23,7 +23,7 @@ th {
 }
 
 .loader {
-    border: 16px solid #F3F3F3;
+    border: 16px solid #F3F3F3;;
     border-top: 16px solid #3498DB;;
     border-radius: 50%;;
     width: 120px;;
