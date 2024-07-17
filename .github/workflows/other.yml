@@ -28,14 +28,16 @@ jobs:
 
       - name: Initialize variable
         id: init_sources
-        run: echo "::set-output name=SOURCES::''"
+        run: echo "SOURCES=''" >> $GITHUB_ENV
 
       - name: Check if there are CSS changes
         id: check_css
         run: |
+          echo "CSS diff:" && \
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^frontend/css/'; \
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^frontend/css/'; then
             echo "::set-output name=changed::true"
-            echo "::set-output name=SOURCES::${{ steps.init_sources.outputs.SOURCES }},frontend/css/"
+            echo "SOURCES=$SOURCES,frontend/css/" >> $GITHUB_ENV
           else
             echo "::set-output name=changed::false"
           fi
@@ -45,7 +47,7 @@ jobs:
         run: |
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^frontend/pages/'; then
             echo "::set-output name=changed::true"
-            echo "::set-output name=SOURCES::${{ steps.check_css.outputs.SOURCES }},frontend/paes/"
+            echo "SOURCES=$SOURCES,frontend/pages/" >> $GITHUB_ENV
           else
             echo "::set-output name=changed::false"
           fi
@@ -55,13 +57,12 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONARQUBE_PAT }}
         run: |
-          echo "Output: [[${{ steps.check_html.outputs.SOURCES }}]]" && \
+          echo "Output: $SOURCES" && \
           docker run \
           --rm \
           -e SONAR_HOST_URL="https://sonarqube.zodac.me" \
           -v "$(pwd):/usr/src/" \
           sonarsource/sonar-scanner-cli:10.0 \
-            -X \
             -Dsonar.projectKey=folding-stats-other  \
-            -Dsonar.sources=${{ steps.check_html.outputs.SOURCES }} \
+            -Dsonar.sources="$SOURCES" \
             -Dsonar.token=${{ secrets.SONARQUBE_PAT }}
