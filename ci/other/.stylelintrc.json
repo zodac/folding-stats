@@ -1,5 +1,8 @@
 {
-  "extends": ["stylelint-config-standard"],
+  "extends": [
+    "stylelint-config-standard"
+  ],
+  "defaultSeverity": "warning",
   "rules": {
     "no-descending-specificity": null
   }
