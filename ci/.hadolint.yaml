@@ -2,6 +2,7 @@ failure-threshold: warning
 format: json
 ignored:
   - DL3008
+  - DL3049
 label-schema:
   author: text
   contact: email

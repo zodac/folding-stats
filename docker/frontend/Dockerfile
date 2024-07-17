@@ -36,8 +36,8 @@ RUN grep -rl '%REST_ENDPOINT_URL%' . | xargs sed -i "s|%REST_ENDPOINT_URL%|${RES
 RUN minify --verbose --match=\.*.css$ --type=css --output /docker/apache/site/res/css/ /docker/apache/css/ && \
     minify --verbose --match=\.*.js$ --type=js --output /docker/apache/site/res/js/ /docker/apache/js/ && \
     minify --verbose --match=\.*.js$ --type=js --output /docker/apache/site/res/js/ /docker/apache/js/util && \
-    find /docker/apache/site/res/ -iname "*.css" | sed 's|....$||' | xargs -i mv {}.css {}.min.css && \
-    find /docker/apache/site/res/ -iname "*.js" | sed 's|...$||' | xargs -i mv {}.js {}.min.js
+    find /docker/apache/site/res/ -iname "*.css" | sed 's|....$||' | xargs -I mv {}.css {}.min.css && \
+    find /docker/apache/site/res/ -iname "*.js" | sed 's|...$||' | xargs -I mv {}.js {}.min.js
 
 FROM httpd:2.4-alpine
 
