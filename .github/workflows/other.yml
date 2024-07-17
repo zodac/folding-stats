@@ -34,8 +34,8 @@ jobs:
         id: check_css
         run: |
           echo "CSS diff:" && \
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^frontend/css/';
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^frontend/css/'; then
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^.*/frontend/css/';
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^.*/frontend/css/'; then
             echo "::set-output name=changed::true"
             echo "SOURCES=$SOURCES,frontend/css/" >> $GITHUB_ENV
           else
@@ -45,7 +45,7 @@ jobs:
       - name: Check if there are HTML changes
         id: check_html
         run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^frontend/pages/'; then
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^.*/frontend/pages/'; then
             echo "::set-output name=changed::true"
             echo "SOURCES=$SOURCES,frontend/pages/" >> $GITHUB_ENV
           else
