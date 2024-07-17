@@ -35,17 +35,18 @@ RUN grep -rl '%REST_ENDPOINT_URL%' . | xargs sed -i "s|%REST_ENDPOINT_URL%|${RES
     grep -rl '%UPDATE_ENABLED%' . | xargs sed -i "s|%UPDATE_ENABLED%|${UPDATE_ENABLED}|g"
 
 # Minify JS and CSS files, then rename to end with *.min.*
-RUN minify --recursive --verbose --type=css --output /docker/apache/site/res/css/ /docker/apache/css/ && \
-    minify --recursive --verbose --type=js --output /docker/apache/site/res/js/ /docker/apache/js/ && \
-    minify --recursive --verbose --type=js --output /docker/apache/site/res/js/ /docker/apache/js/util && \
-    find /docker/apache/site/res/ -iname "*.css" | sed 's|....$||' | xargs -I mv {}.css {}.min.css && \
-    find /docker/apache/site/res/ -iname "*.js" | sed 's|...$||' | xargs -I mv {}.js {}.min.js
+WORKDIR /docker/apache/
+RUN minify --recursive --verbose --type=css --output /docker/apache/site/res/css/ css/ && \
+    minify --recursive --verbose --type=js --output /docker/apache/site/res/js/ js/ && \
+    mv /docker/apache/site/res/js/util/*.js /docker/apache/site/res/js/ && \
+    rm -rf /docker/apache/site/res/js/util/ && \
+    find /docker/apache/site/res/ -iname "*.css" | sed 's|....$||' | xargs -i mv {}.css {}.min.css && \
+    find /docker/apache/site/res/ -iname "*.js" | sed 's|...$||' | xargs -i mv {}.js {}.min.js
 
 FROM httpd:${HTTPD_VERSION}-alpine
 
-# Updating system packages, and installing any required packages
-RUN apk update && apk upgrade && \
-    apk add \
+# Installing any required packages
+RUN apk --no-cache add \
       brotli
 
 # Apache configuration (SSL certs are provided through a volume mount)
@@ -84,30 +85,11 @@ COPY --from=minifier /docker/apache/site/res ./res
 
 # Add a hash to each of the JS files to avoid Apache caching them after changes are made
 # Also update all existing HTML pages references to the files to the new name
-WORKDIR /usr/local/apache2/htdocs/res/js
-RUN for file_name in *.js; do \
-      base=$(basename "${file_name}") && \
-      name_without_extension=$(echo "${base%%.*}")  && \
-      hash=$(cat "${file_name}" | md5sum | tr -s ' ' | cut -d ' ' -f1) && \
-      new_file_name="${name_without_extension}-${hash}.min.js" && \
-      mv "${file_name}" "${new_file_name}" && \
-      echo "'${file_name}'" && \
-      grep -rl "${file_name}" /usr/local/apache2/htdocs | xargs sed -i "s|${file_name}|${new_file_name}|g" \
-    ; done
-WORKDIR /usr/local/apache2/htdocs/
-
-# Do the same for the CSS files
-WORKDIR /usr/local/apache2/htdocs/res/css
-RUN for file_name in *.css; do \
-      base=$(basename "${file_name}") && \
-      name_without_extension=$(echo "${base%%.*}")  && \
-      hash=$(cat "${file_name}" | md5sum | tr -s ' ' | cut -d ' ' -f1) && \
-      new_file_name="${name_without_extension}-${hash}.min.css" && \
-      mv "${file_name}" "${new_file_name}" && \
-      echo "'${file_name}'" && \
-      grep -rl "${file_name}" /usr/local/apache2/htdocs | xargs sed -i "s|${file_name}|${new_file_name}|g" \
-    ; done
-WORKDIR /usr/local/apache2/htdocs/
+COPY ./docker/frontend/scripts/hash_files.sh /hash_files.sh
+RUN chmod +x /hash_files.sh && \
+    sh /hash_files.sh "js" && \
+    sh /hash_files.sh "css" && \
+    rm -f /usr/local/apache2/htdocs/hash_files.sh
 
 # Copy the static content (images, 3PP JS/CSS files) only after the src JS files have been renamed and moved
 COPY ./docker/frontend/res/img ./res/img
