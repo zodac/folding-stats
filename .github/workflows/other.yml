@@ -55,6 +55,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONARQUBE_PAT }}
         run: |
+          echo "Output: [[${{ steps.check_html.outputs.SOURCES }}]]" && \
           docker run \
           --rm \
           -e SONAR_HOST_URL="https://sonarqube.zodac.me" \
