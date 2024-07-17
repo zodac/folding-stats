@@ -6,6 +6,7 @@ on:
     paths-ignore:
       - '.github/workflows/dockerfile.yml'
       - '.github/workflows/javascript.yml'
+      - 'ci/.hadolint.yaml'
       - 'CONTRIBUTING.md'
       - 'README.md'
   schedule:
