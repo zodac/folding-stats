@@ -28,7 +28,7 @@ jobs:
 
       - name: Initialize variable
         id: init_sources
-        run: echo "SOURCES=''" >> $GITHUB_ENV
+        run: echo "SOURCES=" >> $GITHUB_ENV
 
       - name: Check if there are CSS changes
         id: check_css
