@@ -34,7 +34,7 @@ jobs:
         id: check_css
         run: |
           echo "CSS diff:" && \
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^frontend/css/'; \
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^frontend/css/';
           if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^frontend/css/'; then
             echo "::set-output name=changed::true"
             echo "SOURCES=$SOURCES,frontend/css/" >> $GITHUB_ENV
