@@ -10,6 +10,7 @@ WORKDIR /usr/local/certs/stats/
 
 # Generate PCKS12 keystore with self-signed certificate, and extract public crt and private key
 ARG KEYSTORE_PASSWORD
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt-get update && apt-get install -yqq --no-install-recommends openssl && \
     keytool \
         -genkey \
