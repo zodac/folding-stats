@@ -19,7 +19,7 @@ function main() {
   do
     base=$(basename "${file_name}")
     name_without_extension="${base%%.*}"
-    hash=$(cat "${file_name}" | md5sum | tr -s ' ' | cut -d ' ' -f1)
+    hash=$(md5sum "${file_name}" | tr -s ' ' | cut -d ' ' -f1)
     new_file_name="${name_without_extension}-${hash}.min.${file_extension}"
     mv "${file_name}" "${new_file_name}"
     echo "'${file_name}'"
