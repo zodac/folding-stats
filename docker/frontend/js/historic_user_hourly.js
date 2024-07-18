@@ -101,7 +101,7 @@ function getUserHistoricStats(userId, userName, day, month, monthName, year) {
 
 
             tableBody = document.createElement("tbody")
-            jsonResponse.forEach(function (statsEntry, i) {
+            jsonResponse.forEach(function (statsEntry) {
                 tableRow = document.createElement("tr")
 
                 dateCell = document.createElement("td")
@@ -130,7 +130,7 @@ function getUserHistoricStats(userId, userName, day, month, monthName, year) {
         })
 }
 
-document.addEventListener("DOMContentLoaded", function (event) {
+document.addEventListener("DOMContentLoaded", function () {
     populateUserDropdown("user_dropdown")
     populateDayDropdown(selectedMonth, selectedYear, "day_dropdown", "getUserHistoricStats")
     populateMonthDropdown("month_dropdown", "getUserHistoricStats")

@@ -20,7 +20,7 @@ var selectedUserId = 0
 var selectedUser = ""
 var selectedYear = new Date().getUTCFullYear()
 
-function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
+function getTeamHistoricStats(teamId, teamName, year) {
     if (teamId != 0) {
         selectedTeamId = teamId
     }
@@ -29,14 +29,6 @@ function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
         selectedTeam = teamName
         teamDropdownTitle = document.getElementById("team_dropdown_root")
         teamDropdownTitle.innerHTML = selectedTeam
-    }
-
-    if (month != null) {
-        selectedMonth = month
-    }
-
-    if (monthName != null) {
-        selectedMonthName = monthName
     }
 
     if (year != null) {
@@ -83,7 +75,7 @@ function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
 
 
             tableBody = document.createElement("tbody")
-            jsonResponse.forEach(function (statsEntry, i) {
+            jsonResponse.forEach(function (statsEntry) {
                 tableRow = document.createElement("tr")
 
                 dateCell = document.createElement("td")
@@ -112,7 +104,7 @@ function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
         })
 }
 
-document.addEventListener("DOMContentLoaded", function (event) {
+document.addEventListener("DOMContentLoaded", function () {
     populateTeamDropdown()
     populateYearDropdown("year_dropdown", "getTeamHistoricStats")
     updateTimer()

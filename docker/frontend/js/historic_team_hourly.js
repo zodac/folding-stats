@@ -97,7 +97,7 @@ function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
 
 
             tableBody = document.createElement("tbody")
-            jsonResponse.forEach(function (statsEntry, i) {
+            jsonResponse.forEach(function (statsEntry) {
                 tableRow = document.createElement("tr")
 
                 dateCell = document.createElement("td")
@@ -126,7 +126,7 @@ function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
         })
 }
 
-document.addEventListener("DOMContentLoaded", function (event) {
+document.addEventListener("DOMContentLoaded", function () {
     populateTeamDropdown()
     populateDayDropdown(selectedMonth, selectedYear, "day_dropdown", "getTeamHistoricStats")
     populateMonthDropdown("month_dropdown", "getTeamHistoricStats")

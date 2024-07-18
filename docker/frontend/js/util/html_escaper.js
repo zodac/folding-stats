@@ -21,4 +21,5 @@ function html_escape(unsafe) {
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
+        .replaceAll('\'', "&#39;")
 }

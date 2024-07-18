@@ -726,7 +726,7 @@ function approveUserChangeNow(id) {
             "Authorization": sessionGet("Authorization")
         }
     })
-        .then(response => {
+        .then(() => {
             hide("loader")
             successToast("Request approved (now)")
 
@@ -750,7 +750,7 @@ function approveUserChangeNextMonth(id) {
             "Authorization": sessionGet("Authorization")
         }
     })
-        .then(response => {
+        .then(() => {
             hide("loader")
             successToast("Request approved (next month)")
 
@@ -773,7 +773,7 @@ function rejectUserChange(id) {
             "Authorization": sessionGet("Authorization")
         }
     })
-        .then(response => {
+        .then(() => {
             hide("loader")
             successToast("Request rejected")
 

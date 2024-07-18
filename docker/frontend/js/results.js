@@ -133,7 +133,7 @@ function loadTeamLeaderboard(jsonResponse) {
 
     leaderboardTableBody = document.createElement("tbody")
 
-    jsonResponse.forEach(function (team, i) {
+    jsonResponse.forEach(function (team) {
         leaderboardTableBodyRow = document.createElement("tr")
 
         leaderboardProperties.forEach(function (property) {
@@ -284,7 +284,7 @@ function populateYearDropdown() {
     yearDropdownTitle.innerHTML = selectedYear
 }
 
-document.addEventListener("DOMContentLoaded", function (event) {
+document.addEventListener("DOMContentLoaded", function () {
     populateMonthDropdown()
     populateYearDropdown()
     updateTimer()

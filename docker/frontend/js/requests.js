@@ -68,10 +68,10 @@ function loadUserChanges(states, idPrefix, title) {
 
             usersTableBody = document.createElement("tbody")
 
-            jsonResponse.forEach(function (usersItem, i) {
+            jsonResponse.forEach(function (usersItem) {
                 // Update users display table
                 usersTableBodyRow = document.createElement("tr")
-                usersProperties.forEach(function (usersProperty, i) {
+                usersProperties.forEach(function (usersProperty) {
                     usersTableBodyCell = document.createElement("td")
 
                     if (usersProperty === "liveStatsLink") {
@@ -243,10 +243,10 @@ function loadHardware() {
 
             hardwareTableBody = document.createElement("tbody")
 
-            jsonResponse.forEach(function (hardwareItem, i) {
+            jsonResponse.forEach(function (hardwareItem) {
                 // Update hardware display table
                 hardwareTableBodyRow = document.createElement("tr")
-                hardwareProperties.forEach(function (hardwareProperty, i) {
+                hardwareProperties.forEach(function (hardwareProperty) {
                     hardwareTableBodyCell = document.createElement("td")
 
                     if (hardwareProperty === "multiplier") {
@@ -279,7 +279,7 @@ function loadHardware() {
                 }
 
                 // Add entries
-                jsonResponse.forEach(function (hardwareItem, i) {
+                jsonResponse.forEach(function (hardwareItem) {
                     hardwareOption = document.createElement("option")
                     hardwareOption.setAttribute("value", hardwareItem['hardwareName'])
                     hardwareOption.innerHTML = hardwareItem['displayName']
@@ -333,10 +333,10 @@ function loadUsers() {
 
             usersTableBody = document.createElement("tbody")
 
-            jsonResponse.forEach(function (usersItem, i) {
+            jsonResponse.forEach(function (usersItem) {
                 // Update users display table
                 usersTableBodyRow = document.createElement("tr")
-                usersProperties.forEach(function (usersProperty, i) {
+                usersProperties.forEach(function (usersProperty) {
                     usersTableBodyCell = document.createElement("td")
 
                     if (usersProperty === "liveStatsLink" || usersProperty === "profileLink") {
@@ -380,7 +380,7 @@ function loadUsers() {
                 }
 
                 // Add entries
-                jsonResponse.forEach(function (userItem, i) {
+                jsonResponse.forEach(function (userItem) {
                     userOption = document.createElement("option")
                     userOption.setAttribute("value", userItem['id'] + ": " + userItem['displayName'])
                     userOption.innerHTML = userItem['foldingUserName'] + " (" + getCategoryFrontend(userItem['category']) + ", " + userItem['team']['teamName'] + ")"
@@ -433,9 +433,9 @@ function loadTeams() {
 
             teamsTableBody = document.createElement("tbody")
 
-            jsonResponse.forEach(function (teamsItem, i) {
+            jsonResponse.forEach(function (teamsItem) {
                 teamsTableBodyRow = document.createElement("tr")
-                teamsProperties.forEach(function (teamsProperty, i) {
+                teamsProperties.forEach(function (teamsProperty) {
                     teamsTableBodyCell = document.createElement("td")
 
                     if (teamsProperty === "forumLink") {
@@ -472,7 +472,7 @@ function loadTeams() {
                 }
 
                 // Add entries
-                jsonResponse.forEach(function (teamItem, i) {
+                jsonResponse.forEach(function (teamItem) {
                     teamOption = document.createElement("option")
                     teamOption.setAttribute("value", teamItem['teamName'])
                     teamDataList.append(teamOption)
@@ -481,7 +481,7 @@ function loadTeams() {
         })
 }
 
-document.addEventListener("DOMContentLoaded", function (event) {
+document.addEventListener("DOMContentLoaded", function () {
     loadHardware()
     loadTeams()
     loadUsers()

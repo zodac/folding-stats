@@ -31,7 +31,7 @@ function populateUserDropdown(dropdownId) {
         .then(function (jsonResponse) {
             userDropdownDiv = document.getElementById(dropdownId)
 
-            jsonResponse.forEach(function (userItem, i) {
+            jsonResponse.forEach(function (userItem) {
                 userButton = document.createElement("button")
                 userButton.setAttribute("class", "dropdown-item")
                 userButton.setAttribute("type", "button")
@@ -58,7 +58,7 @@ function populateTeamDropdown() {
         .then(function (jsonResponse) {
             teamDropDownDiv = document.getElementById('team_dropdown')
 
-            jsonResponse.forEach(function (teamItem, i) {
+            jsonResponse.forEach(function (teamItem) {
                 teamButton = document.createElement("button")
                 teamButton.setAttribute("class", "dropdown-item")
                 teamButton.setAttribute("type", "button")

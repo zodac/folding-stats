@@ -20,7 +20,7 @@ var selectedUserId = 0
 var selectedUser = ""
 var selectedYear = new Date().getUTCFullYear()
 
-function getUserHistoricStats(userId, userName, day, month, monthName, year) {
+function getUserHistoricStats(userId, userName, year) {
     if (userId != 0) {
         selectedUserId = userId
     }
@@ -75,7 +75,7 @@ function getUserHistoricStats(userId, userName, day, month, monthName, year) {
 
 
             tableBody = document.createElement("tbody")
-            jsonResponse.forEach(function (statsEntry, i) {
+            jsonResponse.forEach(function (statsEntry) {
                 tableRow = document.createElement("tr")
 
                 dateCell = document.createElement("td")
@@ -104,7 +104,7 @@ function getUserHistoricStats(userId, userName, day, month, monthName, year) {
         })
 }
 
-document.addEventListener("DOMContentLoaded", function (event) {
+document.addEventListener("DOMContentLoaded", function () {
     populateUserDropdown("user_dropdown")
     populateYearDropdown("year_dropdown", "getUserHistoricStats")
     updateTimer()

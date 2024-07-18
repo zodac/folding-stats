@@ -25,8 +25,7 @@ var selectedMonth = (currentUtcDate.getMonth() + 1)
 var selectedYear = currentUtcDate.getFullYear()
 var selectedMonthName = new Date(selectedYear, (selectedMonth - 1), 1).toLocaleString("default", { month: "long" })
 
-
-function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
+function getTeamHistoricStats(teamId, teamName, month, monthName, year) {
     if (teamId != 0) {
         selectedTeamId = teamId
     }
@@ -91,7 +90,7 @@ function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
 
 
             tableBody = document.createElement("tbody")
-            jsonResponse.forEach(function (statsEntry, i) {
+            jsonResponse.forEach(function (statsEntry) {
                 tableRow = document.createElement("tr")
 
                 dateCell = document.createElement("td")
@@ -120,7 +119,7 @@ function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
         })
 }
 
-document.addEventListener("DOMContentLoaded", function (event) {
+document.addEventListener("DOMContentLoaded", function () {
     populateTeamDropdown()
     populateMonthDropdown("month_dropdown", "getTeamHistoricStats")
     populateYearDropdown("year_dropdown", "getTeamHistoricStats")

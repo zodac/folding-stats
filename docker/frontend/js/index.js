@@ -17,7 +17,7 @@
 const REST_ENDPOINT_URL = "%REST_ENDPOINT_URL%"
 
 function toggleTeam(teamNumber, classList) {
-    toggleMainButtonStyle("team_" + teamNumber + "_button")
+    toggleMainButtonStyle("team_" + teamNumber + "_button", classList)
 }
 
 function loadSummaryStats() {
@@ -44,7 +44,7 @@ function loadSummaryStats() {
 
             summaryTableHead = document.createElement("thead")
             summaryTableHeaderRow = document.createElement("tr")
-            summaryTableHeaders.forEach(function (header, i) {
+            summaryTableHeaders.forEach(function (header) {
                 summaryTableHeader = document.createElement("th")
                 summaryTableHeader.setAttribute("scope", "col")
                 summaryTableHeader.innerHTML = header
@@ -56,7 +56,7 @@ function loadSummaryStats() {
 
             summaryTableBody = document.createElement("tbody")
             summaryTableBodyRow = document.createElement("tr")
-            summaryTableProperties.forEach(function (property, i) {
+            summaryTableProperties.forEach(function (property) {
                 summaryTableBodyCell = document.createElement("td")
 
                 if (property === "totalMultipliedPoints") {
@@ -116,7 +116,7 @@ function loadTeamLeaderboard() {
 
             leaderboardTableBody = document.createElement("tbody")
 
-            jsonResponse.forEach(function (team, i) {
+            jsonResponse.forEach(function (team) {
                 leaderboardTableBodyRow = document.createElement("tr")
 
 
@@ -329,10 +329,10 @@ function loadTeamStats() {
 
                 activeUsers = team['activeUsers']
                 activeUsers.sort(sortJsonByKey("rankInTeam"))
-                activeUsers.forEach(function (activeUser, i) {
+                activeUsers.forEach(function (activeUser) {
                     teamTableBodyRow = document.createElement("tr")
 
-                    activeUserProperties.forEach(function (userProperty, i) {
+                    activeUserProperties.forEach(function (userProperty) {
                         teamTableUserCell = document.createElement("td")
 
                         if (userProperty === "multipliedPoints") {
@@ -389,10 +389,10 @@ function loadTeamStats() {
 
                 retiredUsers = team['retiredUsers']
                 retiredUsers.sort(sortJsonByKey("rankInTeam"))
-                retiredUsers.forEach(function (retiredUser, i) {
+                retiredUsers.forEach(function (retiredUser) {
                     teamTableBodyRow = document.createElement("tr")
 
-                    activeUserProperties.forEach(function (userProperty, i) {
+                    activeUserProperties.forEach(function (userProperty) {
                         teamTableUserCell = document.createElement("td")
 
                         if (userProperty === "multipliedPoints") {
@@ -424,7 +424,7 @@ function loadTeamStats() {
         })
 }
 
-document.addEventListener("DOMContentLoaded", function (event) {
+document.addEventListener("DOMContentLoaded", function () {
     loadSummaryStats()
     loadTeamLeaderboard()
     loadCategoryLeaderboard()
