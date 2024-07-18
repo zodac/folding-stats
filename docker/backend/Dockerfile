@@ -52,6 +52,7 @@ COPY ./folding-stats-api/src/main ./folding-stats-api/src/main
 WORKDIR /folding-stats-spring-boot/folding-stats-api
 RUN --mount=type=cache,target=/root/.m2 mvn install -P docker
 
+WORKDIR /folding-stats-spring-boot
 COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/proguard-rules.cfg ./folding-stats-jar/
 COPY ./folding-stats-jar/src/main ./folding-stats-jar/src/main
 WORKDIR /folding-stats-spring-boot/folding-stats-jar
