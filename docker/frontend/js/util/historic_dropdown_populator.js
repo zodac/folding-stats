@@ -25,24 +25,24 @@ function populateUserDropdown(dropdownId) {
     }
 
     fetch(REST_ENDPOINT_URL + "/users")
-    .then(response => {
-        return response.json()
-    })
-    .then(function(jsonResponse) {
-        userDropdownDiv = document.getElementById(dropdownId)
-
-        jsonResponse.forEach(function(userItem, i){
-            userButton = document.createElement("button")
-            userButton.setAttribute("class", "dropdown-item")
-            userButton.setAttribute("type", "button")
-
-            var userDisplayNameWithoutQuotes = escape(userItem['displayName'])
-            userButton.setAttribute("onclick", "getUserHistoricStats("+userItem['id']+",'"+userDisplayNameWithoutQuotes+"',null,null,null,null)")
-            userButton.innerHTML = userItem['displayName']
-
-            userDropdownDiv.append(userButton)
+        .then(response => {
+            return response.json()
         })
-    })
+        .then(function (jsonResponse) {
+            userDropdownDiv = document.getElementById(dropdownId)
+
+            jsonResponse.forEach(function (userItem, i) {
+                userButton = document.createElement("button")
+                userButton.setAttribute("class", "dropdown-item")
+                userButton.setAttribute("type", "button")
+
+                var userDisplayNameWithoutQuotes = escape(userItem['displayName'])
+                userButton.setAttribute("onclick", "getUserHistoricStats(" + userItem['id'] + ",'" + userDisplayNameWithoutQuotes + "',null,null,null,null)")
+                userButton.innerHTML = userItem['displayName']
+
+                userDropdownDiv.append(userButton)
+            })
+        })
 }
 
 function populateTeamDropdown() {
@@ -52,24 +52,24 @@ function populateTeamDropdown() {
     }
 
     fetch(REST_ENDPOINT_URL + "/teams")
-    .then(response => {
-        return response.json()
-    })
-    .then(function(jsonResponse) {
-        teamDropDownDiv = document.getElementById('team_dropdown')
-
-        jsonResponse.forEach(function(teamItem, i){
-            teamButton = document.createElement("button")
-            teamButton.setAttribute("class", "dropdown-item")
-            teamButton.setAttribute("type", "button")
-
-            var teamNameWithoutQuotes = escape(teamItem['teamName'])
-            teamButton.setAttribute("onclick", "getTeamHistoricStats("+teamItem['id']+",'"+teamNameWithoutQuotes+"',null,null,null,null)")
-            teamButton.innerHTML = teamItem['teamName']
-
-            teamDropDownDiv.append(teamButton)
+        .then(response => {
+            return response.json()
         })
-    })
+        .then(function (jsonResponse) {
+            teamDropDownDiv = document.getElementById('team_dropdown')
+
+            jsonResponse.forEach(function (teamItem, i) {
+                teamButton = document.createElement("button")
+                teamButton.setAttribute("class", "dropdown-item")
+                teamButton.setAttribute("type", "button")
+
+                var teamNameWithoutQuotes = escape(teamItem['teamName'])
+                teamButton.setAttribute("onclick", "getTeamHistoricStats(" + teamItem['id'] + ",'" + teamNameWithoutQuotes + "',null,null,null,null)")
+                teamButton.innerHTML = teamItem['teamName']
+
+                teamDropDownDiv.append(teamButton)
+            })
+        })
 }
 
 function populateDayDropdown(month, year, dropdownId, historicFunctionName) {
@@ -81,17 +81,17 @@ function populateDayDropdown(month, year, dropdownId, historicFunctionName) {
     dayDropdownDiv = document.getElementById(dropdownId)
     var numberOfDaysInMonth = new Date(year, month, 0).getDate()
 
-    if(selectedDay > numberOfDaysInMonth){
+    if (selectedDay > numberOfDaysInMonth) {
         selectedDay = numberOfDaysInMonth
     }
 
     for (let i = 0; i < numberOfDaysInMonth; i++) {
-        var loopDay = ordinalSuffixOf((i+1))
+        var loopDay = ordinalSuffixOf((i + 1))
 
         dayButton = document.createElement("button")
         dayButton.setAttribute("class", "dropdown-item")
         dayButton.setAttribute("type", "button")
-        dayButton.setAttribute("onclick", historicFunctionName + "(0,null,'"+(i+1)+"',null,null,null)")
+        dayButton.setAttribute("onclick", historicFunctionName + "(0,null,'" + (i + 1) + "',null,null,null)")
         dayButton.innerHTML = loopDay
 
         dayDropdownDiv.append(dayButton)
@@ -116,7 +116,7 @@ function populateMonthDropdown(dropdownId, historicFunctionName) {
         monthButton = document.createElement("button")
         monthButton.setAttribute("class", "dropdown-item")
         monthButton.setAttribute("type", "button")
-        monthButton.setAttribute("onclick", historicFunctionName + "(0,null,null,"+(i+1)+",'"+loopMonthName+"',null)")
+        monthButton.setAttribute("onclick", historicFunctionName + "(0,null,null," + (i + 1) + ",'" + loopMonthName + "',null)")
         monthButton.innerHTML = loopMonthName
 
         monthDropdownDiv.append(monthButton)
@@ -140,7 +140,7 @@ function populateYearDropdown(dropdownId, historicFunctionName) {
         yearButton = document.createElement("button")
         yearButton.setAttribute("class", "dropdown-item")
         yearButton.setAttribute("type", "button")
-        yearButton.setAttribute("onclick", historicFunctionName + "(0,null,null,null,null,"+loopYear+")")
+        yearButton.setAttribute("onclick", historicFunctionName + "(0,null,null,null,null," + loopYear + ")")
         yearButton.innerHTML = loopYear
 
         yearDropdownDiv.append(yearButton)

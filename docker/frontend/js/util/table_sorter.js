@@ -31,7 +31,7 @@ function sortTable(columnIndex, tableId) {
         for (let i = 1; i < (rows.length - 1); i++) {
             // Start by saying there should be no switching:
             shouldSwitch = false
-          
+
             // Get the two elements you want to compare, one from current row and one from the next
             firstElement = rows[i].getElementsByTagName("td")[columnIndex]
             secondElement = rows[i + 1].getElementsByTagName("td")[columnIndex]
@@ -40,10 +40,10 @@ function sortTable(columnIndex, tableId) {
             // Making lowercase so sort is case-insensitive
             first = firstElement.innerHTML.replaceAll(",", "").toLowerCase()
             second = secondElement.innerHTML.replaceAll(",", "").toLowerCase()
-         
+
             // Check if the two rows should switch place, based on the direction, asc or desc
             if (dir == "asc") {
-                if (isNaN(first) || isNaN(second)){
+                if (isNaN(first) || isNaN(second)) {
                     if (first > second) {
                         shouldSwitch = true
                         break
@@ -55,7 +55,7 @@ function sortTable(columnIndex, tableId) {
                     }
                 }
             } else if (dir == "desc") {
-                if (isNaN(first) || isNaN(second)){
+                if (isNaN(first) || isNaN(second)) {
                     if (first < second) {
                         shouldSwitch = true
                         break
@@ -68,12 +68,12 @@ function sortTable(columnIndex, tableId) {
                 }
             }
         }
-        
+
         if (shouldSwitch) {
             // If a switch has been marked, make the switch and mark that a switch has been done
             rows[i].parentNode.insertBefore(rows[i + 1], rows[i])
             switching = true
-            
+
             // Each time a switch is done, increase this count by 1:
             switchCount++
         } else {

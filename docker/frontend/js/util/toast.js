@@ -32,17 +32,17 @@ function closeToast(id) {
         .dispose()
 }
 
-function successToast(text){
+function successToast(text) {
     document.getElementById("toast-success-text").innerHTML = escape(text)
     showToast("toast-success", true)
 }
 
-function failureToast(text){
+function failureToast(text) {
     document.getElementById("toast-failure-text").innerHTML = escape(text)
     showToast("toast-failure", true)
 }
 
-function failureToastPermanent(text){
+function failureToastPermanent(text) {
     document.getElementById("toast-failure-text").innerHTML = escape(text)
     showToast("toast-failure", false)
 }

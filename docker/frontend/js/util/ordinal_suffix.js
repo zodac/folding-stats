@@ -16,18 +16,18 @@
  */
 // More 'borrowed' code:
 // https://stackoverflow.com/a/13627586
-function ordinalSuffixOf(i) {
-    var j = i % 10
-    var k = i % 100
+function ordinalSuffixOf(input) {
+    var units = input % 10
+    var tens = input % 100
 
-    if (j == 1 && k != 11) {
-        return i + "st"
+    if (units == 1 && tens != 11) {
+        return input + "st"
     }
-    if (j == 2 && k != 12) {
-        return i + "nd"
+    if (units == 2 && tens != 12) {
+        return input + "nd"
     }
-    if (j == 3 && k != 13) {
-        return i + "rd"
+    if (units == 3 && tens != 13) {
+        return input + "rd"
     }
-    return i + "th"
+    return input + "th"
 }

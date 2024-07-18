@@ -107,27 +107,27 @@ function getHardwareTypeBackend(value) {
 }
 
 function getUserChangeStateFrontend(value) {
-    if (value.toLowerCase() === "requested_now"){
+    if (value.toLowerCase() === "requested_now") {
         return "Requested (Immediate)"
     }
 
-    if (value.toLowerCase() === "requested_next_month"){
+    if (value.toLowerCase() === "requested_next_month") {
         return "Requested (1st " + nextMonth() + ")"
     }
 
-    if (value.toLowerCase() === "approved_now"){
+    if (value.toLowerCase() === "approved_now") {
         return "Approved (change in progress...)"
     }
 
-    if (value.toLowerCase() === "approved_next_month"){
+    if (value.toLowerCase() === "approved_next_month") {
         return "Approved (will be applied 1st " + nextMonth() + ")"
     }
 
-    if (value.toLowerCase() === "rejected"){
+    if (value.toLowerCase() === "rejected") {
         return "Rejected"
     }
 
-    if (value.toLowerCase() === "completed"){
+    if (value.toLowerCase() === "completed") {
         return "Completed"
     }
 

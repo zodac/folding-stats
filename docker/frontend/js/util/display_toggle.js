@@ -31,10 +31,10 @@ function hideElement(element) {
 }
 
 // The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
-function toggleMainButtonStyle(id, classList){
+function toggleMainButtonStyle(id, classList) {
     var button = document.getElementById(id)
 
-    if(classList.contains("collapsed")){
+    if (classList.contains("collapsed")) {
         button.classList.add("btn-primary")
         button.classList.remove("btn-success")
     } else {

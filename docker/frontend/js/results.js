@@ -14,7 +14,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-const REST_ENDPOINT_URL="%REST_ENDPOINT_URL%"
+const REST_ENDPOINT_URL = "%REST_ENDPOINT_URL%"
 
 const FIRST_YEAR_WITH_RESULTS = 2021
 const NUMBER_OF_MONTHS = 12
@@ -29,11 +29,11 @@ var currentUtcDate = new Date(currentDate.getUTCFullYear(), currentDate.getUTCMo
 var selectedMonth = currentUtcDate.getMonth() == 0 ? 12 : currentUtcDate.getMonth()
 
 // If month is December, choose previous year
-var selectedYear = selectedMonth == 12 ? currentUtcDate.getFullYear() - 1: currentUtcDate.getFullYear()
+var selectedYear = selectedMonth == 12 ? currentUtcDate.getFullYear() - 1 : currentUtcDate.getFullYear()
 var selectedMonthName = new Date(selectedYear, (selectedMonth - 1), 1).toLocaleString("default", { month: "long" })
 
 function getPastResult(month, monthName, year) {
-    if (month != null){
+    if (month != null) {
         selectedMonth = month
     }
 
@@ -53,60 +53,60 @@ function getPastResult(month, monthName, year) {
     hide("main_parent")
 
     fetch(REST_ENDPOINT_URL + "/results/result/" + selectedYear + "/" + selectedMonth)
-    .then(response => {
-        if (response.ok) {
-            // Make a fresh call which we will parse to JSON
-            // Cannot use original call since parsing to JSON will cause the 404 scenario to fail
-            fetch(REST_ENDPOINT_URL + "/results/result/" + selectedYear + "/" + selectedMonth)
-            .then(response => {
-                return response.json()
-            })
-            .then(function(jsonResponse) {
-                leaderboardDiv = document.getElementById("leaderboard_div")
-                while (leaderboardDiv.firstChild) {
-                    leaderboardDiv.removeChild(leaderboardDiv.lastChild)
-                }
+        .then(response => {
+            if (response.ok) {
+                // Make a fresh call which we will parse to JSON
+                // Cannot use original call since parsing to JSON will cause the 404 scenario to fail
+                fetch(REST_ENDPOINT_URL + "/results/result/" + selectedYear + "/" + selectedMonth)
+                    .then(response => {
+                        return response.json()
+                    })
+                    .then(function (jsonResponse) {
+                        leaderboardDiv = document.getElementById("leaderboard_div")
+                        while (leaderboardDiv.firstChild) {
+                            leaderboardDiv.removeChild(leaderboardDiv.lastChild)
+                        }
 
-                categoryDiv = document.getElementById("category_div")
-                while (categoryDiv.firstChild) {
-                    categoryDiv.removeChild(categoryDiv.lastChild)
-                }
+                        categoryDiv = document.getElementById("category_div")
+                        while (categoryDiv.firstChild) {
+                            categoryDiv.removeChild(categoryDiv.lastChild)
+                        }
 
-                loadTeamLeaderboard(jsonResponse['teamLeaderboard'])
-                loadCategoryLeaderboard(jsonResponse['userCategoryLeaderboard'])
+                        loadTeamLeaderboard(jsonResponse['teamLeaderboard'])
+                        loadCategoryLeaderboard(jsonResponse['userCategoryLeaderboard'])
 
-                show("leaderboard_div")
-                show("category_div")
-                hide("missing_div")
+                        show("leaderboard_div")
+                        show("category_div")
+                        hide("missing_div")
+                        hide("loader")
+                        show("main_parent")
+                    })
+                    .catch((error) => {
+                        hide("loader")
+                        console.error("Unexpected error loading result: ", error)
+                        return false
+                    })
+            } else {
+                missingMonthSpan = document.getElementById("missing_month").innerHTML = selectedMonthName
+                missingYearSpan = document.getElementById("missing_year").innerHTML = selectedYear
+
+                hide("leaderboard_div")
+                hide("category_div")
+                show("missing_div")
                 hide("loader")
                 show("main_parent")
-            })
-            .catch((error) => {
-                hide("loader")
-                console.error("Unexpected error loading result: ", error)
-                return false
-            })
-        } else {
-            missingMonthSpan = document.getElementById("missing_month").innerHTML = selectedMonthName
-            missingYearSpan = document.getElementById("missing_year").innerHTML = selectedYear
-
-            hide("leaderboard_div")
-            hide("category_div")
-            show("missing_div")
+            }
+        })
+        .catch((error) => {
             hide("loader")
-            show("main_parent")
-        }
-    })
-    .catch((error) => {
-        hide("loader")
-        console.error("Unexpected error loading result: ", error)
-        return false
-    })
+            console.error("Unexpected error loading result: ", error)
+            return false
+        })
 }
 
 function loadTeamLeaderboard(jsonResponse) {
     const leaderboardHeaders = ["Rank", "Team", "Points", "Units", "Points To Leader", "Points To Next"]
-    const leaderboardProperties = [ "rank", "teamName", "teamMultipliedPoints", "teamUnits", "diffToLeader", "diffToNext"]
+    const leaderboardProperties = ["rank", "teamName", "teamMultipliedPoints", "teamUnits", "diffToLeader", "diffToNext"]
 
     leaderboardDiv = document.getElementById("leaderboard_div")
 
@@ -133,10 +133,10 @@ function loadTeamLeaderboard(jsonResponse) {
 
     leaderboardTableBody = document.createElement("tbody")
 
-    jsonResponse.forEach(function(team, i){
+    jsonResponse.forEach(function (team, i) {
         leaderboardTableBodyRow = document.createElement("tr")
 
-        leaderboardProperties.forEach(function(property){
+        leaderboardProperties.forEach(function (property) {
             leaderboardCell = document.createElement("td")
 
             if (property === "teamMultipliedPoints") {
@@ -174,14 +174,14 @@ function loadCategoryLeaderboard(jsonResponse) {
     categoryLeaderboardTitle.innerHTML = "Category Leaderboard"
     categoryDiv.append(categoryLeaderboardTitle)
 
-    Object.keys(jsonResponse).forEach(function(key) {
+    Object.keys(jsonResponse).forEach(function (key) {
         var keyDisplay = getCategoryFrontend(key)
         categoryTitle = document.createElement("h2")
         categoryTitle.setAttribute("class", "navbar-brand")
         categoryTitle.innerHTML = keyDisplay
         categoryDiv.append(categoryTitle)
 
-        tableId = "category_" + key.replace(/\s+/g,"_").toLowerCase()
+        tableId = "category_" + key.replace(/\s+/g, "_").toLowerCase()
 
         categoryTable = document.createElement("table")
         categoryTable.setAttribute("id", tableId)
@@ -191,7 +191,7 @@ function loadCategoryLeaderboard(jsonResponse) {
         categoryTableHeaderRow = document.createElement("tr")
         categoryHeaders.forEach(function (header, i) {
             categoryTableHeader = document.createElement("th")
-            categoryTableHeader.setAttribute("onclick", "sortTable(" + i + ", '"+tableId+"')")
+            categoryTableHeader.setAttribute("onclick", "sortTable(" + i + ", '" + tableId + "')")
             categoryTableHeader.setAttribute("scope", "col")
             categoryTableHeader.innerHTML = header
 
@@ -203,13 +203,13 @@ function loadCategoryLeaderboard(jsonResponse) {
         categoryTableBody = document.createElement("tbody")
 
         users = jsonResponse[key]
-        users.forEach(function(user){
+        users.forEach(function (user) {
             categoryTableBodyRow = document.createElement("tr")
 
-            categoryProperties.forEach(function(property){
+            categoryProperties.forEach(function (property) {
                 categoryCell = document.createElement("td")
 
-                if(property === "multipliedPoints") {
+                if (property === "multipliedPoints") {
                     categoryCell.setAttribute("data-bs-toggle", "tooltip")
                     categoryCell.setAttribute("data-placement", "top")
                     categoryCell.setAttribute("title", "Unmultiplied: " + user['points'].toLocaleString())
@@ -249,7 +249,7 @@ function populateMonthDropdown() {
         monthButton = document.createElement("button")
         monthButton.setAttribute("class", "dropdown-item")
         monthButton.setAttribute("type", "button")
-        monthButton.setAttribute("onclick", "getPastResult("+(i+1)+",'"+loopMonthName+"',null)")
+        monthButton.setAttribute("onclick", "getPastResult(" + (i + 1) + ",'" + loopMonthName + "',null)")
         monthButton.innerHTML = loopMonthName
 
         monthDropdownDiv.append(monthButton)
@@ -274,7 +274,7 @@ function populateYearDropdown() {
         yearButton = document.createElement("button")
         yearButton.setAttribute("class", "dropdown-item")
         yearButton.setAttribute("type", "button")
-        yearButton.setAttribute("onclick", "getPastResult(null,null,"+loopYear+")")
+        yearButton.setAttribute("onclick", "getPastResult(null,null," + loopYear + ")")
         yearButton.innerHTML = loopYear
 
         yearDropdownDiv.append(yearButton)
@@ -284,7 +284,7 @@ function populateYearDropdown() {
     yearDropdownTitle.innerHTML = selectedYear
 }
 
-document.addEventListener("DOMContentLoaded", function(event) {
+document.addEventListener("DOMContentLoaded", function (event) {
     populateMonthDropdown()
     populateYearDropdown()
     updateTimer()

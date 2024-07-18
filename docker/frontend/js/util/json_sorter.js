@@ -15,7 +15,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 function sortJsonByKey(key) {
-    return function(first, second) {
+    return function (first, second) {
         firstVal = first[key].toString().toLowerCase()
         secondVal = second[key].toString().toLowerCase()
 
