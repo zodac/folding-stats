@@ -49,7 +49,7 @@ function adminLogin(){
         document.getElementById("login_username").value = ""
         document.getElementById("login_password").value = ""
 
-        if(response.status != 200){
+        if(response.status != HTTP_OK){
             failureToast("Invalid admin credentials!")
             hide("loader")
             return
@@ -87,7 +87,7 @@ function manualUpdate() {
     .then(response => {
         hide("loader")
 
-        if(response.status != 200){
+        if(response.status != HTTP_OK){
             failureToast("Manual update failed with code: " + response.status)
             response.json()
             .then(response => {
@@ -116,7 +116,7 @@ function manualLars() {
     .then(response => {
         hide("loader")
 
-        if(response.status != 200){
+        if(response.status != HTTP_OK){
             failureToast("Manual LARS update failed with code: " + response.status)
             response.json()
             .then(response => {
@@ -147,7 +147,7 @@ function manualResultSave() {
     .then(response => {
         hide("loader")
 
-        if(response.status != 200){
+        if(response.status != HTTP_OK){
             failureToast("Manual result save failed with code: " + response.status)
             response.json()
             .then(response => {
@@ -176,7 +176,7 @@ function printCaches() {
     .then(response => {
         hide("loader")
 
-        if(response.status != 200){
+        if(response.status != HTTP_OK){
             failureToast("Printing caches failed with code: " + response.status)
             response.json()
             .then(response => {

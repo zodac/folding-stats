@@ -45,7 +45,7 @@ function createHardware() {
     .then(response => {
         hide("loader")
 
-        if(response.status != 201){
+        if(response.status != HTTP_CREATED){
             failureToast("Hardware create failed with code: " + response.status)
             response.json()
             .then(response => {
@@ -102,7 +102,7 @@ function updateHardware() {
     .then(response => {
         hide("loader")
 
-        if(response.status != 200){
+        if(response.status != HTTP_OK){
             failureToast("Hardware update failed with code: " + response.status)
             response.json()
             .then(response => {
@@ -150,7 +150,7 @@ function deleteHardware() {
     .then(response => {
         hide("loader")
 
-        if(response.status != 200){
+        if(response.status != HTTP_OK){
             failureToast("Hardware delete failed with code: " + response.status)
             response.json()
             .then(response => {
@@ -208,7 +208,7 @@ function createTeam() {
     .then(response => {
         hide("loader")
 
-        if(response.status != 201){
+        if(response.status != HTTP_CREATED){
             failureToast("Team create failed with code: " + response.status)
             response.json()
             .then(response => {
@@ -256,7 +256,7 @@ function updateTeam() {
     .then(response => {
         hide("loader")
 
-        if(response.status != 200){
+        if(response.status != HTTP_OK){
             failureToast("Team update failed with code: " + response.status)
             response.json()
             .then(response => {
@@ -301,7 +301,7 @@ function deleteTeam() {
     .then(response => {
         hide("loader")
 
-        if(response.status != 200){
+        if(response.status != HTTP_OK){
             failureToast("Team delete failed with code: " + response.status)
             response.json()
             .then(response => {
@@ -385,7 +385,7 @@ function createUser() {
             .then(response => {
                 hide("loader")
 
-                if(response.status != 201){
+                if(response.status != HTTP_CREATED){
                     failureToast("User create failed with code: " + response.status)
                     response.json()
                     .then(response => {
@@ -471,7 +471,7 @@ function updateUser() {
             .then(response => {
                 hide("loader")
 
-                if(response.status != 200){
+                if(response.status != HTTP_OK){
                     failureToast("User update failed with code: " + response.status)
                     response.json()
                     .then(response => {
@@ -525,7 +525,7 @@ function deleteUser() {
     .then(response => {
         hide("loader")
 
-        if(response.status != 200){
+        if(response.status != HTTP_OK){
             failureToast("User delete failed with code: " + response.status)
             response.json()
             .then(response => {
@@ -599,7 +599,7 @@ function offsetUser() {
         .then(response => {
             hide("loader")
 
-            if(response.status != 200){
+            if(response.status != HTTP_OK){
                 failureToast("User stats offset failed with code: " + response.status)
                 response.json()
                 .then(response => {
@@ -676,14 +676,14 @@ function createUserChange() {
         .then(response => {
             hide("loader")
 
-            if(response.status == 409){
+            if(response.status == HTTP_CONFLICT){
                 response.json()
                 .then(response => {
                     failureToastPermanent("Request already exists!")
                     console.error(JSON.stringify(response, null, 2))
                 })
                 return
-            } else if(response.status != 201){
+            } else if(response.status != HTTP_CREATED){
                 response.json()
                 .then(response => {
                     failureToastPermanent("Failure: " + response["errors"])

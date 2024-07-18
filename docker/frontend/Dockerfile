@@ -42,8 +42,8 @@ RUN minify --recursive --verbose --type=css --output /docker/apache/site/res/css
     minify --recursive --verbose --type=js --output /docker/apache/site/res/js/ js/ && \
     mv /docker/apache/site/res/js/util/*.js /docker/apache/site/res/js/ && \
     rm -rf /docker/apache/site/res/js/util/ && \
-    find /docker/apache/site/res/ -iname "*.css" | sed 's|....$||' | xargs -I mv {}.css {}.min.css && \
-    find /docker/apache/site/res/ -iname "*.js" | sed 's|...$||' | xargs -I mv {}.js {}.min.js
+    find /docker/apache/site/res/ -iname "*.css" | sed 's|....$||' | xargs -I {} mv {}.css {}.min.css && \
+    find /docker/apache/site/res/ -iname "*.js" | sed 's|...$||' | xargs -I {} mv {}.js {}.min.js
 
 FROM httpd:${HTTPD_VERSION}-alpine
 
