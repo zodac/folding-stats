@@ -119,6 +119,7 @@ jobs:
             -Dsonar.projectName=folding-stats-other  \
             -Dsonar.sources=. \
             -Dsonar.token=${{ secrets.SONARQUBE_PAT }} \
+            -Dsonar.java.binaries=**/target/classes \
             -Dsonar.java.checkstyle.reportPaths=**/target/checkstyle-result.xml \
             -Dsonar.java.pmd.reportPaths=**/target/pmd.xml \
             -Dsonar.java.spotbugs.reportPaths=**/target/spotbugsXml.xml \
