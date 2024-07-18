@@ -49,17 +49,20 @@ RUN --mount=type=cache,target=/root/.m2 mvn install -P docker
 
 COPY ./folding-stats-api/pom.xml ./folding-stats-api/proguard-rules.cfg ./folding-stats-api/
 COPY ./folding-stats-api/src/main ./folding-stats-api/src/main
-RUN --mount=type=cache,target=/root/.m2 cd ./folding-stats-api && mvn install -P docker && cd ..
+WORKDIR /folding-stats-spring-boot/folding-stats-api
+RUN --mount=type=cache,target=/root/.m2 mvn install -P docker
 
 COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/proguard-rules.cfg ./folding-stats-jar/
 COPY ./folding-stats-jar/src/main ./folding-stats-jar/src/main
-RUN --mount=type=cache,target=/root/.m2 cd ./folding-stats-jar && mvn install -P docker && cd ..
+WORKDIR /folding-stats-spring-boot/folding-stats-jar
+RUN --mount=type=cache,target=/root/.m2 mvn install -P docker
 
+WORKDIR /folding-stats-spring-boot
 COPY ./folding-stats-rest/pom.xml ./folding-stats-rest/pom.xml
 COPY ./folding-stats-rest/src/main ./folding-stats-rest/src/main
 
-RUN --mount=type=cache,target=/root/.m2 cd ./folding-stats-rest && \
-    mvn verify -P docker -Dlogging-config-location="/var/backend/log4j2.xml" && \
+WORKDIR /folding-stats-spring-boot/folding-stats-rest
+RUN --mount=type=cache,target=/root/.m2 mvn verify -P docker -Dlogging-config-location="/var/backend/log4j2.xml" && \
     mv ./target/folding-stats-rest*.jar /folding-stats.jar
 
 ARG JAVA_VERSION
