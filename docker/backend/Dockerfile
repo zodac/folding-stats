@@ -23,8 +23,8 @@ RUN apt-get update && apt-get install -yqq --no-install-recommends openssl && \
         -validity 3650 \
         -storepass "${KEYSTORE_PASSWORD}" && \
     openssl pkcs12 -in folding-stats.p12 -out folding-stats.pem -nodes -passin pass:"${KEYSTORE_PASSWORD}" && \
-    cat folding-stats.pem | sed -n '/^-----BEGIN CERTIFICATE-----/,/^-----END CERTIFICATE-----/{p;/^-----END CERTIFICATE-----/q}' > folding-stats.crt && \
-    cat folding-stats.pem | sed -n '/^-----BEGIN PRIVATE KEY-----/,/^-----END PRIVATE KEY-----/{p;/^-----END PRIVATE KEY-----/q}' > folding-stats.key
+    sed -n '/^-----BEGIN CERTIFICATE-----/,/^-----END CERTIFICATE-----/{p;/^-----END CERTIFICATE-----/q}' folding-stats.pem > folding-stats.crt && \
+    sed -n '/^-----BEGIN PRIVATE KEY-----/,/^-----END PRIVATE KEY-----/{p;/^-----END PRIVATE KEY-----/q}' folding-stats.pem > folding-stats.key
 
 # Pulling maven image but only to retrieve the binary - we don't mind the JDK version here
 FROM maven:${MAVEN_VERSION}-eclipse-temurin-21 AS maven_builder
