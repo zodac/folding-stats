@@ -19,7 +19,7 @@ function sortJsonByKey(key) {
         firstVal = first[key].toString().toLowerCase()
         secondVal = second[key].toString().toLowerCase()
 
-        if (isNaN(firstVal) || isNaN(secondVal)){
+        if (isNaN(firstVal) || isNaN(secondVal)) {
             if (firstVal > secondVal) {
                 return 1
             }

@@ -26,7 +26,7 @@ String.prototype.format = function() {
 }
 
 function loadUserChanges(states, id_prefix, title) {
-    fetch(REST_ENDPOINT_URL+"/changes?state=" + states + "&numberOfMonths=3")
+    fetch(REST_ENDPOINT_URL + "/changes?state=" + states + "&numberOfMonths=3")
     .then(response => {
         return response.json()
     })
@@ -173,14 +173,8 @@ function loadUserChanges(states, id_prefix, title) {
                         usersTableBodyCell.append(spacerSpan)
                         usersTableBodyCell.append(newSpan)
                     }
-                } else if (usersProperty === "createdUtcTimestamp") {
-                    var timestamp = usersItem['createdUtcTimestamp']
-                    var tsDate = timestamp['date']
-                    var tsTime = timestamp['time']
-
-                    usersTableBodyCell.innerHTML = "{0}/{1}/{2} {3}:{4}".format(tsDate['year'], tsDate['month'], tsDate['day'], tsTime['hour'], tsTime['minute'])
-                } else if (usersProperty === "updatedUtcTimestamp") {
-                    var timestamp = usersItem['updatedUtcTimestamp']
+                } else if (usersProperty === "createdUtcTimestamp" || usersProperty === "updatedUtcTimestamp") {
+                    var timestamp = usersItem[usersProperty]
                     var tsDate = timestamp['date']
                     var tsTime = timestamp['time']
 
@@ -206,7 +200,7 @@ function loadCompletedUserChanges() {
 }
 
 function loadHardware() {
-    fetch(REST_ENDPOINT_URL+"/hardware")
+    fetch(REST_ENDPOINT_URL + "/hardware")
     .then(response => {
         return response.json()
     })
@@ -296,7 +290,7 @@ function loadHardware() {
 }
 
 function loadUsers() {
-    fetch(REST_ENDPOINT_URL+"/users")
+    fetch(REST_ENDPOINT_URL + "/users")
     .then(response => {
         return response.json()
     })
@@ -397,7 +391,7 @@ function loadUsers() {
 }
 
 function loadTeams() {
-    fetch(REST_ENDPOINT_URL+"/teams")
+    fetch(REST_ENDPOINT_URL + "/teams")
     .then(response => {
         return response.json()
     })

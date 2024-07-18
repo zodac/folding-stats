@@ -137,10 +137,8 @@ function getUserChangeStateFrontend(value) {
 function nextMonth() {
     var now = new Date()
     if (now.getUTCMonth() == 11) {
-        var current = new Date(now.getUTCFullYear() + 1, 0, 1)
-    } else {
-        var current = new Date(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)
+        return new Date(now.getUTCFullYear() + 1, 0, 1).toLocaleString("default", { month: "long" })
     }
 
-    return current.toLocaleString("default", { month: "long" })
+    return new Date(now.getUTCFullYear(), now.getUTCMonth() + 1, 1).toLocaleString("default", { month: "long" })
 }

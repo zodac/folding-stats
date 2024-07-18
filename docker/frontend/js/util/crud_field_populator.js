@@ -20,7 +20,7 @@ function populateHardwareUpdate(){
 
     if (hardwareName == "") {
         hardwareFields = document.querySelectorAll(".hardware_update")
-        for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
+        for (let i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
             hideElement(hardwareField)
         }
 
@@ -29,7 +29,7 @@ function populateHardwareUpdate(){
 
     show("loader")
 
-    var url = encodeURI(REST_ENDPOINT_URL+"/hardware/fields?hardwareName=" + hardwareName)
+    var url = encodeURI(REST_ENDPOINT_URL + "/hardware/fields?hardwareName=" + hardwareName)
     fetch(url)
     .then(response => {
         return response.json()
@@ -45,7 +45,7 @@ function populateHardwareUpdate(){
     })
 
     hardwareFields = document.querySelectorAll(".hardware_update")
-    for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
+    for (let i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
         showElement(hardwareField)
     }
     hide("loader")
@@ -57,7 +57,7 @@ function populateHardwareDelete(){
 
     if (hardwareName == "") {
         hardwareFields = document.querySelectorAll(".hardware_delete")
-        for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
+        for (let i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
             hideElement(hardwareField)
         }
 
@@ -66,7 +66,7 @@ function populateHardwareDelete(){
 
     show("loader")
 
-    var url = encodeURI(REST_ENDPOINT_URL+"/hardware/fields?hardwareName=" + hardwareName)
+    var url = encodeURI(REST_ENDPOINT_URL + "/hardware/fields?hardwareName=" + hardwareName)
     fetch(url)
     .then(response => {
         return response.json()
@@ -82,7 +82,7 @@ function populateHardwareDelete(){
     })
 
     hardwareFields = document.querySelectorAll(".hardware_delete")
-    for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
+    for (let i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
         showElement(hardwareField)
     }
     hide("loader")
@@ -94,7 +94,7 @@ function populateTeamUpdate(){
 
     if (teamName == "") {
         teamFields = document.querySelectorAll(".team_update")
-        for (var i = 0, teamField; teamField = teamFields[i]; i++) {
+        for (let i = 0, teamField; teamField = teamFields[i]; i++) {
             hideElement(teamField)
         }
 
@@ -103,7 +103,7 @@ function populateTeamUpdate(){
 
     show("loader")
 
-    var url = encodeURI(REST_ENDPOINT_URL+"/teams/fields?teamName=" + teamName)
+    var url = encodeURI(REST_ENDPOINT_URL + "/teams/fields?teamName=" + teamName)
     fetch(url)
     .then(response => {
         return response.json()
@@ -121,7 +121,7 @@ function populateTeamUpdate(){
     })
 
     teamFields = document.querySelectorAll(".team_update")
-    for (var i = 0, teamField; teamField = teamFields[i]; i++) {
+    for (let i = 0, teamField; teamField = teamFields[i]; i++) {
         showElement(teamField)
     }
     hide("loader")
@@ -133,7 +133,7 @@ function populateTeamDelete(){
 
     if (teamName == "") {
         teamFields = document.querySelectorAll(".team_delete")
-        for (var i = 0, teamField; teamField = teamFields[i]; i++) {
+        for (let i = 0, teamField; teamField = teamFields[i]; i++) {
             hideElement(teamField)
         }
 
@@ -142,7 +142,7 @@ function populateTeamDelete(){
 
     show("loader")
 
-    var url = encodeURI(REST_ENDPOINT_URL+"/teams/fields?teamName=" + teamName)
+    var url = encodeURI(REST_ENDPOINT_URL + "/teams/fields?teamName=" + teamName)
     fetch(url)
     .then(response => {
         return response.json()
@@ -160,7 +160,7 @@ function populateTeamDelete(){
     })
 
     teamFields = document.querySelectorAll(".team_delete")
-    for (var i = 0, teamField; teamField = teamFields[i]; i++) {
+    for (let i = 0, teamField; teamField = teamFields[i]; i++) {
         showElement(teamField)
     }
     hide("loader")
@@ -172,7 +172,7 @@ function populateUserUpdate(){
 
     if (input == "") {
         userFields = document.querySelectorAll(".user_update")
-        for (var i = 0, userField; userField = userFields[i]; i++) {
+        for (let i = 0, userField; userField = userFields[i]; i++) {
             hideElement(userField)
         }
 
@@ -182,7 +182,7 @@ function populateUserUpdate(){
     show("loader")
 
     var userId = input.split(":")[0]
-    var url = encodeURI(REST_ENDPOINT_URL+"/users/" + userId + "/passkey")
+    var url = encodeURI(REST_ENDPOINT_URL + "/users/" + userId + "/passkey")
     fetch(url, {
         headers: {
             "Content-Type": "application/json",
@@ -215,7 +215,7 @@ function populateUserUpdate(){
         var hardwareId = jsonResponse['hardware']['id']
         var teamId = jsonResponse['team']['id']
 
-        var hardwareUrl = encodeURI(REST_ENDPOINT_URL+"/hardware/" + hardwareId)
+        var hardwareUrl = encodeURI(REST_ENDPOINT_URL + "/hardware/" + hardwareId)
         fetch(hardwareUrl)
         .then(response => {
             return response.json()
@@ -223,7 +223,7 @@ function populateUserUpdate(){
         .then(function(jsonResponse) {
             document.getElementById("user_update_hardware_selector_input").value = jsonResponse['hardwareName']
 
-            var teamUrl = encodeURI(REST_ENDPOINT_URL+"/teams/" + teamId)
+            var teamUrl = encodeURI(REST_ENDPOINT_URL + "/teams/" + teamId)
             fetch(teamUrl)
             .then(response => {
                 return response.json()
@@ -232,7 +232,7 @@ function populateUserUpdate(){
                 document.getElementById("user_update_team_selector_input").value = jsonResponse['teamName']
 
                 userFields = document.querySelectorAll(".user_update")
-                for (var i = 0, userField; userField = userFields[i]; i++) {
+                for (let i = 0, userField; userField = userFields[i]; i++) {
                     showElement(userField)
                 }
                 hide("loader")
@@ -247,7 +247,7 @@ function populateUserDelete(){
 
     if (input == "") {
         userFields = document.querySelectorAll(".user_delete")
-        for (var i = 0, userField; userField = userFields[i]; i++) {
+        for (let i = 0, userField; userField = userFields[i]; i++) {
             hideElement(userField)
         }
 
@@ -257,7 +257,7 @@ function populateUserDelete(){
     show("loader")
 
     var userId = input.split(":")[0]
-    var url = encodeURI(REST_ENDPOINT_URL+"/users/" + userId + "/passkey")
+    var url = encodeURI(REST_ENDPOINT_URL + "/users/" + userId + "/passkey")
     fetch(url, {
             headers: {
                 "Content-Type": "application/json",
@@ -290,7 +290,7 @@ function populateUserDelete(){
         var hardwareId = jsonResponse['hardware']['id']
         var teamId = jsonResponse['team']['id']
 
-        var hardwareUrl = encodeURI(REST_ENDPOINT_URL+"/hardware/" + hardwareId)
+        var hardwareUrl = encodeURI(REST_ENDPOINT_URL + "/hardware/" + hardwareId)
         fetch(hardwareUrl)
         .then(response => {
             return response.json()
@@ -298,7 +298,7 @@ function populateUserDelete(){
         .then(function(jsonResponse) {
             document.getElementById("user_delete_hardware_selector_input").value = jsonResponse['hardwareName']
 
-            var teamUrl = encodeURI(REST_ENDPOINT_URL+"/teams/" + teamId)
+            var teamUrl = encodeURI(REST_ENDPOINT_URL + "/teams/" + teamId)
             fetch(teamUrl)
             .then(response => {
                 return response.json()
@@ -307,7 +307,7 @@ function populateUserDelete(){
                 document.getElementById("user_delete_team_selector_input").value = jsonResponse['teamName']
 
                 userFields = document.querySelectorAll(".user_delete")
-                for (var i = 0, userField; userField = userFields[i]; i++) {
+                for (let i = 0, userField; userField = userFields[i]; i++) {
                     showElement(userField)
                 }
                 hide("loader")
@@ -322,7 +322,7 @@ function populateUserOffset(){
 
     if (input == "") {
         userFields = document.querySelectorAll(".user_offset")
-        for (var i = 0, userField; userField = userFields[i]; i++) {
+        for (let i = 0, userField; userField = userFields[i]; i++) {
             hideElement(userField)
         }
 
@@ -332,7 +332,7 @@ function populateUserOffset(){
     show("loader")
 
     var userId = input.split(":")[0]
-    var url = encodeURI(REST_ENDPOINT_URL+"/users/" + userId)
+    var url = encodeURI(REST_ENDPOINT_URL + "/users/" + userId)
     fetch(url)
     .then(response => {
         return response.json()
@@ -346,7 +346,7 @@ function populateUserOffset(){
         var hardwareId = jsonResponse['hardware']['id']
         var teamId = jsonResponse['team']['id']
 
-        var statsUrl = encodeURI(REST_ENDPOINT_URL+"/stats/users/" + userId)
+        var statsUrl = encodeURI(REST_ENDPOINT_URL + "/stats/users/" + userId)
         fetch(statsUrl)
         .then(response => {
             return response.json()
@@ -355,7 +355,7 @@ function populateUserOffset(){
             document.getElementById("user_offset_points").value = jsonResponse['multipliedPoints'].toLocaleString()
             document.getElementById("user_offset_units").value = jsonResponse['units'].toLocaleString()
 
-            var hardwareUrl = encodeURI(REST_ENDPOINT_URL+"/hardware/" + hardwareId)
+            var hardwareUrl = encodeURI(REST_ENDPOINT_URL + "/hardware/" + hardwareId)
             fetch(hardwareUrl)
             .then(response => {
                 return response.json()
@@ -363,7 +363,7 @@ function populateUserOffset(){
             .then(function(jsonResponse) {
                 document.getElementById("user_offset_hardware_selector_input").value = jsonResponse['hardwareName']
 
-                var teamUrl = encodeURI(REST_ENDPOINT_URL+"/teams/" + teamId)
+                var teamUrl = encodeURI(REST_ENDPOINT_URL + "/teams/" + teamId)
                 fetch(teamUrl)
                 .then(response => {
                     return response.json()
@@ -372,7 +372,7 @@ function populateUserOffset(){
                     document.getElementById("user_offset_team_selector_input").value = jsonResponse['teamName']
 
                     userFields = document.querySelectorAll(".user_offset")
-                    for (var i = 0, userField; userField = userFields[i]; i++) {
+                    for (let i = 0, userField; userField = userFields[i]; i++) {
                         showElement(userField)
                     }
                     hide("loader")
@@ -388,7 +388,7 @@ function populateUserChangeCreate(){
 
     if (input == "") {
         userChangeFields = document.querySelectorAll(".user_change_create")
-        for (var i = 0, userChangeField; userChangeField = userChangeFields[i]; i++) {
+        for (let i = 0, userChangeField; userChangeField = userChangeFields[i]; i++) {
             hideElement(userChangeField)
         }
 
@@ -398,7 +398,7 @@ function populateUserChangeCreate(){
     show("loader")
 
     var userId = input.split(":")[0]
-    var url = encodeURI(REST_ENDPOINT_URL+"/users/" + userId)
+    var url = encodeURI(REST_ENDPOINT_URL + "/users/" + userId)
     fetch(url)
     .then(response => {
         return response.json()
@@ -417,7 +417,7 @@ function populateUserChangeCreate(){
 
         var hardwareId = jsonResponse['hardware']['id']
 
-        var hardwareUrl = encodeURI(REST_ENDPOINT_URL+"/hardware/" + hardwareId)
+        var hardwareUrl = encodeURI(REST_ENDPOINT_URL + "/hardware/" + hardwareId)
         fetch(hardwareUrl)
         .then(response => {
             return response.json()
@@ -426,7 +426,7 @@ function populateUserChangeCreate(){
             document.getElementById("user_change_create_hardware_selector_input").value = jsonResponse['hardwareName']
 
             userChangeFields = document.querySelectorAll(".user_change_create")
-            for (var i = 0, userChangeField; userChangeField = userChangeFields[i]; i++) {
+            for (let i = 0, userChangeField; userChangeField = userChangeFields[i]; i++) {
                 showElement(userChangeField)
             }
             hide("loader")

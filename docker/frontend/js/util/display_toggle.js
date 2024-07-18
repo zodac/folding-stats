@@ -15,7 +15,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 function show(elementId) {
-    document.getElementById(elementId).style.display = "block"
+    showElement(document.getElementById(elementId))
 }
 
 function showElement(element) {
@@ -23,7 +23,7 @@ function showElement(element) {
 }
 
 function hide(elementId) {
-    document.getElementById(elementId).style.display = "none"
+    hideElement(document.getElementById(elementId))
 }
 
 function hideElement(element) {

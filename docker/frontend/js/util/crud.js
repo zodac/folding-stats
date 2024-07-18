@@ -34,7 +34,7 @@ function createHardware() {
     )
 
     show("loader")
-    fetch(REST_ENDPOINT_URL+"/hardware", {
+    fetch(REST_ENDPOINT_URL + "/hardware", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -60,7 +60,7 @@ function createHardware() {
         document.getElementById("hardware_create_hardware_type_input").value = ""
         document.getElementById("hardware_create_multiplier").value = ""
         document.getElementById("hardware_create_average_ppd").value = ""
-        successToast("Hardware '" + displayName + "' created")
+        successToast(`Hardware '${displayName}' created`)
         loadHardware()
     })
     .catch((error) => {
@@ -91,7 +91,7 @@ function updateHardware() {
     )
 
     show("loader")
-    fetch(REST_ENDPOINT_URL+"/hardware/" + hardwareId, {
+    fetch(REST_ENDPOINT_URL + "/hardware/" + hardwareId, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -121,11 +121,11 @@ function updateHardware() {
         document.getElementById("hardware_update_average_ppd").value = ""
 
         hardwareFields = document.querySelectorAll(".hardware_update")
-        for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
+        for (let i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
             hideElement(hardwareField)
         }
 
-        successToast("Hardware '" + displayName + "' updated")
+        successToast(`Hardware '${displayName}' updated`)
         loadHardware()
     })
     .catch((error) => {
@@ -140,7 +140,7 @@ function deleteHardware() {
     var displayName = document.getElementById("hardware_delete_display_name").value.trim()
 
     show("loader")
-    fetch(REST_ENDPOINT_URL+"/hardware/" + hardwareId, {
+    fetch(REST_ENDPOINT_URL + "/hardware/" + hardwareId, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
@@ -169,11 +169,11 @@ function deleteHardware() {
         document.getElementById("hardware_delete_average_ppd").value = ""
 
         hardwareFields = document.querySelectorAll(".hardware_delete")
-        for (var i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
+        for (let i = 0, hardwareField; hardwareField = hardwareFields[i]; i++) {
             hideElement(hardwareField)
         }
 
-        successToast("Hardware '" + displayName + "' deleted")
+        successToast(`Hardware '${displayName}' deleted`)
         loadHardware()
     })
     .catch((error) => {
@@ -197,7 +197,7 @@ function createTeam() {
     )
 
     show("loader")
-    fetch(REST_ENDPOINT_URL+"/teams", {
+    fetch(REST_ENDPOINT_URL + "/teams", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -220,7 +220,7 @@ function createTeam() {
         document.getElementById("team_create_name").value = ""
         document.getElementById("team_create_description").value = ""
         document.getElementById("team_create_forum_link").value = ""
-        successToast("Team '" + teamName + "' created")
+        successToast(`Team '${teamName}' created`)
         loadTeams()
     })
     .catch((error) => {
@@ -245,7 +245,7 @@ function updateTeam() {
     )
 
     show("loader")
-    fetch(REST_ENDPOINT_URL+"/teams/" + teamId, {
+    fetch(REST_ENDPOINT_URL + "/teams/" + teamId, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -272,11 +272,11 @@ function updateTeam() {
         document.getElementById("team_update_forum_link").value = ""
 
         teamFields = document.querySelectorAll(".team_update")
-        for (var i = 0, teamField; teamField = teamFields[i]; i++) {
+        for (let i = 0, teamField; teamField = teamFields[i]; i++) {
             hideElement(teamField)
         }
 
-        successToast("Team '" + teamName + "' updated")
+        successToast(`Team '${teamName}' updated`)
         loadTeams()
     })
     .catch((error) => {
@@ -291,7 +291,7 @@ function deleteTeam() {
     var teamName = document.getElementById("team_delete_name").value.trim()
 
     show("loader")
-    fetch(REST_ENDPOINT_URL+"/teams/" + teamId, {
+    fetch(REST_ENDPOINT_URL + "/teams/" + teamId, {
         method: "DELETE",
         headers: {
             "Content-Type": "application/json",
@@ -317,11 +317,11 @@ function deleteTeam() {
         document.getElementById("team_delete_forum_link").value = ""
 
         teamFields = document.querySelectorAll(".team_delete")
-        for (var i = 0, teamField; teamField = teamFields[i]; i++) {
+        for (let i = 0, teamField; teamField = teamFields[i]; i++) {
             hideElement(teamField)
         }
 
-        successToast("Team '" + teamName + "' deleted")
+        successToast(`Team '${teamName}' deleted`)
         loadTeams()
     })
     .catch((error) => {
@@ -342,7 +342,7 @@ function createUser() {
     var teamName = document.getElementById("user_create_team_selector_input").value.trim()
     var isCaptain = document.getElementById("user_create_is_captain").checked
 
-    var hardwareUrl = encodeURI(REST_ENDPOINT_URL+"/hardware/fields?hardwareName=" + hardwareName)
+    var hardwareUrl = encodeURI(REST_ENDPOINT_URL + "/hardware/fields?hardwareName=" + hardwareName)
     fetch(hardwareUrl)
     .then(response => {
         return response.json()
@@ -350,7 +350,7 @@ function createUser() {
     .then(function(jsonResponse) {
         var hardwareId = jsonResponse['id']
 
-        var teamUrl = encodeURI(REST_ENDPOINT_URL+"/teams/fields?teamName=" + teamName)
+        var teamUrl = encodeURI(REST_ENDPOINT_URL + "/teams/fields?teamName=" + teamName)
         fetch(teamUrl)
         .then(response => {
             return response.json()
@@ -373,7 +373,7 @@ function createUser() {
             )
 
             show("loader")
-            var url = encodeURI(REST_ENDPOINT_URL+"/users")
+            var url = encodeURI(REST_ENDPOINT_URL + "/users")
             fetch(url, {
                 method: "POST",
                 headers: {
@@ -404,7 +404,7 @@ function createUser() {
                 document.getElementById("user_create_team_selector_input").value = ""
                 document.getElementById("user_create_is_captain").checked = false
 
-                successToast("User '" + displayName + "' created")
+                successToast(`User '${displayName}' created`)
                 loadUsersAdmin()
             })
             .catch((error) => {
@@ -428,7 +428,7 @@ function updateUser() {
     var teamName = document.getElementById("user_update_team_selector_input").value.trim()
     var isCaptain = document.getElementById("user_update_is_captain").checked
 
-    var hardwareUrl = encodeURI(REST_ENDPOINT_URL+"/hardware/fields?hardwareName=" + hardwareName)
+    var hardwareUrl = encodeURI(REST_ENDPOINT_URL + "/hardware/fields?hardwareName=" + hardwareName)
     fetch(hardwareUrl)
     .then(response => {
         return response.json()
@@ -436,7 +436,7 @@ function updateUser() {
     .then(function(jsonResponse) {
         var hardwareId = jsonResponse['id']
 
-        var teamUrl = encodeURI(REST_ENDPOINT_URL+"/teams/fields?teamName=" + teamName)
+        var teamUrl = encodeURI(REST_ENDPOINT_URL + "/teams/fields?teamName=" + teamName)
         fetch(teamUrl)
         .then(response => {
             return response.json()
@@ -459,7 +459,7 @@ function updateUser() {
             )
 
             show("loader")
-            var url = encodeURI(REST_ENDPOINT_URL+"/users/" + userId)
+            var url = encodeURI(REST_ENDPOINT_URL + "/users/" + userId)
             fetch(url, {
                 method: "PUT",
                 headers: {
@@ -493,11 +493,11 @@ function updateUser() {
                 document.getElementById("user_update_is_captain").checked = false
 
                 userFields = document.querySelectorAll(".user_update")
-                for (var i = 0, userField; userField = userFields[i]; i++) {
+                for (let i = 0, userField; userField = userFields[i]; i++) {
                     hideElement(userField)
                 }
 
-                successToast("User '" + displayName + "' updated")
+                successToast(`User '${displayName}' updated`)
                 loadUsersAdmin()
             })
             .catch((error) => {
@@ -514,7 +514,7 @@ function deleteUser() {
     var displayName = document.getElementById("user_delete_display_name").value
 
     show("loader")
-    var url = encodeURI(REST_ENDPOINT_URL+"/users/" + userId)
+    var url = encodeURI(REST_ENDPOINT_URL + "/users/" + userId)
     fetch(url, {
         method: "DELETE",
         headers: {
@@ -547,11 +547,11 @@ function deleteUser() {
         document.getElementById("user_delete_is_captain").checked = false
 
         userFields = document.querySelectorAll(".user_delete")
-        for (var i = 0, userField; userField = userFields[i]; i++) {
+        for (let i = 0, userField; userField = userFields[i]; i++) {
             hideElement(userField)
         }
 
-        successToast("User '" + displayName + "' deleted")
+        successToast(`User '${displayName}' deleted`)
         loadUsersAdmin()
     })
     .catch((error) => {
@@ -566,7 +566,7 @@ function offsetUser() {
     var displayName = document.getElementById("user_offset_display_name").value
 
     show("loader")
-    var url = encodeURI(REST_ENDPOINT_URL+"/stats/users/" + userId)
+    var url = encodeURI(REST_ENDPOINT_URL + "/stats/users/" + userId)
     fetch(url)
     .then(response => {
         return response.json()
@@ -587,7 +587,7 @@ function offsetUser() {
             }
         )
 
-        var statsUrl = encodeURI(REST_ENDPOINT_URL+"/stats/users/" + userId)
+        var statsUrl = encodeURI(REST_ENDPOINT_URL + "/stats/users/" + userId)
         fetch(statsUrl, {
             method: "PATCH",
             headers: {
@@ -619,11 +619,11 @@ function offsetUser() {
             document.getElementById("user_offset_units").value = ""
 
             userFields = document.querySelectorAll(".user_offset")
-            for (var i = 0, userField; userField = userFields[i]; i++) {
+            for (let i = 0, userField; userField = userFields[i]; i++) {
                 hideElement(userField)
             }
 
-            successToast("User '" + displayName + "' stats updated: " + offsetPoints + " points, " + offsetUnits + " units")
+            successToast(`User '${displayName}' stats updated: ${offsetPoints} points, ${offsetUnits} units`)
             loadUsersAdmin()
         })
         .catch((error) => {
@@ -643,7 +643,7 @@ function createUserChange() {
     var hardwareName = document.getElementById("user_change_create_hardware_selector_input").value.trim()
     var when = document.getElementById("user_change_create_when_input").value.trim()
 
-    var hardwareUrl = encodeURI(REST_ENDPOINT_URL+"/hardware/fields?hardwareName=" + hardwareName)
+    var hardwareUrl = encodeURI(REST_ENDPOINT_URL + "/hardware/fields?hardwareName=" + hardwareName)
     fetch(hardwareUrl)
     .then(response => {
         return response.json()
@@ -665,7 +665,7 @@ function createUserChange() {
         )
 
         show("loader")
-        var url = encodeURI(REST_ENDPOINT_URL+"/changes")
+        var url = encodeURI(REST_ENDPOINT_URL + "/changes")
         fetch(url, {
             method: "POST",
             headers: {
@@ -702,7 +702,7 @@ function createUserChange() {
             document.getElementById("user_change_create_when_input").value = ""
 
             userCreateFields = document.querySelectorAll(".user_change_create")
-            for (var i = 0, userCreateField; userCreateField = userCreateFields[i]; i++) {
+            for (let i = 0, userCreateField; userCreateField = userCreateFields[i]; i++) {
                 hideElement(userCreateField)
             }
 
@@ -718,7 +718,7 @@ function createUserChange() {
 }
 
 function approveUserChangeNow(id){
-    var url = encodeURI(REST_ENDPOINT_URL+"/changes/" + id + "/approve/immediate")
+    var url = encodeURI(REST_ENDPOINT_URL + "/changes/" + id + "/approve/immediate")
     fetch(url, {
         method: "PUT",
         headers: {
@@ -742,7 +742,7 @@ function approveUserChangeNow(id){
 }
 
 function approveUserChangeNextMonth(id){
-    var url = encodeURI(REST_ENDPOINT_URL+"/changes/" + id + "/approve/next")
+    var url = encodeURI(REST_ENDPOINT_URL + "/changes/" + id + "/approve/next")
     fetch(url, {
         method: "PUT",
         headers: {
@@ -765,7 +765,7 @@ function approveUserChangeNextMonth(id){
 }
 
 function rejectUserChange(id){
-    var url = encodeURI(REST_ENDPOINT_URL+"/changes/" + id + "/reject")
+    var url = encodeURI(REST_ENDPOINT_URL + "/changes/" + id + "/reject")
     fetch(url, {
         method: "PUT",
         headers: {

@@ -38,7 +38,7 @@ function adminLogin(){
 
     show("loader")
 
-    fetch(REST_ENDPOINT_URL+"/login/admin", {
+    fetch(REST_ENDPOINT_URL + "/login/admin", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -77,7 +77,7 @@ function adminLogin(){
 
 function manualUpdate() {
     show("loader")
-    fetch(REST_ENDPOINT_URL+"/stats/manual/update", {
+    fetch(REST_ENDPOINT_URL + "/stats/manual/update", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -106,7 +106,7 @@ function manualUpdate() {
 
 function manualLars() {
     show("loader")
-    fetch(REST_ENDPOINT_URL+"/debug/lars", {
+    fetch(REST_ENDPOINT_URL + "/debug/lars", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -137,7 +137,7 @@ function manualLars() {
 
 function manualResultSave() {
     show("loader")
-    fetch(REST_ENDPOINT_URL+"/results/manual/save", {
+    fetch(REST_ENDPOINT_URL + "/results/manual/save", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -166,7 +166,7 @@ function manualResultSave() {
 
 function printCaches() {
     show("loader")
-    fetch(REST_ENDPOINT_URL+"/debug/caches", {
+    fetch(REST_ENDPOINT_URL + "/debug/caches", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -194,7 +194,7 @@ function printCaches() {
 }
 
 function loadHardware() {
-    fetch(REST_ENDPOINT_URL+"/hardware")
+    fetch(REST_ENDPOINT_URL + "/hardware")
     .then(response => {
         return response.json()
     })
@@ -284,7 +284,7 @@ function loadHardware() {
 }
 
 function loadUsersAdmin() {
-    var url = encodeURI(REST_ENDPOINT_URL+"/users/all/passkey")
+    var url = encodeURI(REST_ENDPOINT_URL + "/users/all/passkey")
     fetch(url, {
         headers: {
             "Authorization": sessionGet("Authorization")
@@ -389,7 +389,7 @@ function loadUsersAdmin() {
 }
 
 function loadTeams() {
-    fetch(REST_ENDPOINT_URL+"/teams")
+    fetch(REST_ENDPOINT_URL + "/teams")
     .then(response => {
         return response.json()
     })
@@ -480,7 +480,7 @@ function loadTeams() {
 }
 
 function loadUserChangesAdmin(states, id_prefix, title) {
-    var url = encodeURI(REST_ENDPOINT_URL+"/changes/passkey?state=" + states)
+    var url = encodeURI(REST_ENDPOINT_URL + "/changes/passkey?state=" + states)
     fetch(url, {
         headers: {
             "Authorization": sessionGet("Authorization")

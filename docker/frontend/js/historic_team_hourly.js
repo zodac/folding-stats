@@ -66,7 +66,7 @@ function getTeamHistoricStats(teamId, teamName, day, month, monthName, year) {
     show("loader")
     hide("historic_stats")
 
-    fetch(REST_ENDPOINT_URL+"/historic/teams/" + selectedTeamId + "/" + selectedYear + "/" + selectedMonth + "/" + selectedDay)
+    fetch(REST_ENDPOINT_URL + "/historic/teams/" + selectedTeamId + "/" + selectedYear + "/" + selectedMonth + "/" + selectedDay)
     .then(response => {
         return response.json()
     })

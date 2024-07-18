@@ -16,33 +16,12 @@
  */
 const REST_ENDPOINT_URL="%REST_ENDPOINT_URL%"
 
-// The 'toggle' functions below simply change the colour of the buttons. There must be a smarter way to do this...
-function toggleMainButtonStyle(id, classList){
-    var button = document.getElementById(id)
-
-    if(classList.contains("collapsed")){
-        button.classList.add("btn-primary")
-        button.classList.remove("btn-success")
-    } else {
-        button.classList.add("btn-success")
-        button.classList.remove("btn-primary")
-    }
-}
-
 function toggleTeam(teamNumber, classList) {
-    var button = document.getElementById("team_"+teamNumber+"_button")
-
-    if(classList.contains("collapsed")){
-        button.classList.add("btn-primary")
-        button.classList.remove("btn-success")
-    } else {
-        button.classList.add("btn-success")
-        button.classList.remove("btn-primary")
-    }
+    toggleMainButtonStyle("team_" + teamNumber + "_button")
 }
 
 function loadSummaryStats() {
-    fetch(REST_ENDPOINT_URL+'/stats/summary')
+    fetch(REST_ENDPOINT_URL + '/stats/summary')
         .then(response => {
             return response.json()
         })
@@ -98,7 +77,7 @@ function loadSummaryStats() {
 }
 
 function loadTeamLeaderboard() {
-    fetch(REST_ENDPOINT_URL+"/stats/leaderboard")
+    fetch(REST_ENDPOINT_URL + "/stats/leaderboard")
     .then(response => {
         return response.json()
     })
@@ -185,7 +164,7 @@ function loadTeamLeaderboard() {
 }
 
 function loadCategoryLeaderboard() {
-    fetch(REST_ENDPOINT_URL+"/stats/category")
+    fetch(REST_ENDPOINT_URL + "/stats/category")
     .then(response => {
         return response.json()
     })
@@ -264,7 +243,7 @@ function loadCategoryLeaderboard() {
 }
 
 function loadTeamStats() {
-    fetch(REST_ENDPOINT_URL+'/stats')
+    fetch(REST_ENDPOINT_URL + '/stats')
     .then(response => {
         return response.json()
     })

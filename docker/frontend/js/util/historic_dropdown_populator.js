@@ -24,7 +24,7 @@ function populateUserDropdown(dropdownId) {
         dropdown.removeChild(dropdown.lastChild)
     }
 
-    fetch(REST_ENDPOINT_URL+"/users")
+    fetch(REST_ENDPOINT_URL + "/users")
     .then(response => {
         return response.json()
     })
@@ -51,7 +51,7 @@ function populateTeamDropdown() {
         dropdown.removeChild(dropdown.lastChild)
     }
 
-    fetch(REST_ENDPOINT_URL+"/teams")
+    fetch(REST_ENDPOINT_URL + "/teams")
     .then(response => {
         return response.json()
     })
@@ -85,7 +85,7 @@ function populateDayDropdown(month, year, dropdownId, historicFunctionName) {
         selectedDay = numberOfDaysInMonth
     }
 
-    for (i = 0; i < numberOfDaysInMonth; i++) {
+    for (let i = 0; i < numberOfDaysInMonth; i++) {
         var loopDay = ordinalSuffixOf((i+1))
 
         dayButton = document.createElement("button")
@@ -110,7 +110,7 @@ function populateMonthDropdown(dropdownId, historicFunctionName) {
 
     monthDropdownDiv = document.getElementById(dropdownId)
 
-    for (i = 0; i < NUMBER_OF_MONTHS; i++) {
+    for (let i = 0; i < NUMBER_OF_MONTHS; i++) {
         var loopMonthName = new Date(YEAR_START, i, 1).toLocaleString("default", { month: "long" })
 
         monthButton = document.createElement("button")
@@ -134,7 +134,7 @@ function populateYearDropdown(dropdownId, historicFunctionName) {
 
     yearDropdownDiv = document.getElementById(dropdownId)
 
-    for (i = 0; i < NUMBER_OF_YEARS_TO_SHOW; i++) {
+    for (let i = 0; i < NUMBER_OF_YEARS_TO_SHOW; i++) {
         var loopYear = (YEAR_START - i)
 
         yearButton = document.createElement("button")

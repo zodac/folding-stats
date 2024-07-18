@@ -70,7 +70,7 @@ function getUserHistoricStats(userId, userName, day, month, monthName, year) {
     show("loader")
     hide("historic_stats")
 
-    fetch(REST_ENDPOINT_URL+"/historic/users/" + selectedUserId + "/" + selectedYear + "/" + selectedMonth + "/" + selectedDay)
+    fetch(REST_ENDPOINT_URL + "/historic/users/" + selectedUserId + "/" + selectedYear + "/" + selectedMonth + "/" + selectedDay)
     .then(response => {
         return response.json()
     })

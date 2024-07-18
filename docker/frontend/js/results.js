@@ -30,7 +30,7 @@ var selectedMonth = currentUtcDate.getMonth() == 0 ? 12 : currentUtcDate.getMont
 
 // If month is December, choose previous year
 var selectedYear = selectedMonth == 12 ? currentUtcDate.getFullYear() - 1: currentUtcDate.getFullYear()
-var selectedMonthName = new Date(selectedYear, (selectedMonth-1), 1).toLocaleString("default", { month: "long" })
+var selectedMonthName = new Date(selectedYear, (selectedMonth - 1), 1).toLocaleString("default", { month: "long" })
 
 function getPastResult(month, monthName, year) {
     if (month != null){
@@ -52,12 +52,12 @@ function getPastResult(month, monthName, year) {
     show("loader")
     hide("main_parent")
 
-    fetch(REST_ENDPOINT_URL+"/results/result/" + selectedYear + "/" + selectedMonth)
+    fetch(REST_ENDPOINT_URL + "/results/result/" + selectedYear + "/" + selectedMonth)
     .then(response => {
         if (response.ok) {
             // Make a fresh call which we will parse to JSON
             // Cannot use original call since parsing to JSON will cause the 404 scenario to fail
-            fetch(REST_ENDPOINT_URL+"/results/result/" + selectedYear + "/" + selectedMonth)
+            fetch(REST_ENDPOINT_URL + "/results/result/" + selectedYear + "/" + selectedMonth)
             .then(response => {
                 return response.json()
             })
