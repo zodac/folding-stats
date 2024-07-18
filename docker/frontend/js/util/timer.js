@@ -26,19 +26,19 @@ function startTimer() {
 }
 
 function calculateNumberOfUpdates() {
-    now = new Date()
+    const now = new Date()
 
-    startOfMonth = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), FIRST_DAY_OF_MONTH, 0, UPDATE_MINUTE, 0, 0)
-    seconds = Math.floor((now - (startOfMonth)) / 1000)
-    minutes = seconds / 60
-    hours = Math.floor(minutes / 60)
+    const startOfMonth = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), FIRST_DAY_OF_MONTH, 0, UPDATE_MINUTE, 0, 0)
+    const seconds = Math.floor((now - (startOfMonth)) / MILLISECONDS_IN_SECOND)
+    const minutes = seconds / SECONDS_IN_MINUTE
+    const hours = Math.floor(minutes / MINUTES_IN_HOUR)
 
     if (localContains(NUMBER_OF_UPDATES_PROPERTY_NAME)) {
-        previousNumber = localGet(NUMBER_OF_UPDATES_PROPERTY_NAME)
+        let previousNumber = localGet(NUMBER_OF_UPDATES_PROPERTY_NAME)
 
         if (previousNumber < hours) {
-            diff = hours - previousNumber
-            updateCountToast = document.getElementById("toast-update-count-text")
+            let diff = hours - previousNumber
+            let updateCountToast = document.getElementById("toast-update-count-text")
 
             if (diff == 1) {
                 updateCountToast.innerHTML = diff.toLocaleString() + " update"
@@ -61,15 +61,15 @@ function updateTimer() {
         return
     }
 
-    const currentDayOfMonth = new Date().getUTCDate()
+    const now = new Date()
+    const currentDayOfMonth = now.getUTCDate()
     const zeroPad = (num, places) => String(num).padStart(places, '0')
 
     // If within the update period, set the update value to the next UPDATE_MINUTE
     if (currentDayOfMonth >= parseInt(FIRST_DAY_OF_MONTH)) {
-        let time = new Date()
-        let secsRemaining = 3600 - (time.getUTCMinutes() - UPDATE_MINUTE) % 60 * 60 - time.getUTCSeconds()
-        let minutes = Math.floor(secsRemaining / 60) % 60
-        let seconds = secsRemaining % 60
+        let secsRemaining = SECONDS_IN_HOUR - (now.getUTCMinutes() - UPDATE_MINUTE) % SECONDS_IN_HOUR - time.getUTCSeconds()
+        let minutes = Math.floor(secsRemaining / SECONDS_IN_MINUTE) % SECONDS_IN_MINUTE
+        let seconds = secsRemaining % SECONDS_IN_MINUTE
 
         document.getElementById("min-part").innerHTML = minutes
         document.getElementById("sec-part").innerHTML = zeroPad(seconds, 2)
@@ -78,10 +78,9 @@ function updateTimer() {
             showToast("toast-refresh", false)
         }
     } else { // If not within update period, set the update value to the FIRST_DAY_OF_MONTH
-        let time = new Date()
-        let msToStart = Math.abs(time - Date.UTC(time.getUTCFullYear(), time.getUTCMonth(), FIRST_DAY_OF_MONTH))
-        let minutes = Math.floor(msToStart / 60000)
-        let seconds = Math.floor((msToStart % 60000) / 1000)
+        let msToStart = Math.abs(now - Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), FIRST_DAY_OF_MONTH))
+        let minutes = millisAsMinutes(msToStart)
+        let seconds = Math.floor((msToStart % MILLISECONDS_IN_MINUTE) / MILLISECONDS_IN_SECOND)
 
         document.getElementById("min-part").innerHTML = minutes
         document.getElementById("sec-part").innerHTML = zeroPad(seconds, 2)
@@ -92,5 +91,5 @@ function updateTimer() {
     }
 
     // We want to check every 1s regardless of whether we're in the update period or not
-    setTimeout(updateTimer, 1000 - (new Date()).getUTCMilliseconds())
+    setTimeout(updateTimer, MILLISECONDS_IN_SECOND - now.getUTCMilliseconds())
 }
