@@ -650,7 +650,7 @@ function createUserChange() {
         })
         .then(function (jsonResponse) {
             var hardwareId = jsonResponse['id']
-            var immediate = when === "Immediately"
+            var isImmediateChange = when === "Immediately"
 
             var requestData = JSON.stringify(
                 {
@@ -660,7 +660,7 @@ function createUserChange() {
                     "passkey": html_escape(passkey),
                     "liveStatsLink": html_escape(liveStatsLink),
                     "hardwareId": html_escape(hardwareId),
-                    "immediate": immediate
+                    "immediate": isImmediateChange
                 }
             )
 

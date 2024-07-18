@@ -14,12 +14,12 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-function showToast(id, autohide) {
+function showToast(id, isAutohide) {
     new bootstrap
         .Toast(document.getElementById(id),
             {
                 animation: true,
-                autohide: autohide,
+                autohide: isAutohide,
                 delay: 3000 // 3 seconds
             }
         )
