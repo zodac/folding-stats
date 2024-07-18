@@ -479,7 +479,7 @@ function loadTeams() {
         })
 }
 
-function loadUserChangesAdmin(states, id_prefix, title) {
+function loadUserChangesAdmin(states, idPrefix, title) {
     var url = encodeURI(REST_ENDPOINT_URL + "/changes/passkey?state=" + states)
     fetch(url, {
         headers: {
@@ -493,7 +493,7 @@ function loadUserChangesAdmin(states, id_prefix, title) {
             // Build users
             jsonResponse.sort(sortJsonByKey("id"))
 
-            if (id_prefix === "pending_user_changes") {
+            if (idPrefix === "pending_user_changes") {
                 usersHeaders = ["Folding Name", "Passkey", "Live Stats Link", "Hardware", "Created", "Updated", "State", "Approve/Reject"]
                 usersProperties = ["foldingUserName", "passkey", "liveStatsLink", "hardware", "createdUtcTimestamp", "updatedUtcTimestamp", "state", "approve"]
             } else {
@@ -502,7 +502,7 @@ function loadUserChangesAdmin(states, id_prefix, title) {
             }
 
             // Empty div of existing content, if any
-            usersDiv = document.getElementById(id_prefix + "_div")
+            usersDiv = document.getElementById(idPrefix + "_div")
             while (usersDiv.firstChild) {
                 usersDiv.removeChild(usersDiv.lastChild)
             }
@@ -515,14 +515,14 @@ function loadUserChangesAdmin(states, id_prefix, title) {
             usersTableDiv = document.createElement("div")
             usersTableDiv.setAttribute("class", "scrollable-table")
             usersTable = document.createElement('table')
-            usersTable.setAttribute("id", id_prefix + "_table")
+            usersTable.setAttribute("id", idPrefix + "_table")
             usersTable.setAttribute("class", "table table-dark table-striped table-hover")
 
             usersTableHead = document.createElement("thead")
             usersTableHeaderRow = document.createElement("tr")
             usersHeaders.forEach(function (header, i) {
                 usersTableHeader = document.createElement("th")
-                usersTableHeader.setAttribute("onclick", "sortTable(" + i + ", '" + id_prefix + "_table')")
+                usersTableHeader.setAttribute("onclick", "sortTable(" + i + ", '" + idPrefix + "_table')")
                 usersTableHeader.setAttribute("scope", "col")
                 usersTableHeader.innerHTML = header
 

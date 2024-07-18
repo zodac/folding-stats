@@ -25,7 +25,7 @@ String.prototype.format = function () {
     return formatted
 }
 
-function loadUserChanges(states, id_prefix, title) {
+function loadUserChanges(states, idPrefix, title) {
     fetch(REST_ENDPOINT_URL + "/changes?state=" + states + "&numberOfMonths=3")
         .then(response => {
             return response.json()
@@ -37,7 +37,7 @@ function loadUserChanges(states, id_prefix, title) {
             const usersProperties = ["foldingUserName", "passkey", "liveStatsLink", "hardware", "createdUtcTimestamp", "updatedUtcTimestamp", "state"]
 
             // Empty div of existing content, if any
-            usersDiv = document.getElementById(id_prefix + "_div")
+            usersDiv = document.getElementById(idPrefix + "_div")
             while (usersDiv.firstChild) {
                 usersDiv.removeChild(usersDiv.lastChild)
             }
@@ -50,14 +50,14 @@ function loadUserChanges(states, id_prefix, title) {
             usersTableDiv = document.createElement("div")
             usersTableDiv.setAttribute("class", "scrollable-table")
             usersTable = document.createElement('table')
-            usersTable.setAttribute("id", id_prefix + "_table")
+            usersTable.setAttribute("id", idPrefix + "_table")
             usersTable.setAttribute("class", "table table-dark table-striped table-hover")
 
             usersTableHead = document.createElement("thead")
             usersTableHeaderRow = document.createElement("tr")
             usersHeaders.forEach(function (header, i) {
                 usersTableHeader = document.createElement("th")
-                usersTableHeader.setAttribute("onclick", "sortTable(" + i + ", '" + id_prefix + "_table')")
+                usersTableHeader.setAttribute("onclick", "sortTable(" + i + ", '" + idPrefix + "_table')")
                 usersTableHeader.setAttribute("scope", "col")
                 usersTableHeader.innerHTML = header
 
