@@ -16,6 +16,7 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta name="viewport" http-equiv="Content-Type" content="width=device-width, initial-scale=1, maximum-scale=2">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -42,223 +43,208 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 </head>
 
 <body>
-<nav id="navbar" class="navbar navbar-expand navbar-dark bg-dark">
-    <a id="navbar-title" class="navbar-brand" href="%FORUM_LINK%" target="_blank" rel="noreferrer">%TITLE%</a>
-    <a href="https://github.com/zodac/folding-stats" target="_blank" rel="noopener noreferrer">
-        <svg height="32" viewBox="0 0 16 16" width="32" class="github-logo">
-            <path fill-rule="evenodd"
-                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
-        </svg>
-    </a>
+    <nav id="navbar" class="navbar navbar-expand navbar-dark bg-dark">
+        <a id="navbar-title" class="navbar-brand" href="%FORUM_LINK%" target="_blank" rel="noreferrer">%TITLE%</a>
+        <a href="https://github.com/zodac/folding-stats" target="_blank" rel="noopener noreferrer">
+            <svg height="32" viewBox="0 0 16 16" width="32" class="github-logo">
+                <path fill-rule="evenodd"
+                      d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+                </path>
+            </svg>
+        </a>
 
-    <div id="navbarSupportedContent">
-        <ul id="navbar-links-parent" class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="./">ETF Stats</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="./results">Past Results</a>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle unselectable" id="navbarDropdownUserLink" role="button"
-                   data-bs-toggle="dropdown" aria-expanded="false">
-                    User Stats
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <li><a class="dropdown-item" href="./historic_user_hourly">Hourly</a></li>
-                    <li><a class="dropdown-item" href="./historic_user_daily">Daily</a></li>
-                    <li><a class="dropdown-item" href="./historic_user_monthly">Monthly</a></li>
-                </ul>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle unselectable" id="navbarDropdownTeamLink" role="button"
-                   data-bs-toggle="dropdown" aria-expanded="false">
-                    Team Stats
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <li><a class="dropdown-item" href="./historic_team_hourly">Hourly</a></li>
-                    <li><a class="dropdown-item" href="./historic_team_daily">Daily</a></li>
-                    <li><a class="dropdown-item" href="./historic_team_monthly">Monthly</a></li>
-                </ul>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle unselectable active" id="navbarDropdownAdminLink" role="button"
-                   data-bs-toggle="dropdown" aria-expanded="false">
-                    System
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <li><a class="dropdown-item" href="./requests">Request A User Change</a></li>
-                    <li><a class="dropdown-item" href="./admin">Admin</a></li>
-                </ul>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="%ROOT_URL%/api.html" target="_blank">API</a>
-            </li>
-        </ul>
-    </div>
-    <div id="update_timer" style="position: absolute; right: 5px;">Next update: <span id="min-part"></span>:<span id="sec-part"></span>
-    </div>
-</nav>
+        <div id="navbarSupportedContent">
+            <ul id="navbar-links-parent" class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="./">ETF Stats</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="./results">Past Results</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle unselectable" id="navbarDropdownUserLink" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        User Stats
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <li><a class="dropdown-item" href="./historic_user_hourly">Hourly</a></li>
+                        <li><a class="dropdown-item" href="./historic_user_daily">Daily</a></li>
+                        <li><a class="dropdown-item" href="./historic_user_monthly">Monthly</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle unselectable" id="navbarDropdownTeamLink" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        Team Stats
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <li><a class="dropdown-item" href="./historic_team_hourly">Hourly</a></li>
+                        <li><a class="dropdown-item" href="./historic_team_daily">Daily</a></li>
+                        <li><a class="dropdown-item" href="./historic_team_monthly">Monthly</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle unselectable active" id="navbarDropdownAdminLink" role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        System
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <li><a class="dropdown-item" href="./requests">Request A User Change</a></li>
+                        <li><a class="dropdown-item" href="./admin">Admin</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="%ROOT_URL%/api.html" target="_blank">API</a>
+                </li>
+            </ul>
+        </div>
+        <div id="update_timer" style="position: absolute; right: 5px;">Next update: <span id="min-part"></span>:<span id="sec-part"></span>
+        </div>
+    </nav>
 
-<br/>
-
-<!-- Toasts, which will be triggered to show by JS scripts -->
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-    <div id="toast-refresh" class="toast text-white bg-secondary" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-body">Stats updated, refresh page!</div>
-    </div>
-</div>
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-    <div id="toast-success" class="toast text-white bg-success" role="alert" aria-live="assertive"
-         aria-atomic="true">
-        <div id="toast-success-text" class="toast-body"></div>
-    </div>
-</div>
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
-    <div id="toast-failure" class="toast text-white bg-danger" role="alert" aria-live="assertive"
-         aria-atomic="true">
-        <div id="toast-failure-text" class="toast-body"></div>
-    </div>
-</div>
-
-<div>
     <br/>
-</div>
 
-<div id="user_change_div">
-    <h1 class="navbar-brand">Request A User Change</h1>
+    <!-- Toasts, which will be triggered to show by JS scripts -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+        <div id="toast-refresh" class="toast text-white bg-secondary" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-body">Stats updated, refresh page!</div>
+        </div>
+    </div>
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+        <div id="toast-success" class="toast text-white bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+            <div id="toast-success-text" class="toast-body"></div>
+        </div>
+    </div>
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+        <div id="toast-failure" class="toast text-white bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
+            <div id="toast-failure-text" class="toast-body"></div>
+        </div>
+    </div>
+
     <div>
-        <p>You can request a change to your user here. You may request a change for the following data:</p>
-        <ul>
-            <li>Folding@Home Username</li>
-            <li>Folding@Home passkey</li>
-            <li>Live Folding@Home stats link</li>
-            <li>Hardware used</li>
-        </ul>
-        <p>For any other changes (display name, team, etc.), get in touch with <b><a
-                href="https://extremehw.net/profile/81-damric/">damric</a></b>.</p>
-        <p>Please enter your existing passkey to confirm your identity, before making other changes.</p>
+        <br/>
     </div>
-    <div id="create_user_change">
-        <form id="user_change_create_form" class="row g-3"
-              onsubmit="createUserChange(); return false;" action="">
-            <div class="col-auto">
+
+    <div id="user_change_div">
+        <h1 class="navbar-brand">Request A User Change</h1>
+        <div>
+            <p>You can request a change to your user here. You may request a change for the following data:</p>
+            <ul>
+                <li>Folding@Home Username</li>
+                <li>Folding@Home passkey</li>
+                <li>Live Folding@Home stats link</li>
+                <li>Hardware used</li>
+            </ul>
+            <p>For any other changes (display name, team, etc.), get in touch with <b>
+                <a href="https://extremehw.net/profile/81-damric/">damric</a></b>.
+            </p>
+            <p>Please enter your existing passkey to confirm your identity, before making other changes.</p>
+        </div>
+        <div id="create_user_change">
+            <form id="user_change_create_form" class="row g-3" onsubmit="createUserChange(); return false;" action="">
+                <div class="col-auto">
+                    <br/>
+                    <button type="submit" class="btn btn-primary mb-3">Request User Change</button>
+                </div>
+                <div class="col-auto">
+                    User
+                    <input class="form-control" list="user_change_user_selector" id="user_change_user_selector_input"
+                           onchange="populateUserChangeCreate();" placeholder="Search for User...">
+                    <datalist id="user_change_user_selector" class="user_datalist" aria-label="user_change_user_list" required>
+                        <!-- Will be populated by admin.js -->
+                    </datalist>
+                </div>
+                <div class="col-auto" style="display:none;">
+                    User ID
+                    <input id="user_change_create_id" class="form-control" type="text" placeholder="User ID" aria-label="User ID" disabled>
+                </div>
+                <div class="col-auto user_change_create" style="display:none;">
+                    Existing User Passkey
+                    <input id="user_change_create_existing_passkey" class="form-control" type="text" maxlength="32" minlength="32"
+                           placeholder="Existing User Passkey" aria-label="Passkey" required>
+                </div>
                 <br/>
-                <button type="submit" class="btn btn-primary mb-3">Request User Change</button>
-            </div>
-            <div class="col-auto">
-                User
-                <input class="form-control"
-                       list="user_change_user_selector"
-                       id="user_change_user_selector_input"
-                       onchange="populateUserChangeCreate();"
-                       placeholder="Search for User...">
-                <datalist id="user_change_user_selector"
-                          class="user_datalist"
-                          aria-label="user_change_user_list"
-                          required>
-                    <!-- Will be populated by admin.js -->
-                </datalist>
-            </div>
-            <div class="col-auto" style="display:none;">
-                User ID
-                <input id="user_change_create_id" class="form-control" type="text" placeholder="User ID"
-                       aria-label="User ID" disabled>
-            </div>
-            <div class="col-auto user_change_create" style="display:none;">
-                Existing User Passkey
-                <input id="user_change_create_existing_passkey" class="form-control" type="text" maxlength="32"
-                       minlength="32" placeholder="Existing User Passkey" aria-label="Passkey" required>
-            </div>
-            <br/>
-            <div class="col-auto user_change_create" style="display:none;">
-                Folding@Home Name
-                <input id="user_change_create_folding_name" class="form-control" type="text" pattern="[^\s]+"
-                       placeholder="Folding@Home Name" aria-label="Folding@Home Name" required>
-            </div>
-            <div class="col-auto user_change_create" style="display:none;">
-                Passkey
-                <input id="user_change_create_passkey" class="form-control" type="text" maxlength="32"
-                       minlength="32" placeholder="Passkey" aria-label="Passkey" required>
-            </div>
-            <div class="col-auto user_change_create" style="display:none;">
-                Live Stats Link
-                <input id="user_change_create_live_stats_link" class="form-control" type="url"
-                       placeholder="Live Stats Link" aria-label="Live Stats Link">
-            </div>
-            <div class="col-auto user_change_create" style="display:none;">
-                Hardware
-                <input class="form-control"
-                       list="user_change_create_hardware_selector"
-                       id="user_change_create_hardware_selector_input"
-                       placeholder="Search for hardware..."
-                       required>
-                <datalist id="user_change_create_hardware_selector"
-                          class="hardware_datalist"
-                          aria-label="user_create_hardware_selector">
-                    <!-- Will be populated by requests.js -->
-                </datalist>
-            </div>
-            <div class="col-auto user_change_create" style="display:none;">
-                When To Make Change
-                <input class="form-control"
-                       list="user_change_create_when"
-                       id="user_change_create_when_input"
-                       placeholder="When"
-                       required>
-                <datalist id="user_change_create_when"
-                          aria-label="user_change_create_when">
-                    <option value="Immediately"></option>
-                    <option value="Next Month"></option>
-                </datalist>
-            </div>
-        </form>
+                <div class="col-auto user_change_create" style="display:none;">
+                    Folding@Home Name
+                    <input id="user_change_create_folding_name" class="form-control" type="text" pattern="[^\s]+" placeholder="Folding@Home Name"
+                           aria-label="Folding@Home Name" required>
+                </div>
+                <div class="col-auto user_change_create" style="display:none;">
+                    Passkey
+                    <input id="user_change_create_passkey" class="form-control" type="text" maxlength="32" minlength="32" placeholder="Passkey"
+                           aria-label="Passkey" required>
+                </div>
+                <div class="col-auto user_change_create" style="display:none;">
+                    Live Stats Link
+                    <input id="user_change_create_live_stats_link" class="form-control" type="url" placeholder="Live Stats Link"
+                           aria-label="Live Stats Link">
+                </div>
+                <div class="col-auto user_change_create" style="display:none;">
+                    Hardware
+                    <input class="form-control" list="user_change_create_hardware_selector" id="user_change_create_hardware_selector_input"
+                           placeholder="Search for hardware..." required>
+                    <datalist id="user_change_create_hardware_selector" class="hardware_datalist" aria-label="user_create_hardware_selector">
+                        <!-- Will be populated by requests.js -->
+                    </datalist>
+                </div>
+                <div class="col-auto user_change_create" style="display:none;">
+                    When To Make Change
+                    <input class="form-control" list="user_change_create_when" id="user_change_create_when_input" placeholder="When" required>
+                    <datalist id="user_change_create_when" aria-label="user_change_create_when">
+                        <option value="Immediately"></option>
+                        <option value="Next Month"></option>
+                    </datalist>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<div>
-    <br/>
-</div>
-
-<button onclick="toggleMainButtonStyle('pending_user_changes_button', this.classList)" class="btn btn-primary"
-        id="pending_user_changes_button" href="#pending_user_changes_div" data-bs-toggle="collapse" role="button">
-    Pending Requests
-</button>
-<button onclick="toggleMainButtonStyle('completed_user_changes_button', this.classList)" class="btn btn-primary"
-        id="completed_user_changes_button" href="#completed_user_changes_div" data-bs-toggle="collapse" role="button">
-    Completed Requests
-</button>
-
-<button onclick="toggleMainButtonStyle('hardware_button', this.classList)" class="btn btn-primary" id="hardware_button"
-        href="#hardware_div" data-bs-toggle="collapse" role="button">List of Hardware
-</button>
-<button onclick="toggleMainButtonStyle('teams_button', this.classList)" class="btn btn-primary" id="teams_button"
-        href="#teams_div" data-bs-toggle="collapse" role="button">List of Teams
-</button>
-<button onclick="toggleMainButtonStyle('users_button', this.classList)" class="btn btn-primary" id="users_button"
-        href="#users_div" data-bs-toggle="collapse" role="button">List of Users
-</button>
-
-<!-- These divs will be populated by requests.js -->
-<div id="pending_user_changes_div" class="collapse"></div>
-<div id="completed_user_changes_div" class="collapse"></div>
-
-<!-- These divs will be populated by index.js -->
-<div id="main_parent">
-    <div id="hardware_div" class="collapse"></div>
-    <div id="teams_div" class="collapse"></div>
-    <div id="users_div" class="collapse"></div>
-</div>
-
-<div id="loader" class="loader"></div>
-
-<footer id="footer">
-    <div id="footer-content">
-        Folding@Home data provided by <a href="https://stats.foldingathome.org/donor/">Folding@Home Statistics</a> |
-        Hardware PPD data provided by <a href="https://folding.lar.systems/">LARS PPD DB</a> (<a
-            href="https://chrome.google.com/webstore/detail/folding-at-home-in-the-da/alpjkkbjnbkddolgnicglknicbgfahoe/">Chrome
-        Extension</a>)
+    <div>
+        <br/>
     </div>
-</footer>
+
+    <button onclick="toggleMainButtonStyle('pending_user_changes_button', this.classList)" class="btn btn-primary" id="pending_user_changes_button"
+            href="#pending_user_changes_div" data-bs-toggle="collapse" role="button">
+        Pending Requests
+    </button>
+    <button onclick="toggleMainButtonStyle('completed_user_changes_button', this.classList)" class="btn btn-primary" id="completed_user_changes_button"
+            href="#completed_user_changes_div" data-bs-toggle="collapse" role="button">
+        Completed Requests
+    </button>
+
+    <button onclick="toggleMainButtonStyle('hardware_button', this.classList)" class="btn btn-primary" id="hardware_button" href="#hardware_div"
+            data-bs-toggle="collapse" role="button">
+        List of Hardware
+    </button>
+    <button onclick="toggleMainButtonStyle('teams_button', this.classList)" class="btn btn-primary" id="teams_button" href="#teams_div"
+            data-bs-toggle="collapse" role="button">
+        List of Teams
+    </button>
+    <button onclick="toggleMainButtonStyle('users_button', this.classList)" class="btn btn-primary" id="users_button" href="#users_div"
+            data-bs-toggle="collapse" role="button">
+        List of Users
+    </button>
+
+    <!-- These divs will be populated by requests.js -->
+    <div id="pending_user_changes_div" class="collapse"></div>
+    <div id="completed_user_changes_div" class="collapse"></div>
+
+    <!-- These divs will be populated by index.js -->
+    <div id="main_parent">
+        <div id="hardware_div" class="collapse"></div>
+        <div id="teams_div" class="collapse"></div>
+        <div id="users_div" class="collapse"></div>
+    </div>
+
+    <div id="loader" class="loader"></div>
+
+    <footer id="footer">
+        <div id="footer-content">
+            Folding@Home data provided by <a href="https://stats.foldingathome.org/donor/">Folding@Home Statistics</a> | Hardware PPD data provided by <a
+                href="https://folding.lar.systems/">LARS PPD DB</a> (<a
+                href="https://chrome.google.com/webstore/detail/folding-at-home-in-the-da/alpjkkbjnbkddolgnicglknicbgfahoe/">Chrome Extension</a>)
+        </div>
+    </footer>
 </body>
+
 </html>
