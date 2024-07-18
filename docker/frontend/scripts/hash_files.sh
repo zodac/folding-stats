@@ -18,7 +18,7 @@ function main() {
   for file_name in *."${file_extension}"
   do
     base=$(basename "${file_name}")
-    name_without_extension=$(echo "${base%%.*}")
+    name_without_extension="${base%%.*}"
     hash=$(cat "${file_name}" | md5sum | tr -s ' ' | cut -d ' ' -f1)
     new_file_name="${name_without_extension}-${hash}.min.${file_extension}"
     mv "${file_name}" "${new_file_name}"
