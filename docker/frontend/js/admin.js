@@ -28,7 +28,7 @@ String.prototype.format = function () {
 function adminLogin() {
     var userName = document.getElementById("login_username").value
     var password = document.getElementById("login_password").value
-    var authorizationPayload = "Basic " + encode(userName, password)
+    var authorizationPayload = "Basic " + btoa(userName + ":" + password)
 
     var requestData = JSON.stringify(
         {
