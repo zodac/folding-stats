@@ -33,16 +33,16 @@ function closeToast(id) {
 }
 
 function successToast(text) {
-    document.getElementById("toast-success-text").innerHTML = escape(text)
+    document.getElementById("toast-success-text").innerHTML = html_escape(text)
     showToast("toast-success", true)
 }
 
 function failureToast(text) {
-    document.getElementById("toast-failure-text").innerHTML = escape(text)
+    document.getElementById("toast-failure-text").innerHTML = html_escape(text)
     showToast("toast-failure", true)
 }
 
 function failureToastPermanent(text) {
-    document.getElementById("toast-failure-text").innerHTML = escape(text)
+    document.getElementById("toast-failure-text").innerHTML = html_escape(text)
     showToast("toast-failure", false)
 }

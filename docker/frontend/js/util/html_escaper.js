@@ -15,7 +15,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 // https://stackoverflow.com/a/6234804
-function escape(unsafe) {
+function html_escape(unsafe) {
     return unsafe.toString()
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")

@@ -24,12 +24,12 @@ function createHardware() {
 
     var requestData = JSON.stringify(
         {
-            "hardwareName": escape(hardwareName),
-            "displayName": escape(displayName),
-            "hardwareMake": getHardwareMakeBackend(escape(hardwareMake)),
-            "hardwareType": getHardwareTypeBackend(escape(hardwareType)),
-            "multiplier": escape(multiplier),
-            "averagePpd": escape(averagePpd),
+            "hardwareName": html_escape(hardwareName),
+            "displayName": html_escape(displayName),
+            "hardwareMake": getHardwareMakeBackend(html_escape(hardwareMake)),
+            "hardwareType": getHardwareTypeBackend(html_escape(hardwareType)),
+            "multiplier": html_escape(multiplier),
+            "averagePpd": html_escape(averagePpd),
         }
     )
 
@@ -81,12 +81,12 @@ function updateHardware() {
 
     var requestData = JSON.stringify(
         {
-            "hardwareName": escape(hardwareName),
-            "displayName": escape(displayName),
-            "hardwareMake": getHardwareMakeBackend(escape(hardwareMake)),
-            "hardwareType": getHardwareTypeBackend(escape(hardwareType)),
-            "multiplier": escape(multiplier),
-            "averagePpd": escape(averagePpd),
+            "hardwareName": html_escape(hardwareName),
+            "displayName": html_escape(displayName),
+            "hardwareMake": getHardwareMakeBackend(html_escape(hardwareMake)),
+            "hardwareType": getHardwareTypeBackend(html_escape(hardwareType)),
+            "multiplier": html_escape(multiplier),
+            "averagePpd": html_escape(averagePpd),
         }
     )
 
@@ -190,9 +190,9 @@ function createTeam() {
 
     var requestData = JSON.stringify(
         {
-            "teamName": escape(teamName),
-            "teamDescription": escape(teamDescription),
-            "forumLink": escape(forumLink)
+            "teamName": html_escape(teamName),
+            "teamDescription": html_escape(teamDescription),
+            "forumLink": html_escape(forumLink)
         }
     )
 
@@ -238,9 +238,9 @@ function updateTeam() {
 
     var requestData = JSON.stringify(
         {
-            "teamName": escape(teamName),
-            "teamDescription": escape(teamDescription),
-            "forumLink": escape(forumLink)
+            "teamName": html_escape(teamName),
+            "teamDescription": html_escape(teamDescription),
+            "forumLink": html_escape(forumLink)
         }
     )
 
@@ -360,15 +360,15 @@ function createUser() {
 
                     var requestData = JSON.stringify(
                         {
-                            "foldingUserName": escape(foldingUserName),
-                            "displayName": escape(displayName),
-                            "passkey": escape(passkey),
-                            "category": getCategoryBackend(escape(category)),
-                            "profileLink": escape(profileLink),
-                            "liveStatsLink": escape(liveStatsLink),
-                            "hardwareId": escape(hardwareId),
-                            "teamId": escape(teamId),
-                            "userIsCaptain": escape(isCaptain)
+                            "foldingUserName": html_escape(foldingUserName),
+                            "displayName": html_escape(displayName),
+                            "passkey": html_escape(passkey),
+                            "category": getCategoryBackend(html_escape(category)),
+                            "profileLink": html_escape(profileLink),
+                            "liveStatsLink": html_escape(liveStatsLink),
+                            "hardwareId": html_escape(hardwareId),
+                            "teamId": html_escape(teamId),
+                            "userIsCaptain": html_escape(isCaptain)
                         }
                     )
 
@@ -446,15 +446,15 @@ function updateUser() {
 
                     var requestData = JSON.stringify(
                         {
-                            "foldingUserName": escape(foldingUserName),
-                            "displayName": escape(displayName),
-                            "passkey": escape(passkey),
-                            "category": getCategoryBackend(escape(category)),
-                            "profileLink": escape(profileLink),
-                            "liveStatsLink": escape(liveStatsLink),
-                            "hardwareId": escape(hardwareId),
-                            "teamId": escape(teamId),
-                            "userIsCaptain": escape(isCaptain)
+                            "foldingUserName": html_escape(foldingUserName),
+                            "displayName": html_escape(displayName),
+                            "passkey": html_escape(passkey),
+                            "category": getCategoryBackend(html_escape(category)),
+                            "profileLink": html_escape(profileLink),
+                            "liveStatsLink": html_escape(liveStatsLink),
+                            "hardwareId": html_escape(hardwareId),
+                            "teamId": html_escape(teamId),
+                            "userIsCaptain": html_escape(isCaptain)
                         }
                     )
 
@@ -582,8 +582,8 @@ function offsetUser() {
 
             var requestData = JSON.stringify(
                 {
-                    "multipliedPointsOffset": escape(offsetPoints),
-                    "unitsOffset": escape(offsetUnits)
+                    "multipliedPointsOffset": html_escape(offsetPoints),
+                    "unitsOffset": html_escape(offsetUnits)
                 }
             )
 
@@ -654,12 +654,12 @@ function createUserChange() {
 
             var requestData = JSON.stringify(
                 {
-                    "userId": escape(userId),
-                    "existingPasskey": escape(existingPasskey),
-                    "foldingUserName": escape(foldingUserName),
-                    "passkey": escape(passkey),
-                    "liveStatsLink": escape(liveStatsLink),
-                    "hardwareId": escape(hardwareId),
+                    "userId": html_escape(userId),
+                    "existingPasskey": html_escape(existingPasskey),
+                    "foldingUserName": html_escape(foldingUserName),
+                    "passkey": html_escape(passkey),
+                    "liveStatsLink": html_escape(liveStatsLink),
+                    "hardwareId": html_escape(hardwareId),
                     "immediate": immediate
                 }
             )

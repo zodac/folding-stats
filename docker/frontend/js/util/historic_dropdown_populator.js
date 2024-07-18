@@ -36,7 +36,7 @@ function populateUserDropdown(dropdownId) {
                 userButton.setAttribute("class", "dropdown-item")
                 userButton.setAttribute("type", "button")
 
-                var userDisplayNameWithoutQuotes = escape(userItem['displayName'])
+                var userDisplayNameWithoutQuotes = html_escape(userItem['displayName'])
                 userButton.setAttribute("onclick", "getUserHistoricStats(" + userItem['id'] + ",'" + userDisplayNameWithoutQuotes + "',null,null,null,null)")
                 userButton.innerHTML = userItem['displayName']
 
@@ -63,7 +63,7 @@ function populateTeamDropdown() {
                 teamButton.setAttribute("class", "dropdown-item")
                 teamButton.setAttribute("type", "button")
 
-                var teamNameWithoutQuotes = escape(teamItem['teamName'])
+                var teamNameWithoutQuotes = html_escape(teamItem['teamName'])
                 teamButton.setAttribute("onclick", "getTeamHistoricStats(" + teamItem['id'] + ",'" + teamNameWithoutQuotes + "',null,null,null,null)")
                 teamButton.innerHTML = teamItem['teamName']
 
