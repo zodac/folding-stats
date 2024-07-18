@@ -3,7 +3,7 @@ ARG MINIFY_VERSION
 ARG NODE_VERSION
 FROM node:${NODE_VERSION}-alpine AS raml
 # Install raml2html
-RUN npm install --ignore-scripts -g raml2html
+RUN npm install --ignore-scripts -g raml2html@7.8.0
 
 ARG REST_ENDPOINT_URL
 ARG TITLE

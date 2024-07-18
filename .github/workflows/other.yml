@@ -40,7 +40,7 @@ jobs:
           node-version: '22.4.0'
 
       - name: Install StyleLint
-        run: npm install -g stylelint stylelint-config-standard
+        run: npm install -g stylelint@16.7.0 stylelint-config-standard@36.0.1
 
       - name: Run StyleLint
         run: stylelint --config ./ci/other/.stylelintrc.json --formatter json --max-warnings 0 --output-file stylelint-report.json "docker/frontend/css/*.css" || true
