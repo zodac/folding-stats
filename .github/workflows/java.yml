@@ -28,7 +28,7 @@ jobs:
 
       - name: Fetch all commits & tags
         run: |
-          git fetch --unshallow --tags && \
+          git fetch --prune --depth=10000 && \
           git fetch --prune --unshallow --tags
 
       - name: Set up JDK 22
