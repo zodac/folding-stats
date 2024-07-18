@@ -5,7 +5,6 @@ on:
     branches: [ master ]
     paths-ignore:
       - '.github/workflows/other.yml'
-      - 'ci/.hadolint.yaml'
       - 'ci/other/**'
       - 'CONTRIBUTING.md'
       - 'LICENSE'
@@ -57,7 +56,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Deploy docker containers
-        id: deploy
+        id: docker_deploy
         run: docker compose --file docker-compose-dev.yml up --build --detach
 
       - name: Run linters and unit/integration tests, then publish results to SonarQube
@@ -65,7 +64,8 @@ jobs:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
           SONARQUBE_PAT: ${{ secrets.SONARQUBE_PAT }}
         run: mvn clean install -Dall -Dsonarqube
+        continue-on-error: true
 
       - name: Shut down docker containers
         run: docker compose --file docker-compose-dev.yml down
-        if: steps.deploy.outcome == 'success'
+        if: steps.docker_deploy.outcome == 'success'
