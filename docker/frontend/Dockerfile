@@ -14,7 +14,7 @@ WORKDIR /docker/
 COPY ./docker/frontend/raml/ /docker/apache/raml/
 
 # Replace environment arguments in RAML files, then build RAML output HTML
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 RUN grep -rl '%REST_ENDPOINT_URL%' . | xargs sed -i "s|%REST_ENDPOINT_URL%|${REST_ENDPOINT_URL}|g" && \
     grep -rl '%TITLE%' . | xargs sed -i "s|%TITLE%|${TITLE}|g" && \
     raml2html --input /docker/apache/raml/api.raml --output /docker/apache/api.html
@@ -32,7 +32,7 @@ COPY ./docker/frontend/css /docker/apache/css
 COPY ./docker/frontend/js /docker/apache/js
 
 # Replace environment arguments in JS files
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 RUN grep -rl '%REST_ENDPOINT_URL%' . | xargs sed -i "s|%REST_ENDPOINT_URL%|${REST_ENDPOINT_URL}|g" && \
     grep -rl '%UPDATE_ENABLED%' . | xargs sed -i "s|%UPDATE_ENABLED%|${UPDATE_ENABLED}|g"
 
@@ -103,7 +103,7 @@ ARG ROOT_URL
 ARG TITLE
 
 # Replace environment arguments in HTML files
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 RUN grep -rl '%FORUM_LINK%' . | xargs sed -i "s|%FORUM_LINK%|${FORUM_LINK}|g" && \
     grep -rl '%ROOT_URL%' . | xargs sed -i "s|%ROOT_URL%|${ROOT_URL}|g" && \
     grep -rl '%TITLE%' . | xargs sed -i "s|%TITLE%|${TITLE}|g"
