@@ -61,15 +61,16 @@ function updateTimer() {
         return
     }
 
-    currentDayOfMonth = new Date().getUTCDate()
+    const currentDayOfMonth = new Date().getUTCDate()
     const zeroPad = (num, places) => String(num).padStart(places, '0')
 
     // If within the update period, set the update value to the next UPDATE_MINUTE
     if (currentDayOfMonth >= parseInt(FIRST_DAY_OF_MONTH)) {
-        time = new Date()
-        secsRemaining = 3600 - (time.getUTCMinutes() - UPDATE_MINUTE) % 60 * 60 - time.getUTCSeconds()
-        minutes = Math.floor(secsRemaining / 60) % 60
-        seconds = secsRemaining % 60
+        let time = new Date()
+        let secsRemaining = 3600 - (time.getUTCMinutes() - UPDATE_MINUTE) % 60 * 60 - time.getUTCSeconds()
+        let minutes = Math.floor(secsRemaining / 60) % 60
+        let seconds = secsRemaining % 60
+
         document.getElementById("min-part").innerHTML = minutes
         document.getElementById("sec-part").innerHTML = zeroPad(seconds, 2)
 
@@ -77,10 +78,10 @@ function updateTimer() {
             showToast("toast-refresh", false)
         }
     } else { // If not within update period, set the update value to the FIRST_DAY_OF_MONTH
-        time = new Date()
-        var msToStart = Math.abs(time - Date.UTC(time.getUTCFullYear(), time.getUTCMonth(), FIRST_DAY_OF_MONTH))
-        var minutes = Math.floor(msToStart / 60000)
-        var seconds = Math.floor((msToStart % 60000) / 1000)
+        let time = new Date()
+        let msToStart = Math.abs(time - Date.UTC(time.getUTCFullYear(), time.getUTCMonth(), FIRST_DAY_OF_MONTH))
+        let minutes = Math.floor(msToStart / 60000)
+        let seconds = Math.floor((msToStart % 60000) / 1000)
 
         document.getElementById("min-part").innerHTML = minutes
         document.getElementById("sec-part").innerHTML = zeroPad(seconds, 2)
