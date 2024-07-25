@@ -24,6 +24,6 @@ jobs:
 
       - uses: DavidAnson/markdownlint-cli2-action@v16.0.0
         with:
-          config: 'doc/.markdownlint.json'
+          config: 'ci/doc/.markdownlint.json'
           globs: 'README.md,CONTRIBUTING.md'
           separator: ','
