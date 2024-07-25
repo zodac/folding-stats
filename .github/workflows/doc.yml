@@ -1,0 +1,29 @@
+name: Documentation CI
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - '.github/workflows/doc.yml'
+      - 'ci/doc/.markdownlint.json'
+      - 'CONTRIBUTING.md'
+      - 'README.md'
+
+jobs:
+  analyze:
+    name: Documentation Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.7
+
+      - uses: DavidAnson/markdownlint-cli2-action@v16.0.0
+        with:
+          config: 'doc/.markdownlint.json'
+          globs: 'README.md,CONTRIBUTING.md'
+          separator: ','

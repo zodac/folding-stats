@@ -89,11 +89,11 @@ ENV JAVA_HOME "/opt/jdk/"
 ENV PATH "${PATH}:${JAVA_HOME}/bin"
 
 # Updating system packages, and installing:
-# - nano to allow user to edit log4j2.xml (smaller than vi)
+# - vi to allow user to edit log4j2.xml
 # - wget to run healthcheck
 RUN --mount=type=cache,target=/var/cache/apt apt-get update && apt-get upgrade -y && \
     apt-get install -yqq --no-install-recommends \
-      nano \
+      vim \
       wget \
     && \
     apt-get autoremove && \

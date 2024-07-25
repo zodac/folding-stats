@@ -4,7 +4,9 @@ on:
   push:
     branches: [ master ]
     paths-ignore:
+      - '.github/workflows/doc.yml'
       - '.github/workflows/other.yml'
+      - 'ci/doc/**'
       - 'ci/other/**'
       - 'CONTRIBUTING.md'
       - 'LICENSE'

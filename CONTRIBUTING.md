@@ -1,5 +1,3 @@
-# !Work In Progress!
-
 # Developing folding-stats
 
 - [Java](#java)
@@ -29,15 +27,15 @@
 - [ProGuard Obfuscation](#proguard-obfuscation)
     - [Configuration](#configuration)
 
-# Java
+## Java
 
-# Docker
+## Docker
 
-## Containers
+### Containers
 
-# Database Management
+## Database Management
 
-## Adding Support for Another Database
+### Adding Support for Another Database
 
 Since the system is containerised, it is possible to swap out the default PostgreSQL DB for an alternative. The steps required for this are:
 
@@ -51,7 +49,7 @@ Since the system is containerised, it is possible to swap out the default Postgr
     - Update *DbManagerRetriever.java* with a new SWITCH condition for the DB name
     - Optionally, use the instructions in --> jooQ Database Access <-- to run jOOQ code generation for easier SQL query building
 
-## Database Querying With jOOQ
+### Database Querying With jOOQ
 
 We use **jOOQ** for generating PostgreSQL queries (as seen in *PostgresDbManager.java*). We use **jOOQ** code generation to generate files to make SQL
 query building simpler and able to conform to schemas. This requires a few steps when the DB changes:
@@ -65,46 +63,46 @@ query building simpler and able to conform to schemas. This requires a few steps
 
 Once this is done, it will be possible to reference the DB tables/fields/schema from *PostgresDbManager.java* to assist with SQL query generation.
 
-# Tests
+## Tests
 
-## Available Tests
+### Available Tests
 
-### Unit Tests
+#### Unit Tests
 
-### Integration Tests
+#### Integration Tests
 
-### Performance Tests
+#### Performance Tests
 
-#### Hardware
+##### Hardware
 
 | Test Case       | Number Of Users | Max Permitted Time |
 |-----------------|-----------------|--------------------|
 | GET All (empty) | 1               | 100ms              |
 
-### UI Tests
+#### UI Tests
 
-## Running Tests
+### Running Tests
 
-# Linters
+## Linters
 
-## Available Linters
+### Available Linters
 
-### CheckStyle
+#### CheckStyle
 
-### JavaDoc
+#### JavaDoc
 
-### License Check
+#### License Check
 
-### OWASP Dependency Check
+#### OWASP Dependency Check
 
-### PiTest
+#### PiTest
 
-### PMD
+#### PMD
 
-### SpotBugs
+#### SpotBugs
 
-## Running Linters
+### Running Linters
 
-# ProGuard Obfuscation
+## ProGuard Obfuscation
 
 ## Configuration
