@@ -54,13 +54,15 @@ In order to try and normalise scores across different hardware, each hardware is
 GPU or CPU is used as the base and given a multiplier of **1.00**. All other hardware has their multiplier calculated using the formula, rounded to
 two decimal places:
 
-    Average PPD of best GPU / Average PPD of current GPU
+```text
+Average PPD of best GPU / Average PPD of current GPU
+```
 
 Note that we will not compare CPUs to GPUs, but we *will* compare all makes of GPUs to other makes; nVidia and AMD GPUs, for example.
 
 The average PPDs for hardware is retrieved from the [LARS PPD Database](https://folding.lar.systems/).
 
----
+----
 
 ## Getting Started
 
@@ -100,8 +102,10 @@ There are four components to the system:
 These are all run as individual docker containers, and are configured by the `docker-compose.yml` file in the root of the repository. To start, you
 can run the commands:
 
-    cd ~/<GIT_HOME>/folding-stats
-    docker-compose up --build --detach
+```bash
+cd ~/<GIT_HOME>/folding-stats
+docker-compose up --build --detach
+```
 
 This will build and run the docker containers in the background. It will take a minute or so for the backend to come online. You
 can [check the status of the containers](#checking-container-status) to see if they are online.
@@ -268,7 +272,7 @@ When a user is updated and has their team changed (meaning they have been moved)
 their first team, and then added as a new user to their new team. So their old team will get a "Retired User" with the moved user's current stats, and
 the new team will get the user with 0 stats.
 
----
+----
 
 ## Troubleshooting
 
@@ -283,40 +287,40 @@ please try again using Google Chrome.
 
 To check the status of any containers, the following command can be used:
 
-    ```bash
-    docker ps -a
-    ```
+```bash
+docker ps -a
+```
 
 This will show any docker containers (running and stopped) on the system and their status. When the system first comes online, you should see the
 following:
 
-    ```bash
-    CONTAINER ID   IMAGE                      COMMAND                  CREATED                  STATUS                            PORTS                                           NAMES
-    6d314cbbb902   folding-stats_frontend     "httpd-foreground"       Less than a second ago   Up Less than a second             80/tcp, 0.0.0.0:443->443/tcp, :::443->443/tcp   frontend
-    a7b722f8a178   folding-stats_backend      "/startup.sh"            2 seconds ago            Up 1 second (health: starting)    0.0.0.0:8443->8443/tcp, :::8443->8443/tcp       backend
-    312f5f61ec87   folding-stats_database     "docker-entrypoint.s…"   3 seconds ago            Up 3 seconds (health: starting)   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp       database
-    ```
+```bash
+CONTAINER ID   IMAGE                      COMMAND                  CREATED                  STATUS                            PORTS                                           NAMES
+6d314cbbb902   folding-stats_frontend     "httpd-foreground"       Less than a second ago   Up Less than a second             80/tcp, 0.0.0.0:443->443/tcp, :::443->443/tcp   frontend
+a7b722f8a178   folding-stats_backend      "/startup.sh"            2 seconds ago            Up 1 second (health: starting)    0.0.0.0:8443->8443/tcp, :::8443->8443/tcp       backend
+312f5f61ec87   folding-stats_database     "docker-entrypoint.s…"   3 seconds ago            Up 3 seconds (health: starting)   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp       database
+```
 
 (Note that your `CONTAINER ID` value will be different.)
 
 Pay attention to the `STATUS` value. When the system first comes online, the `backend` and `database` containers will take a minute or two to start
 up, as seen by the value **health: starting**. Once they are successfully online, the `STATUS` will change to:
 
-    ```bash
-    CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS                   PORTS                                           NAMES
-    7092e5a354eb   folding-stats_frontend     "httpd-foreground"       17 hours ago   Up 17 hours             80/tcp, 0.0.0.0:443->443/tcp, :::443->443/tcp   frontend
-    6d2128137d5a   folding-stats_backend      "/startup.sh"            17 hours ago   Up 17 hours (healthy)   0.0.0.0:8443->8443/tcp, :::8443->8443/tcp       backend
-    e713645e6a43   folding-stats_database     "docker-entrypoint.s…"   17 hours ago   Up 17 hours (healthy)   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp       database
-    ```
+```bash
+CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS                   PORTS                                           NAMES
+7092e5a354eb   folding-stats_frontend     "httpd-foreground"       17 hours ago   Up 17 hours             80/tcp, 0.0.0.0:443->443/tcp, :::443->443/tcp   frontend
+6d2128137d5a   folding-stats_backend      "/startup.sh"            17 hours ago   Up 17 hours (healthy)   0.0.0.0:8443->8443/tcp, :::8443->8443/tcp       backend
+e713645e6a43   folding-stats_database     "docker-entrypoint.s…"   17 hours ago   Up 17 hours (healthy)   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp       database
+```
 
 However, if one or more of the containers has stopped, you may see a container marked as **Exited**:
 
-    ```bash
-    CONTAINER ID   IMAGE                        COMMAND                  CREATED         STATUS                             PORTS                                           NAMES
-    7092e5a354eb   folding-stats_frontend     "httpd-foreground"       17 hours ago   Up 17 hours                           80/tcp, 0.0.0.0:443->443/tcp, :::443->443/tcp   frontend
-    6d2128137d5a   folding-stats_backend      "/startup.sh"            17 hours ago   Up 17 hours (healthy)                 0.0.0.0:8443->8443/tcp, :::8443->8443/tcp       backend
-    e713645e6a43   folding-stats_database     "docker-entrypoint.s…"   17 hours ago   Up 17 hours (healthy)                 0.0.0.0:5432->5432/tcp, :::5432->5432/tcp       database
-    ```
+```bash
+CONTAINER ID   IMAGE                        COMMAND                  CREATED         STATUS                             PORTS                                           NAMES
+7092e5a354eb   folding-stats_frontend     "httpd-foreground"       17 hours ago   Up 17 hours                           80/tcp, 0.0.0.0:443->443/tcp, :::443->443/tcp   frontend
+6d2128137d5a   folding-stats_backend      "/startup.sh"            17 hours ago   Up 17 hours (healthy)                 0.0.0.0:8443->8443/tcp, :::8443->8443/tcp       backend
+e713645e6a43   folding-stats_database     "docker-entrypoint.s…"   17 hours ago   Up 17 hours (healthy)                 0.0.0.0:5432->5432/tcp, :::5432->5432/tcp       database
+```
 
 #### Restarting Containers
 
@@ -325,17 +329,17 @@ the database content in a docker volume, any stats will be retained through a re
 
 To stop any remaining containers, execute the following command (in the `folding-stats` root directory):
 
-    ```bash
-    docker compose down
-    ```
+```bash
+docker compose down
+```
 
 And to bring the containers back online, execute the command:
 
-    ```bash
-    docker compose up --build --detach
-    ```
+```bash
+docker compose up --build --detach
+```
 
----
+----
 
 ### Errors Performing Admin Functions
 
@@ -373,27 +377,27 @@ The logs are rotated each day, where each previous day's logs will be zipped and
 For additional information to debug issues, we can change the log level from **INFO** to **DEBUG** or **TRACE**. This requires us to connect to
 the `backend` container:
 
-    ```bash
-    docker exec -it backend bash
-    ```
+```bash
+docker exec -it backend bash
+```
 
 We can now edit the */var/backend/log4j2.xml.xml* configuration for our logging. You can use the available `vi` command:
 
-    ```bash
-    vi /var/backend/log4j2.xml
-    ```
+```bash
+vi /var/backend/log4j2.xml
+```
 
 We can change the log level printed to the server.log and console by updating this line:
 
-    ```xml
-    <root level="INFO">
-    ```
+```xml
+<root level="INFO">
+```
 
 to:
 
-    ```xml
-    <root level="DEBUG">
-    ```
+```xml
+<root level="DEBUG">
+```
 
 Save and exit the `vi` editor. After 60 seconds, re-run the failing use-case and the log level will be changed. Remember to reset the log level back
 to **INFO** when finished to avoid the logs getting too large.
@@ -409,38 +413,38 @@ container. We can then copy the file from the container to the host system.
 
 For example, first check the available volumes:
 
-    ```bash
-    $ docker volume ls
-    DRIVER    VOLUME NAME
-    local     folding-stats_backend_certs
-    local     folding-stats_backend_logs
-    local     folding-stats_database_content
-    ```
+```bash
+$ docker volume ls
+DRIVER    VOLUME NAME
+local     folding-stats_backend_certs
+local     folding-stats_backend_logs
+local     folding-stats_database_content
+```
 
 Then create a simple container, attaching the `folding-stats_backend_logs` volume (in read-only mode):
 
-    ```bash
-    docker container create --name dummy -v folding-stats_backend_logs:/root:ro folding-stats_backend
-    ```
+```bash
+docker container create --name dummy -v folding-stats_backend_logs:/root:ro folding-stats_backend
+```
 
 We can then copy the logs from the `dummy` container to our local machine:
 
-    ```bash
-    docker cp dummy:/root/audit.log ./audit.log
-    docker cp dummy:/root/lars.log ./lars.log
-    docker cp dummy:/root/security.log ./security.log
-    docker cp dummy:/root/server.log ./server.log
-    docker cp dummy:/root/sql.log ./sql.log
-    docker cp dummy:/root/stats.log ./stats.log
-    ```
+```bash
+docker cp dummy:/root/audit.log ./audit.log
+docker cp dummy:/root/lars.log ./lars.log
+docker cp dummy:/root/security.log ./security.log
+docker cp dummy:/root/server.log ./server.log
+docker cp dummy:/root/sql.log ./sql.log
+docker cp dummy:/root/stats.log ./stats.log
+```
 
 And finally remove the `dummy` container:
 
-    ```bash
-    docker rm dummy
-    ```
+```bash
+docker rm dummy
+```
 
----
+----
 
 ### Backup And Restore Of Database
 
@@ -449,37 +453,37 @@ onto the new/remade environment. Please note that the instructions below are for
 
 To take a backup of the database, the following commands can be run against the `database` container:
 
-    ```bash
-    docker exec database pg_dump -U folding_user -F t folding_db -f export.tar
-    docker cp database:/export.tar ~/export_$(date +%F).tar
-    ```
+```bash
+docker exec database pg_dump -U folding_user -F t folding_db -f export.tar
+docker cp database:/export.tar ~/export_$(date +%F).tar
+```
 
 The first line will create a backup of the DB in the `database` container, and the second will copy it out to the host.
 
 Assuming a backup was previously created, it can be restored using the following commands against the `database`
 container:
 
-    ```bash
-    docker cp ~/export_<TIMESTAMP>.tar database:/export.tar
-    docker exec database pg_restore -d folding_db export.tar -c -U folding_user
-    ```
+```bash
+docker cp ~/export_<TIMESTAMP>.tar database:/export.tar
+docker exec database pg_restore -d folding_db export.tar -c -U folding_user
+```
 
 The first line will copy the backup from the host to the `database` container, and the second will restore the DB using the *export.tar* file.
 
----
+----
 
 ## Contributing
 
 Would you like to contribute? [Check here](./CONTRIBUTING.md) for details on how.
 
----
+----
 
 ## Contact Us
 
 We are currently running the competition over at [ExtremeHW](https://extremehw.net/forum/125-extreme-team-folding/), so you can get in touch
 with us over there.
 
----
+----
 
 ## License
 
