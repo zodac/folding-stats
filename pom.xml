@@ -52,9 +52,9 @@
         <resilience4j.version>2.2.0</resilience4j.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <spring-boot.version>3.3.1</spring-boot.version>
-        <springdoc-openapi.version>2.6.0</springdoc-openapi.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.6.0</springdoc-openapi-starter-webmvc-ui.version>
         <slf4j-api.version>2.0.13</slf4j-api.version>
-        <swagger.version>2.2.22</swagger.version>
+        <swagger-annotations-jakarta.version>2.2.22</swagger-annotations-jakarta.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.26.0</assertj-core.version>
@@ -169,6 +169,13 @@
                         <artifactId>error_prone_annotations</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <!-- Included so the dependency is picked up by 'mvn versions:update-properties', not actually used -->
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_core</artifactId>
+                <version>${error_prone_core.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>com.google.code.gson</groupId>
