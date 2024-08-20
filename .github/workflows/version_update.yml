@@ -1,24 +1,13 @@
-name: Java CI
+name: Versions Update
 
 on:
-  push:
-    branches: [ master ]
-    paths-ignore:
-      - '.github/workflows/doc.yml'
-      - '.github/workflows/other.yml'
-      - '.github/workflows/version_update.yml'
-      - 'ci/doc/**'
-      - 'ci/other/**'
-      - 'CONTRIBUTING.md'
-      - 'LICENSE'
-      - 'README.md'
   schedule:
-    # Run once a week to check for new CVEs
-    - cron: '15 0 * * 0'
+    # Run once on the first of the month
+    - cron: '45 0 1 * *'
 
 jobs:
-  analyze:
-    name: Java Analysis
+  update:
+    name: Versions Update
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -62,12 +51,27 @@ jobs:
         id: docker_deploy
         run: docker compose --file docker-compose-dev.yml up --build --detach
 
-      - name: Run linters and unit/integration tests, then publish results to SonarQube
+      - name: Update Maven project versions
+        run: mvn versions:update-properties
+
+      - name: Run tests and build
+        run: mvn clean install -Dall
+
+      - name: Run linters and unit/integration tests
+        id: application_tests
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-          SONARQUBE_PAT: ${{ secrets.SONARQUBE_PAT }}
-        run: mvn clean install -Dall -Dsonarqube
+        run: mvn clean install -Dall
         continue-on-error: true
+
+      - name: Commit and push changes
+        if: steps.application_tests.outcome == 'success'
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add .
+          git commit -m 'Updating versions'
+          git push
 
       - name: Shut down docker containers
         run: docker compose --file docker-compose-dev.yml down
