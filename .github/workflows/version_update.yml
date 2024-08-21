@@ -1,6 +1,10 @@
 name: Versions Update
 
 on:
+  push:
+    branches: [ master ]
+    paths:
+      - '.github/workflows/version_update.yml'
   schedule:
     # Run once on the first of the month
     - cron: '45 0 1 * *'
