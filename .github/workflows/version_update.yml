@@ -52,22 +52,20 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Deploy docker containers
-        id: docker_deploy
-        run: docker compose --file docker-compose-dev.yml up --build --detach
+        uses: hoverkraft-tech/compose-action@v2.0.1
+        with:
+          compose-file: docker-compose-dev.yml
 
       - name: Update Maven project versions
         run: mvn versions:update-properties
 
       - name: Run linters and unit/integration tests
-        id: application_tests
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: mvn clean install -Dall
-        continue-on-error: true
 
       - name: Commit changes
         id: change_commit
-        if: steps.application_tests.outcome == 'success'
         run: |
           git config user.name github-actions
           git config user.email "actions@github.com"
@@ -76,11 +74,6 @@ jobs:
 
       - name: Push changes
         uses: ad-m/github-push-action@v0.8.0
-        if: steps.change_commit.outcome == 'success'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: master
-
-      - name: Shut down docker containers
-        run: docker compose --file docker-compose-dev.yml down
-        if: steps.docker_deploy.outcome == 'success'
