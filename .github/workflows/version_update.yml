@@ -58,9 +58,6 @@ jobs:
       - name: Update Maven project versions
         run: mvn versions:update-properties
 
-      - name: Run tests and build
-        run: mvn clean install -Dall
-
       - name: Run linters and unit/integration tests
         id: application_tests
         env:
