@@ -52,23 +52,19 @@ jobs:
           java-version: '22'
           maven-version: '3.9.8'
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3.2.0
-        with:
-          username: ${{ vars.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+#      - name: Log in to Docker Hub
+#        uses: docker/login-action@v3.2.0
+#        with:
+#          username: ${{ vars.DOCKER_USERNAME }}
+#          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Deploy docker containers
-        id: docker_deploy
-        run: docker compose --file docker-compose-dev.yml up --build --detach
+        uses: hoverkraft-tech/compose-action@v2.0.1
+        with:
+          compose-file: docker-compose-dev.yml
 
       - name: Run linters and unit/integration tests, then publish results to SonarQube
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
           SONARQUBE_PAT: ${{ secrets.SONARQUBE_PAT }}
         run: mvn clean install -Dall -Dsonarqube
-        continue-on-error: true
-
-      - name: Shut down docker containers
-        run: docker compose --file docker-compose-dev.yml down
-        if: steps.docker_deploy.outcome == 'success'
