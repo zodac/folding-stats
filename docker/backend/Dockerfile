@@ -83,7 +83,12 @@ FROM debian:${DEBIAN_VERSION}-slim AS spring_base
 COPY --from=jdk_builder /opt/jdk /opt/jdk
 COPY --from=application_builder /folding-stats.jar /folding-stats.jar
 COPY ./docker/backend/scripts/startup.sh /startup.sh
-COPY ./docker/backend/config/log4j2.xml /var/backend/log4j2.xml
+
+# Create non-root user, make owner of log directory
+RUN useradd -ms /bin/bash backend_user && \
+    mkdir --parents /var/backend/logs && \
+    chown -R backend_user:backend_user /var/backend/logs
+COPY --chown=backend_user:backend_user ./docker/backend/config/log4j2.xml /var/backend/log4j2.xml
 
 ENV JAVA_HOME "/opt/jdk/"
 ENV PATH "${PATH}:${JAVA_HOME}/bin"
@@ -105,10 +110,6 @@ COPY --from=cert_builder /usr/local/certs/stats/folding-stats.p12 /usr/local/cer
 COPY --from=cert_builder /usr/local/certs/stats/folding-stats.crt /usr/local/certs/stats/folding-stats.crt
 COPY --from=cert_builder /usr/local/certs/stats/folding-stats.key /usr/local/certs/stats/folding-stats.key
 
-# Create non-root user, make owner of log directory
-RUN useradd -ms /bin/bash backend_user && \
-    mkdir --parents /var/backend/logs && \
-    chown -R backend_user:backend_user /var/backend/logs
 USER backend_user
 
 # Set default directory to the log directory
