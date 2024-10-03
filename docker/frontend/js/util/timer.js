@@ -67,7 +67,7 @@ function updateTimer() {
 
     // If within the update period, set the update value to the next UPDATE_MINUTE
     if (currentDayOfMonth >= parseInt(FIRST_DAY_OF_MONTH)) {
-        let secsRemaining = SECONDS_IN_HOUR - (now.getUTCMinutes() - UPDATE_MINUTE) % SECONDS_IN_HOUR - time.getUTCSeconds()
+        let secsRemaining = SECONDS_IN_HOUR - (now.getUTCMinutes() - UPDATE_MINUTE) % SECONDS_IN_HOUR - now.getUTCSeconds()
         let minutes = Math.floor(secsRemaining / SECONDS_IN_MINUTE) % SECONDS_IN_MINUTE
         let seconds = secsRemaining % SECONDS_IN_MINUTE
 
