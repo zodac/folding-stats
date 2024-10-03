@@ -11,9 +11,9 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         # Docker image versions
-        HTTPD_VERSION: "2.4"        # https://hub.docker.com/_/httpd/tags
+        HTTPD_VERSION: "2.4.62"     # https://hub.docker.com/_/httpd/tags
         MINIFY_VERSION: "v2.20.37"  # https://hub.docker.com/r/tdewolff/minify/tags
-        NODE_VERSION: "22.4.0"      # https://hub.docker.com/_/node/tags
+        NODE_VERSION: "22.9.0"      # https://hub.docker.com/_/node/tags
         # Build arguments
         ADMIN_EMAIL_ADDRESS: "email@test.com"
         FORUM_LINK: "https://extremehw.net/forum/125-extreme-team-folding"
@@ -39,9 +39,9 @@ services:
       dockerfile: docker/backend/Dockerfile
       args:
         # Docker image versions
-        DEBIAN_VERSION: "12.6"    # https://hub.docker.com/_/debian/tags
-        JAVA_VERSION: "22.0.1_8"  # https://hub.docker.com/_/eclipse-temurin/tags
-        MAVEN_VERSION: "3.9.8"    # https://hub.docker.com/_/maven/tags
+        DEBIAN_VERSION: "12.7"    # https://hub.docker.com/_/debian/tags
+        JAVA_VERSION: "22.0.2_9"  # https://hub.docker.com/_/eclipse-temurin/tags
+        MAVEN_VERSION: "3.9.9"    # https://hub.docker.com/_/maven/tags
         # Build arguments
         KEYSTORE_PASSWORD: "shroot"
     container_name: backend_dev
@@ -92,7 +92,7 @@ services:
       dockerfile: docker/database/Dockerfile
       args:
         # Docker image versions
-        POSTGRES_VERSION: "16.3" # https://hub.docker.com/_/postgres/tags
+        POSTGRES_VERSION: "17.0" # https://hub.docker.com/_/postgres/tags
         # Build arguments
         ADMIN_USERNAME: "root"
         ADMIN_PASSWORD: "shroot"
@@ -117,9 +117,8 @@ services:
     ports:
       - "5433:5432"
     restart: "no"
-
   selenium_chrome:
-    image: selenium/standalone-chrome:126.0
+    image: selenium/standalone-chrome:129.0
     container_name: selenium_chrome
     hostname: selenium_chrome
     depends_on:
@@ -131,7 +130,7 @@ services:
     restart: "no"
 
   selenium_firefox:
-    image: selenium/standalone-firefox:127.0
+    image: selenium/standalone-firefox:130.0
     container_name: selenium_firefox
     hostname: selenium_firefox
     depends_on:

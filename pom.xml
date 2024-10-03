@@ -20,7 +20,7 @@
         <!-- Project Properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java-release>22</java-release>
-        <maven-release>3.9.8</maven-release>
+        <maven-release>3.9.9</maven-release>
 
         <!-- Lint Properties -->
         <!-- All disabled by default, activated through profiles -->
@@ -42,27 +42,27 @@
         <!-- 3PP Versions -->
         <caffeine.version>3.1.8</caffeine.version>
         <gson.version>2.11.0</gson.version>
-        <hikariCP.version>5.1.0</hikariCP.version>
+        <hikariCP.version>6.0.0</hikariCP.version>
         <jakarta.jakartaee-web-api.version>10.0.0</jakarta.jakartaee-web-api.version>
         <jersey-server.version>3.1.8</jersey-server.version>
-        <jooq.version>3.19.11</jooq.version>
-        <log4j.version>2.23.1</log4j.version>
+        <jooq.version>3.19.13</jooq.version>
+        <log4j.version>2.24.1</log4j.version>
         <lombok.version>1.18.34</lombok.version>
         <postgresql.version>42.7.4</postgresql.version>
         <resilience4j.version>2.2.0</resilience4j.version>
         <snakeyaml.version>2.3</snakeyaml.version>
-        <spring-boot.version>3.3.3</spring-boot.version>
+        <spring-boot.version>3.3.4</spring-boot.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.6.0</springdoc-openapi-starter-webmvc-ui.version>
         <slf4j-api.version>2.0.16</slf4j-api.version>
-        <swagger-annotations-jakarta.version>2.2.23</swagger-annotations-jakarta.version>
+        <swagger-annotations-jakarta.version>2.2.25</swagger-annotations-jakarta.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.26.3</assertj-core.version>
         <embedded-postgres.version>2.0.7</embedded-postgres.version>
-        <embedded-postgres-binaries-bom.version>16.4.0</embedded-postgres-binaries-bom.version>
-        <flyway-core.version>10.17.2</flyway-core.version>
-        <junit-bom.version>5.11.0</junit-bom.version>
-        <selenium-java.version>4.24.0</selenium-java.version>
+        <embedded-postgres-binaries-bom.version>17.0.0</embedded-postgres-binaries-bom.version>
+        <flyway-core.version>10.19.0</flyway-core.version>
+        <junit-bom.version>5.11.1</junit-bom.version>
+        <selenium-java.version>4.25.0</selenium-java.version>
 
         <!-- Plugin Versions -->
         <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
@@ -82,23 +82,23 @@
         <versions-maven-plugin.version>2.17.1</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>10.18.1</checkstyle.version>
-        <error_prone_core.version>2.31.0</error_prone_core.version>
+        <checkstyle.version>10.18.2</checkstyle.version>
+        <error_prone_core.version>2.33.0</error_prone_core.version>
         <licenses.version>1</licenses.version>
-        <nullaway.version>0.11.2</nullaway.version>
+        <nullaway.version>0.11.3</nullaway.version>
         <pitest-junit5-plugin.version>1.2.1</pitest-junit5-plugin.version>
-        <pmd.version>7.5.0</pmd.version>
+        <pmd.version>7.6.0</pmd.version>
         <spotbugs.version>4.8.6</spotbugs.version>
 
         <!-- Linter Plugin Versions -->
-        <dependency-check-maven.version>10.0.3</dependency-check-maven.version>
-        <license-maven-plugin.version>4.5</license-maven-plugin.version>
+        <dependency-check-maven.version>10.0.4</dependency-check-maven.version>
+        <license-maven-plugin.version>4.6</license-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.5.0</maven-checkstyle-plugin.version>
-        <maven-javadoc-plugin.version>3.10.0</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.10.1</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.25.0</maven-pmd-plugin.version>
-        <pitest-maven.version>1.16.2</pitest-maven.version>
+        <pitest-maven.version>1.17.0</pitest-maven.version>
         <sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
-        <spotbugs-maven-plugin.version>4.8.6.2</spotbugs-maven-plugin.version>
+        <spotbugs-maven-plugin.version>4.8.6.4</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, files are only used in child modules -->
@@ -123,7 +123,7 @@
         <spotbugs-exclude-file>${ci-config-directory}/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
 
         <!-- ProGuard 3PP Versions -->
-        <proguard-base.version>7.5.0</proguard-base.version>
+        <proguard-base.version>7.6.0</proguard-base.version>
         <proguard-core.version>9.1.6</proguard-core.version>
 
         <!-- ProGuard Plugin Versions -->

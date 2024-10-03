@@ -53,10 +53,12 @@ public class UserStatsStorer {
     /**
      * Stores the {@link MonthlyResult} for the current {@link java.time.ZoneOffset#UTC} date-time.
      *
-     * <p> The {@link MonthlyResult} will be generated using {@link LeaderboardStatsGenerator#generateTeamLeaderboards()} and
+     * <p>
+     * The {@link MonthlyResult} will be generated using {@link LeaderboardStatsGenerator#generateTeamLeaderboards()} and
      * {@link LeaderboardStatsGenerator#generateUserCategoryLeaderboards()}.
      *
-     * <p> The JSON output will be in the form:
+     * <p>
+     * The JSON output will be in the form:
      * <pre>
      * {
      *   "teamLeaderboard": [
