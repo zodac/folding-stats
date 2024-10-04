@@ -19,10 +19,3 @@ const MILLISECONDS_IN_SECOND = 1000
 const MINUTES_IN_HOUR = 60
 const SECONDS_IN_HOUR = SECONDS_IN_MINUTE * MINUTES_IN_HOUR
 const MILLISECONDS_IN_MINUTE = SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND
-
-/**
- * Converts the given milliseconds to minutes. Truncates any seconds/milliseconds left over.
- */
-function millisAsMinutes(millis) {
-    return Math.floor(millis / MILLISECONDS_IN_MINUTE)
-}
