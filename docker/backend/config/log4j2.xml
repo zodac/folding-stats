@@ -2,6 +2,7 @@
 <Configuration monitorInterval="60">
     <Properties>
         <Property name="LOG_DIRECTORY">/var/backend/logs</Property>
+        <Property name="ROLLOVER_LOG_FILE_EXTENSION">log.gz</Property>
     </Properties>
 
     <Appenders>
@@ -12,7 +13,7 @@
         <!-- General application log -->
         <RollingFile name="SERVER_LOG"
                      fileName="${LOG_DIRECTORY}/server.log"
-                     filePattern="${LOG_DIRECTORY}/server.log-%d{yyyy-MM-dd}-%i.log.gz">
+                     filePattern="${LOG_DIRECTORY}/server.log-%d{yyyy-MM-dd}-%i.${ROLLOVER_LOG_FILE_EXTENSION}">
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-55logger{55}] %msg%n</Pattern>
             </PatternLayout>
@@ -31,7 +32,7 @@
         <!-- Log for login/authentication requests -->
         <RollingFile name="SECURITY_LOG"
                      fileName="${LOG_DIRECTORY}/security.log"
-                     filePattern="${LOG_DIRECTORY}/security.log-%d{yyyy-MM-dd}-%i.log.gz">
+                     filePattern="${LOG_DIRECTORY}/security.log-%d{yyyy-MM-dd}-%i.${ROLLOVER_LOG_FILE_EXTENSION}">
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-8logger{8}] %msg%n</Pattern>
             </PatternLayout>
@@ -50,7 +51,7 @@
         <!-- Log for REST requests -->
         <RollingFile name="AUDIT_LOG"
                      fileName="${LOG_DIRECTORY}/audit.log"
-                     filePattern="${LOG_DIRECTORY}/audit.log-%d{yyyy-MM-dd}-%i.log.gz">
+                     filePattern="${LOG_DIRECTORY}/audit.log-%d{yyyy-MM-dd}-%i.${ROLLOVER_LOG_FILE_EXTENSION}">
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-5logger{5}] %msg%n</Pattern>
             </PatternLayout>
@@ -69,7 +70,7 @@
         <!-- Log for SQL queries -->
         <RollingFile name="SQL_LOG"
                      fileName="${LOG_DIRECTORY}/sql.log"
-                     filePattern="${LOG_DIRECTORY}/sql.log-%d{yyyy-MM-dd}-%i.log.gz">
+                     filePattern="${LOG_DIRECTORY}/sql.log-%d{yyyy-MM-dd}-%i.${ROLLOVER_LOG_FILE_EXTENSION}">
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-3logger{3}] %msg%n</Pattern>
             </PatternLayout>
@@ -88,7 +89,7 @@
         <!-- Log for stats retrieval -->
         <RollingFile name="STATS_LOG"
                      fileName="${LOG_DIRECTORY}/stats.log"
-                     filePattern="${LOG_DIRECTORY}/stats.log-%d{yyyy-MM-dd}-%i.log.gz">
+                     filePattern="${LOG_DIRECTORY}/stats.log-%d{yyyy-MM-dd}-%i.${ROLLOVER_LOG_FILE_EXTENSION}">
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-5logger{5}] %msg%n</Pattern>
             </PatternLayout>
@@ -108,7 +109,7 @@
         <!-- Monthly rollover -->
         <RollingFile name="LARS_LOG"
                      fileName="${LOG_DIRECTORY}/lars.log"
-                     filePattern="${LOG_DIRECTORY}/lars.log-%d{MM-dd}-%i.log.gz">
+                     filePattern="${LOG_DIRECTORY}/lars.log-%d{MM-dd}-%i.${ROLLOVER_LOG_FILE_EXTENSION}">
             <PatternLayout>
                 <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-5logger{5}] %msg%n</Pattern>
             </PatternLayout>
