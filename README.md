@@ -391,12 +391,18 @@ We can change the log level printed to the server.log and console by updating th
 
 ```xml
 <root level="INFO">
+    <Appender-ref ref="SERVER_LOG"/>
+    <Appender-ref ref="CONSOLE"/>
+</root>
 ```
 
 to:
 
 ```xml
 <root level="DEBUG">
+    <Appender-ref ref="SERVER_LOG"/>
+    <Appender-ref ref="CONSOLE"/>
+</root>
 ```
 
 Save and exit the `vi` editor. After 60 seconds, re-run the failing use-case and the log level will be changed. Remember to reset the log level back

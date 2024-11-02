@@ -26,18 +26,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
 
       # Additional CSS Analysis
       - name: Set up Node.js
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.1.0
         with:
-          node-version: '22.4.0'
+          node-version: '23.1.0'
 
       - name: Install StyleLint
-        run: npm install -g stylelint@16.7.0 stylelint-config-standard@36.0.1
+        run: npm install -g stylelint@16.10.0 stylelint-config-standard@36.0.1
 
       - name: Run StyleLint
         run: stylelint --config ./ci/other/.stylelintrc.json --formatter json --max-warnings 0 --output-file stylelint-report.json "docker/frontend/css/*.css" || true
@@ -56,12 +56,12 @@ jobs:
 
       # Additional JavaScript Analysis
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3.25.11
+        uses: github/codeql-action/init@v3.26.6
         with:
           languages: 'javascript'
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3.25.11
+        uses: github/codeql-action/analyze@v3.26.6
 
         # SonarQube Analysis (CSS, Docker, HTML, JavaScript)
       - name: Execute SonarQube Scan
@@ -73,7 +73,7 @@ jobs:
           --rm \
           -e SONAR_HOST_URL=${{ vars.SONAR_HOST_URL }} \
           -v "$(pwd):/usr/src/" \
-          sonarsource/sonar-scanner-cli:10.0 \
+          sonarsource/sonar-scanner-cli:11.1 \
             -Dsonar.projectKey=folding-stats-other  \
             -Dsonar.projectName=folding-stats-other  \
             -Dsonar.sources=/usr/src/docker/frontend/css/,/usr/src/docker/frontend/pages/,/usr/src/docker/frontend/js,/usr/src/docker/backend/Dockerfile,/usr/src/docker/database/Dockerfile,/usr/src/docker/frontend/Dockerfile,/usr/src/docker/frontend/scripts/,/usr/src/docker/backend/scripts/ \

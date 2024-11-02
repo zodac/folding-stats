@@ -12,8 +12,8 @@ services:
       args:
         # Docker image versions
         HTTPD_VERSION: "2.4.62"     # https://hub.docker.com/_/httpd/tags
-        MINIFY_VERSION: "v2.20.37"  # https://hub.docker.com/r/tdewolff/minify/tags
-        NODE_VERSION: "22.9.0"      # https://hub.docker.com/_/node/tags
+        MINIFY_VERSION: "v2.21.1"   # https://hub.docker.com/r/tdewolff/minify/tags
+        NODE_VERSION: "23.1.0"      # https://hub.docker.com/_/node/tags
         # Build arguments
         ADMIN_EMAIL_ADDRESS: "email@test.com"
         FORUM_LINK: "https://extremehw.net/forum/125-extreme-team-folding"
@@ -117,8 +117,9 @@ services:
     ports:
       - "5433:5432"
     restart: "no"
+
   selenium_chrome:
-    image: selenium/standalone-chrome:129.0
+    image: selenium/standalone-chrome:130.0
     container_name: selenium_chrome
     hostname: selenium_chrome
     depends_on:
@@ -130,7 +131,7 @@ services:
     restart: "no"
 
   selenium_firefox:
-    image: selenium/standalone-firefox:130.0
+    image: selenium/standalone-firefox:132.0
     container_name: selenium_firefox
     hostname: selenium_firefox
     depends_on:

@@ -59,8 +59,8 @@ ARG ADMIN_EMAIL_ADDRESS
 ARG ROOT_URL
 
 # Replace environment arguments in httpd config files
-RUN sed -i -e "s|%ROOT_URL%|${ROOT_URL}|g" /usr/local/apache2/conf/extra/httpd-ssl.conf && \
-    sed -i -e "s|%ADMIN_EMAIL_ADDRESS%|${ADMIN_EMAIL_ADDRESS}|g" /usr/local/apache2/conf/extra/httpd-ssl.conf
+RUN sed -i -e "s|%ROOT_URL%|${ROOT_URL}|g" /usr/local/apache2/conf/extra/httpd-ssl.conf \
+    -e "s|%ADMIN_EMAIL_ADDRESS%|${ADMIN_EMAIL_ADDRESS}|g" /usr/local/apache2/conf/extra/httpd-ssl.conf
 
 WORKDIR /usr/local/apache2/htdocs/
 

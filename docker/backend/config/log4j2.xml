@@ -2,7 +2,7 @@
 <Configuration monitorInterval="60">
     <Properties>
         <Property name="LOG_DIRECTORY">/var/backend/logs</Property>
-        <Property name="ROLLOVER_LOG_FILE_EXTENSION">log.gz</Property>
+        <Property name="ROLLOVER_LOG_FILE_EXTENSION">log</Property>
     </Properties>
 
     <Appenders>
