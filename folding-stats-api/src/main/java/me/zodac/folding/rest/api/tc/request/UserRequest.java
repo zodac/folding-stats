@@ -28,7 +28,7 @@ import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.HardwareMake;
-import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.User}.

@@ -25,7 +25,7 @@ import lombok.experimental.Accessors;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
-import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * POJO defining a single {@link User} Folding on a username/passkey combination to participate in the {@code Team Competition}.

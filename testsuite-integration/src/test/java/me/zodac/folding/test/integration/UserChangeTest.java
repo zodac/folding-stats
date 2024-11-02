@@ -50,6 +50,7 @@ import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.rest.api.util.RestUtilConstants;
 import me.zodac.folding.test.integration.util.TestConstants;
 import me.zodac.folding.test.integration.util.rest.request.UserUtils;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -575,7 +576,7 @@ class UserChangeTest {
         return UserChangeResponseParser.create(response);
     }
 
-    private static UserChangeRequest generateUserChange(final User user, final String liveStatsLink) {
+    private static UserChangeRequest generateUserChange(final User user, @Nullable final String liveStatsLink) {
         return new UserChangeRequest(user.id(), user.passkey(), user.foldingUserName(), user.passkey(), liveStatsLink, user.hardware().id(),
             true);
     }

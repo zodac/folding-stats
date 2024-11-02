@@ -13,9 +13,11 @@
         <!-- Don't think a rule is necessary, should take it on a case-by-case basis to use a Supplier -->
         <exclude name="GuardLogStatement"/>
         <!-- False positives with other assertion libraries -->
-        <exclude name="JUnitTestsShouldIncludeAssert"/>
+        <exclude name="UnitTestShouldIncludeAssert"/>
         <!-- I have no problem with multiple asserts in my tests -->
-        <exclude name="JUnitTestContainsTooManyAsserts"/>
+        <exclude name="UnitTestContainsTooManyAsserts"/>
+        <!-- I think explicit 2D arrays looks clearer -->
+        <exclude name="UseVarargs"/>
     </rule>
     <!-- When using an indexed FOR loop, certain scenarios exist where I'd like to skip the increment -->
     <rule ref="category/java/bestpractices.xml/AvoidReassigningLoopVariables">

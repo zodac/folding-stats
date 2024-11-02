@@ -28,7 +28,7 @@ import me.zodac.folding.rest.api.tc.request.TeamRequest;
 import me.zodac.folding.rest.api.tc.request.UserRequest;
 import me.zodac.folding.test.integration.util.rest.request.HardwareUtils;
 import me.zodac.folding.test.integration.util.rest.request.TeamUtils;
-import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Utility class used to generate {@link HardwareRequest}, {@link TeamRequest} and {@link UserRequest} instances for test cases.

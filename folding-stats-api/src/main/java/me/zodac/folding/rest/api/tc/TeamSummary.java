@@ -19,7 +19,7 @@ package me.zodac.folding.rest.api.tc;
 
 import java.util.Collection;
 import me.zodac.folding.api.tc.Team;
-import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Summary of the stats of a {@link Team}s and its {@link me.zodac.folding.api.tc.User}s in the {@code Team Competition}.

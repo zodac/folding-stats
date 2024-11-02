@@ -25,7 +25,7 @@ import lombok.experimental.Accessors;
 import me.zodac.folding.api.ResponsePojo;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.tc.request.TeamRequest;
-import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * POJO defining a single {@link Team} participating in the {@code Team Competition}. There is a limit on the number of users each team can have,

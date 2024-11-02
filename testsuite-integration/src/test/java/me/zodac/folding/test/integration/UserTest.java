@@ -57,7 +57,7 @@ import me.zodac.folding.test.integration.util.rest.request.StubbedFoldingEndpoin
 import me.zodac.folding.test.integration.util.rest.request.TeamUtils;
 import me.zodac.folding.test.integration.util.rest.request.UserUtils;
 import me.zodac.folding.test.integration.util.rest.response.HttpResponseHeaderUtils;
-import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;

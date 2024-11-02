@@ -30,7 +30,7 @@ import me.zodac.folding.rest.api.header.RestHeader;
 import me.zodac.folding.rest.api.tc.AllTeamsSummary;
 import me.zodac.folding.rest.api.tc.request.OffsetTcStatsRequest;
 import me.zodac.folding.rest.api.util.RestUtilConstants;
-import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Convenience class to send HTTP requests to the {@code Team Competition} stats REST endpoint.

@@ -17,7 +17,7 @@
 
 package me.zodac.folding.api.util;
 
-import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Utility class used to retrieve the name of log files.

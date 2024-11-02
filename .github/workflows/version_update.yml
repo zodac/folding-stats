@@ -43,7 +43,7 @@ jobs:
         with:
           java-distribution: 'temurin'
           java-version: '22'
-          maven-version: '3.9.8'
+          maven-version: '3.9.9'
 
       - name: Deploy docker containers
         uses: hoverkraft-tech/compose-action@v2.0.1

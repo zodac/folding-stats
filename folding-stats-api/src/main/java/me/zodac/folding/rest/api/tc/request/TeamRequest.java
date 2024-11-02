@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.stream.Stream;
 import me.zodac.folding.api.RequestPojo;
 import me.zodac.folding.api.exception.ValidationException;
-import org.checkerframework.nullaway.checker.nullness.qual.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * REST request to create/update a {@link me.zodac.folding.api.tc.Team}.
