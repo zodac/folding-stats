@@ -68,5 +68,6 @@ jobs:
       - name: Run linters and unit/integration tests, then publish results to SonarQube
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONARQUBE_PAT: ${{ secrets.SONARQUBE_PAT }}
         run: mvn clean install -Dall -Dsonarqube
