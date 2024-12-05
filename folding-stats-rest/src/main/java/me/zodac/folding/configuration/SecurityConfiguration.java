@@ -48,6 +48,7 @@ public class SecurityConfiguration {
     /**
      * Disables CSRF and configures CORS for the application.
      *
+     * @param http the {@link HttpSecurity} for the application
      * @return the configured {@link SecurityFilterChain}
      */
     @Bean

@@ -91,7 +91,7 @@ class PageLoadTest {
 
             final List<String> footerHrefAttributes = footer.findElements(Tag.A)
                 .stream()
-                .map(footerLink -> footerLink.getAttribute(Attribute.HREF))
+                .map(footerLink -> footerLink.getDomAttribute(Attribute.HREF))
                 .toList();
 
             assertThat(footerHrefAttributes)

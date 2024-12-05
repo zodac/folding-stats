@@ -24,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Month;
@@ -35,6 +34,8 @@ import java.util.List;
 import me.zodac.folding.api.tc.Category;
 import me.zodac.folding.api.tc.Team;
 import me.zodac.folding.client.java.request.HistoricStatsRequestSender;
+import me.zodac.folding.client.java.request.HistoricStatsType;
+import me.zodac.folding.client.java.request.RestUri;
 import me.zodac.folding.client.java.response.HistoricStatsResponseParser;
 import me.zodac.folding.rest.api.exception.FoldingRestException;
 import me.zodac.folding.rest.api.header.ContentType;
@@ -58,6 +59,7 @@ import org.junit.jupiter.api.Test;
 class HistoricTeamStatsTest {
 
     private static final HistoricStatsRequestSender HISTORIC_STATS_REQUEST_SENDER = HistoricStatsRequestSender.createWithUrl(FOLDING_URL);
+    private static final String BASE_URL = FOLDING_URL + RestUri.REST_URI_PATH_SEPARATOR + "historic";
 
     @BeforeAll
     static void setUp() throws FoldingRestException {
@@ -237,7 +239,7 @@ class HistoricTeamStatsTest {
     void whenGettingHourlyStats_givenInvalidTeamId_thenResponseHasA400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(FOLDING_URL + "/historic/teams/" + INVALID_FORMAT_ID + '/' + Year.parse("2020") + '/' + Month.of(4) + '/' + 12))
+            .uri(RestUri.create(BASE_URL, HistoricStatsType.TEAM.endpointUrl(), INVALID_FORMAT_ID, Year.parse("2020"), Month.of(4), 12))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
@@ -427,7 +429,7 @@ class HistoricTeamStatsTest {
     void whenGettingDailyStats_givenInvalidTeamId_thenResponseHas400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(FOLDING_URL + "/historic/teams/" + INVALID_FORMAT_ID + '/' + Year.parse("2020") + '/' + Month.of(4)))
+            .uri(RestUri.create(BASE_URL, HistoricStatsType.TEAM.endpointUrl(), INVALID_FORMAT_ID, Year.parse("2020"), Month.of(4)))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
@@ -450,7 +452,7 @@ class HistoricTeamStatsTest {
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(FOLDING_URL + "/historic/teams/" + team.id() + "/2020/" + invalidMonth))
+            .uri(RestUri.create(BASE_URL, HistoricStatsType.TEAM.endpointUrl(), team.id(), "2020", invalidMonth))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         final HttpRequest request = requestBuilder.build();
@@ -624,7 +626,7 @@ class HistoricTeamStatsTest {
     void whenGettingMonthlyStats_givenInvalidTeamId_thenResponseHas400Status() throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(FOLDING_URL + "/historic/teams/" + INVALID_FORMAT_ID + '/' + Year.parse("2020")))
+            .uri(RestUri.create(BASE_URL, HistoricStatsType.TEAM.endpointUrl(), INVALID_FORMAT_ID, Year.parse("2020")))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
@@ -646,7 +648,7 @@ class HistoricTeamStatsTest {
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(FOLDING_URL + "/historic/teams/" + team.id() + "/invalidYear"))
+            .uri(RestUri.create(BASE_URL, HistoricStatsType.TEAM.endpointUrl(), team.id(), "invalidYear"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         final HttpRequest request = requestBuilder.build();

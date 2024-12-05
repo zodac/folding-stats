@@ -71,6 +71,7 @@ public class TeamController implements TeamEndpoint {
      * @param foldingRepository the {@link FoldingRepository}
      * @param teamValidator     the {@link TeamValidator}
      */
+    @Autowired
     public TeamController(final FoldingRepository foldingRepository, final TeamValidator teamValidator) {
         this.foldingRepository = foldingRepository;
         this.teamValidator = teamValidator;

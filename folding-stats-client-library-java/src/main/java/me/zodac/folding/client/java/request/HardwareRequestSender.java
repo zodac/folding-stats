@@ -20,7 +20,6 @@ package me.zodac.folding.client.java.request;
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import me.zodac.folding.api.util.StringUtils;
@@ -45,7 +44,7 @@ public record HardwareRequestSender(String hardwareUrl) {
      * @return the created {@link HardwareRequestSender}
      */
     public static HardwareRequestSender createWithUrl(final String foldingUrl) {
-        final String hardwareUrl = foldingUrl + "/hardware";
+        final String hardwareUrl = foldingUrl + RestUri.REST_URI_PATH_SEPARATOR + "hardware";
         return new HardwareRequestSender(hardwareUrl);
     }
 
@@ -75,7 +74,7 @@ public record HardwareRequestSender(String hardwareUrl) {
     public HttpResponse<String> getAll(final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(hardwareUrl))
+            .uri(RestUri.create(hardwareUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -122,7 +121,7 @@ public record HardwareRequestSender(String hardwareUrl) {
     public HttpResponse<String> get(final int hardwareId, final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(hardwareUrl + '/' + hardwareId))
+            .uri(RestUri.create(hardwareUrl, hardwareId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -169,7 +168,7 @@ public record HardwareRequestSender(String hardwareUrl) {
     public HttpResponse<String> get(final String hardwareName, final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(hardwareUrl + "/fields?hardwareName=" + hardwareName))
+            .uri(RestUri.createWithFields(hardwareUrl, "hardwareName", hardwareName))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -201,7 +200,7 @@ public record HardwareRequestSender(String hardwareUrl) {
     public HttpResponse<String> create(final HardwareRequest hardware, final String userName, final String password) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(hardware)))
-            .uri(URI.create(hardwareUrl))
+            .uri(RestUri.create(hardwareUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
@@ -230,7 +229,7 @@ public record HardwareRequestSender(String hardwareUrl) {
         throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(hardware)))
-            .uri(URI.create(hardwareUrl + '/' + hardwareId))
+            .uri(RestUri.create(hardwareUrl, hardwareId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
@@ -257,7 +256,7 @@ public record HardwareRequestSender(String hardwareUrl) {
     public HttpResponse<Void> delete(final int hardwareId, final String userName, final String password) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
-            .uri(URI.create(hardwareUrl + '/' + hardwareId))
+            .uri(RestUri.create(hardwareUrl, hardwareId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();

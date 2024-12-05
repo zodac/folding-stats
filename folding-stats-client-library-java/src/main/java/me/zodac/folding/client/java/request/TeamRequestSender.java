@@ -20,7 +20,6 @@ package me.zodac.folding.client.java.request;
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import me.zodac.folding.api.util.StringUtils;
@@ -46,7 +45,7 @@ public record TeamRequestSender(String teamsUrl) {
      * @return the created {@link TeamRequestSender}
      */
     public static TeamRequestSender createWithUrl(final String foldingUrl) {
-        final String teamsUrl = foldingUrl + "/teams";
+        final String teamsUrl = foldingUrl + RestUri.REST_URI_PATH_SEPARATOR + "teams";
         return new TeamRequestSender(teamsUrl);
     }
 
@@ -76,7 +75,7 @@ public record TeamRequestSender(String teamsUrl) {
     public HttpResponse<String> getAll(final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(teamsUrl))
+            .uri(RestUri.create(teamsUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -123,7 +122,7 @@ public record TeamRequestSender(String teamsUrl) {
     public HttpResponse<String> get(final int teamId, final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(teamsUrl + '/' + teamId))
+            .uri(RestUri.create(teamsUrl, teamId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -170,7 +169,7 @@ public record TeamRequestSender(String teamsUrl) {
     public HttpResponse<String> get(final String teamName, final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(teamsUrl + "/fields?teamName=" + teamName))
+            .uri(RestUri.createWithFields(teamsUrl, "teamName", teamName))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -201,7 +200,7 @@ public record TeamRequestSender(String teamsUrl) {
     public HttpResponse<String> create(final TeamRequest team, final String userName, final String password) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(team)))
-            .uri(URI.create(teamsUrl))
+            .uri(RestUri.create(teamsUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNeitherBlank(userName, password)) {
@@ -234,7 +233,7 @@ public record TeamRequestSender(String teamsUrl) {
         throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(team)))
-            .uri(URI.create(teamsUrl + '/' + teamId))
+            .uri(RestUri.create(teamsUrl, teamId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNeitherBlank(userName, password)) {
@@ -265,7 +264,7 @@ public record TeamRequestSender(String teamsUrl) {
     public HttpResponse<Void> delete(final int teamId, final String userName, final String password) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
-            .uri(URI.create(teamsUrl + '/' + teamId))
+            .uri(RestUri.create(teamsUrl, teamId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();

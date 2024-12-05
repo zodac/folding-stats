@@ -57,6 +57,7 @@ public class LoginController implements LoginEndpoint {
      *
      * @param foldingRepository the {@link FoldingRepository}
      */
+    @Autowired
     public LoginController(final FoldingRepository foldingRepository) {
         this.foldingRepository = foldingRepository;
     }

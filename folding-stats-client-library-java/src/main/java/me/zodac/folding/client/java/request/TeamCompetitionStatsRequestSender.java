@@ -20,7 +20,6 @@ package me.zodac.folding.client.java.request;
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import me.zodac.folding.api.util.StringUtils;
@@ -47,7 +46,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
      * @return the created {@link TeamCompetitionStatsRequestSender}
      */
     public static TeamCompetitionStatsRequestSender createWithUrl(final String foldingUrl) {
-        final String statsUrl = foldingUrl + "/stats";
+        final String statsUrl = foldingUrl + RestUri.REST_URI_PATH_SEPARATOR + "stats";
         return new TeamCompetitionStatsRequestSender(statsUrl);
     }
 
@@ -78,7 +77,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     public HttpResponse<String> getStats(final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(statsUrl))
+            .uri(RestUri.create(statsUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -124,7 +123,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     public HttpResponse<String> getSummaryStats(final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(statsUrl + "/summary"))
+            .uri(RestUri.create(statsUrl, "summary"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -174,7 +173,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     public HttpResponse<String> getStatsForUser(final int userId, final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(statsUrl + "/users/" + userId))
+            .uri(RestUri.create(statsUrl, "users", userId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -218,7 +217,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     public HttpResponse<String> getTeamLeaderboard(final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(statsUrl + "/leaderboard"))
+            .uri(RestUri.create(statsUrl, "leaderboard"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -262,7 +261,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     public HttpResponse<String> getCategoryLeaderboard(final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(statsUrl + "/category"))
+            .uri(RestUri.create(statsUrl, "category"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -293,7 +292,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     public HttpResponse<Void> manualUpdate(final String userName, final String password) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
-            .uri(URI.create(statsUrl + "/manual/update"))
+            .uri(RestUri.create(statsUrl, "manual", "update"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
@@ -320,7 +319,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
     public HttpResponse<Void> manualReset(final String userName, final String password) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
-            .uri(URI.create(statsUrl + "/manual/reset"))
+            .uri(RestUri.create(statsUrl, "manual", "reset"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
@@ -357,7 +356,7 @@ public record TeamCompetitionStatsRequestSender(String statsUrl) {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .method("PATCH", HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(offsetTcStatsRequest)))
-            .uri(URI.create(statsUrl + "/users/" + userId))
+            .uri(RestUri.create(statsUrl, "users", userId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();

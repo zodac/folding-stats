@@ -83,15 +83,17 @@ public final class StringUtils {
     }
 
     private static boolean isValidUrl(final @Nullable String input) {
-        final URI uri;
-        try {
-            uri = new URI(input);
-        } catch (final URISyntaxException e) {
+        if (input == null) {
             return false;
         }
 
-        final String scheme = uri.getScheme();
-        return scheme != null && VALID_URL_SCHEMES.contains(scheme.toLowerCase(Locale.UK));
+        try {
+            final URI uri = new URI(input);
+            final String scheme = uri.getScheme();
+            return scheme != null && VALID_URL_SCHEMES.contains(scheme.toLowerCase(Locale.UK));
+        } catch (final URISyntaxException e) {
+            return false;
+        }
     }
 
     /**

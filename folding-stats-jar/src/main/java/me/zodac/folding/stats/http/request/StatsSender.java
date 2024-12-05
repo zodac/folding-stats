@@ -31,7 +31,7 @@ import me.zodac.folding.api.exception.ExternalConnectionException;
 import me.zodac.folding.api.util.StringUtils;
 import me.zodac.folding.rest.api.header.ContentType;
 import me.zodac.folding.rest.api.header.RestHeader;
-import me.zodac.folding.stats.http.response.StatsResponseParser;
+import me.zodac.folding.stats.http.response.StatsParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,7 +50,7 @@ import org.apache.logging.log4j.Logger;
  * While not ideal, I'm not sure of any other way of forcing an update since it seems to be a server-side decision. This
  * should at least help in reducing the number of duplicate requests that need to be sent.
  */
-public final class StatsRequestSender {
+public final class StatsSender {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int HTTP_TOO_MANY_REQUESTS_STATUS_CODE = 429;
@@ -58,7 +58,7 @@ public final class StatsRequestSender {
     private static final long SECONDS_BETWEEN_ATTEMPTS = getIntOrDefault("SECONDS_BETWEEN_HTTP_REQUEST_ATTEMPTS", 20);
     private static final long MINIMUM_REQUESTS_TO_FLUSH_EXTERNAL_CACHE = 1;
 
-    private StatsRequestSender() {
+    private StatsSender() {
 
     }
 
@@ -77,7 +77,7 @@ public final class StatsRequestSender {
      * </ul>
      *
      * @param statsRequestUrl the URL the stats request should be sent to
-     * @return the {@link HttpResponse} to be parsed by {@link StatsResponseParser}
+     * @return the {@link HttpResponse} to be parsed by {@link StatsParser}
      * @throws ExternalConnectionException thrown if an error occurs connecting to the external URL
      */
     public static HttpResponse<String> sendFoldingRequest(final StatsRequestUrl statsRequestUrl) throws ExternalConnectionException {

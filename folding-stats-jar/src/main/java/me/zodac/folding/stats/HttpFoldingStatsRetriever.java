@@ -17,9 +17,9 @@
 
 package me.zodac.folding.stats;
 
-import static me.zodac.folding.stats.http.request.StatsRequestSender.sendFoldingRequest;
-import static me.zodac.folding.stats.http.response.StatsResponseParser.getPointsFromResponse;
-import static me.zodac.folding.stats.http.response.StatsResponseParser.getUnitsFromResponse;
+import static me.zodac.folding.stats.http.request.StatsSender.sendFoldingRequest;
+import static me.zodac.folding.stats.http.response.StatsParser.getPointsFromResponse;
+import static me.zodac.folding.stats.http.response.StatsParser.getUnitsFromResponse;
 
 import java.net.http.HttpResponse;
 import me.zodac.folding.api.exception.ExternalConnectionException;

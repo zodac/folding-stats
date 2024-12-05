@@ -291,7 +291,7 @@ public class FoldingRepositoryImpl implements FoldingRepository {
             statsRepository.createInitialStats(userTotalStats);
 
             final UserTcStats currentUserTcStats = statsRepository.getHourlyTcStats(userWithStateChange);
-            final OffsetTcStats offsetTcStats = OffsetTcStats.createFromUserTcStats(currentUserTcStats);
+            final OffsetTcStats offsetTcStats = toOffsetTcStats(currentUserTcStats);
             final OffsetTcStats createdOffsetStats = statsRepository.createOffsetStats(userWithStateChange, offsetTcStats);
             LOGGER.debug("Added offset stats of: {}", createdOffsetStats);
 
@@ -299,6 +299,10 @@ public class FoldingRepositoryImpl implements FoldingRepository {
         } catch (final ExternalConnectionException e) {
             LOGGER.error("Unable to update the state of user '{}' (ID: {})", userWithStateChange.displayName(), userWithStateChange.id(), e);
         }
+    }
+
+    private static OffsetTcStats toOffsetTcStats(final UserTcStats userTcStats) {
+        return OffsetTcStats.create(userTcStats.points(), userTcStats.multipliedPoints(), userTcStats.units());
     }
 
     private static boolean isUserTeamChange(final User updatedUser, final User existingUser) {

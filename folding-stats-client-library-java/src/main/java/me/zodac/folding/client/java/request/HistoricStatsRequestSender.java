@@ -18,7 +18,6 @@
 package me.zodac.folding.client.java.request;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Month;
@@ -45,7 +44,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
      * @return the created {@link HistoricStatsRequestSender}
      */
     public static HistoricStatsRequestSender createWithUrl(final String foldingUrl) {
-        final String historicStatsUrl = foldingUrl + "/historic";
+        final String historicStatsUrl = foldingUrl + RestUri.REST_URI_PATH_SEPARATOR + "historic";
         return new HistoricStatsRequestSender(historicStatsUrl);
     }
 
@@ -147,8 +146,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
                                                 final int day, final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(
-                historicStatsUrl + '/' + historicStatsType.endpointUrl + '/' + id + '/' + year.getValue() + '/' + month.getValue() + '/' + day))
+            .uri(RestUri.create(historicStatsUrl, historicStatsType.endpointUrl(), id, year.getValue(), month.getValue(), day))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -161,9 +159,9 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new FoldingRestException("Error sending HTTP request to get hourly stats for " + historicStatsType.endpointUrl, e);
+            throw new FoldingRestException("Error sending HTTP request to get hourly stats for " + historicStatsType.endpointUrl(), e);
         } catch (final IOException e) {
-            throw new FoldingRestException("Error sending HTTP request to get hourly stats for " + historicStatsType.endpointUrl, e);
+            throw new FoldingRestException("Error sending HTTP request to get hourly stats for " + historicStatsType.endpointUrl(), e);
         }
     }
 
@@ -269,7 +267,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
                                                final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(historicStatsUrl + '/' + historicStatsType.endpointUrl + '/' + id + '/' + year.getValue() + '/' + month.getValue()))
+            .uri(RestUri.create(historicStatsUrl, historicStatsType.endpointUrl(), id, year.getValue(), month.getValue()))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -283,9 +281,9 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
 
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new FoldingRestException("Error sending HTTP request to get daily stats for " + historicStatsType.endpointUrl, e);
+            throw new FoldingRestException("Error sending HTTP request to get daily stats for " + historicStatsType.endpointUrl(), e);
         } catch (final IOException e) {
-            throw new FoldingRestException("Error sending HTTP request to get daily stats for " + historicStatsType.endpointUrl, e);
+            throw new FoldingRestException("Error sending HTTP request to get daily stats for " + historicStatsType.endpointUrl(), e);
         }
     }
 
@@ -385,7 +383,7 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
                                                  final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(historicStatsUrl + '/' + historicStatsType.endpointUrl + '/' + id + '/' + year.getValue()))
+            .uri(RestUri.create(historicStatsUrl, historicStatsType.endpointUrl(), id, year.getValue()))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -398,36 +396,9 @@ public record HistoricStatsRequestSender(String historicStatsUrl) {
             return RestUtilConstants.HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new FoldingRestException("Error sending HTTP request to get monthly stats for " + historicStatsType.endpointUrl, e);
+            throw new FoldingRestException("Error sending HTTP request to get monthly stats for " + historicStatsType.endpointUrl(), e);
         } catch (final IOException e) {
-            throw new FoldingRestException("Error sending HTTP request to get monthly stats for " + historicStatsType.endpointUrl, e);
-        }
-    }
-
-    /**
-     * Defines the type of historic stats we want to retrieve.
-     */
-    private enum HistoricStatsType {
-
-        /**
-         * Historic stats for a {@link me.zodac.folding.api.tc.Team}.
-         */
-        TEAM("teams"),
-
-        /**
-         * Historic stats for a {@link me.zodac.folding.api.tc.User}.
-         */
-        USER("users");
-
-        private final String endpointUrl;
-
-        /**
-         * Constructs a {@link HistoricStatsType}.
-         *
-         * @param endpointUrl the value of the {@link HistoricStatsType}
-         */
-        HistoricStatsType(final String endpointUrl) {
-            this.endpointUrl = endpointUrl;
+            throw new FoldingRestException("Error sending HTTP request to get monthly stats for " + historicStatsType.endpointUrl(), e);
         }
     }
 }

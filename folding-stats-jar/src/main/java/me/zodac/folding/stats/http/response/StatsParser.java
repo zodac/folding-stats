@@ -27,25 +27,25 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import me.zodac.folding.api.stats.FoldingStatsDetails;
-import me.zodac.folding.stats.http.request.StatsRequestSender;
+import me.zodac.folding.stats.http.request.StatsSender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
  * Utility class parsing a {@link PointsApiInstance} or {@link UnitsApiInstance} from the Stanford REST request.
  */
-public final class StatsResponseParser {
+public final class StatsParser {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final int EXPECTED_NUMBER_OF_UNIT_RESPONSES = 1;
 
-    private StatsResponseParser() {
+    private StatsParser() {
 
     }
 
     /**
      * Extracts the points from a {@link HttpResponse} that was received by{@link me.zodac.folding.stats.http.request.PointsUrlBuilder} and
-     * {@link StatsRequestSender}. Converts the {@link HttpResponse} to a {@link PointsApiInstance} then extracts the earned points.
+     * {@link StatsSender}. Converts the {@link HttpResponse} to a {@link PointsApiInstance} then extracts the earned points.
      *
      * @param httpResponse the {@link HttpResponse} to parse
      * @return the points for a user/passkey
@@ -70,7 +70,7 @@ public final class StatsResponseParser {
 
     /**
      * Extracts the Work Units from a {@link HttpResponse} that was received by {@link me.zodac.folding.stats.http.request.UnitsUrlBuilder} and
-     * {@link StatsRequestSender}. Converts the {@link HttpResponse} to a {@link UnitsApiInstance} then extracts the finished units.
+     * {@link StatsSender}. Converts the {@link HttpResponse} to a {@link UnitsApiInstance} then extracts the finished units.
      *
      * @param foldingStatsDetails the Folding@Home username/passkey, used for logging in case of an issue
      * @param httpResponse        the {@link HttpResponse} to parse

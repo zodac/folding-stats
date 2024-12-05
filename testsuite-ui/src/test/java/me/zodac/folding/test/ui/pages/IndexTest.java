@@ -65,11 +65,11 @@ class IndexTest {
                 final WebElement navigationBarLinkChild = navigationBarLink.findElement(Tag.A);
 
                 if (i == PAGE_INDEX_IN_NAVIGATION_BAR) {
-                    assertThat(navigationBarLinkChild.getAttribute(Attribute.CLASS))
+                    assertThat(navigationBarLinkChild.getDomAttribute(Attribute.CLASS))
                         .as("Expected '%s' link to be active at index %d", navigationBarLink.getText(), PAGE_INDEX_IN_NAVIGATION_BAR)
                         .contains(NavigationBar.EXPECTED_ACTIVE_LINK_CLASS);
                 } else {
-                    assertThat(navigationBarLinkChild.getAttribute(Attribute.CLASS))
+                    assertThat(navigationBarLinkChild.getDomAttribute(Attribute.CLASS))
                         .as("Did not expect '%s' link to be active at index %d", navigationBarLink.getText(), i)
                         .doesNotContain(NavigationBar.EXPECTED_ACTIVE_LINK_CLASS);
                 }
@@ -89,7 +89,7 @@ class IndexTest {
             final WebElement viewingButton1 = viewingButtons.getFirst();
             assertThat(viewingButton1.getText())
                 .isEqualTo("Summary");
-            assertThat(viewingButton1.getAttribute(Attribute.CLASS))
+            assertThat(viewingButton1.getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
 
@@ -97,21 +97,21 @@ class IndexTest {
             final WebElement viewingButton2 = viewingButtons.get(1);
             assertThat(viewingButton2.getText())
                 .isEqualTo("Leaderboard");
-            assertThat(viewingButton2.getAttribute(Attribute.CLASS))
+            assertThat(viewingButton2.getDomAttribute(Attribute.CLASS))
                 .contains("btn-success")
                 .doesNotContain("btn-primary");
 
             final WebElement viewingButton3 = viewingButtons.get(2);
             assertThat(viewingButton3.getText())
                 .isEqualTo("Team Stats");
-            assertThat(viewingButton3.getAttribute(Attribute.CLASS))
+            assertThat(viewingButton3.getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
 
             final WebElement viewingButton4 = viewingButtons.get(3);
             assertThat(viewingButton4.getText())
                 .isEqualTo("Category Leaderboard");
-            assertThat(viewingButton4.getAttribute(Attribute.CLASS))
+            assertThat(viewingButton4.getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
 
@@ -127,33 +127,33 @@ class IndexTest {
                 .hasSize(4);
 
             final WebElement mainDiv1 = mainDivs.getFirst();
-            assertThat(mainDiv1.getAttribute(Attribute.ID))
+            assertThat(mainDiv1.getDomAttribute(Attribute.ID))
                 .isEqualTo("summary_div");
-            assertThat(mainDiv1.getAttribute(Attribute.CLASS))
+            assertThat(mainDiv1.getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
 
             // Active div
             final WebElement mainDiv2 = mainDivs.get(1);
-            assertThat(mainDiv2.getAttribute(Attribute.ID))
+            assertThat(mainDiv2.getDomAttribute(Attribute.ID))
                 .isEqualTo("leaderboard_div");
-            assertThat(mainDiv2.getAttribute(Attribute.CLASS))
+            assertThat(mainDiv2.getDomAttribute(Attribute.CLASS))
                 .contains(
                     "collapse",
                     "show"
                 );
 
             final WebElement mainDiv3 = mainDivs.get(2);
-            assertThat(mainDiv3.getAttribute(Attribute.ID))
+            assertThat(mainDiv3.getDomAttribute(Attribute.ID))
                 .isEqualTo("stats_div");
-            assertThat(mainDiv3.getAttribute(Attribute.CLASS))
+            assertThat(mainDiv3.getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
 
             final WebElement mainDiv4 = mainDivs.get(3);
-            assertThat(mainDiv4.getAttribute(Attribute.ID))
+            assertThat(mainDiv4.getDomAttribute(Attribute.ID))
                 .isEqualTo("category_div");
-            assertThat(mainDiv4.getAttribute(Attribute.CLASS))
+            assertThat(mainDiv4.getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
         });
@@ -182,30 +182,30 @@ class IndexTest {
             final List<WebElement> mainDivs = mainParent.findElements(divs);
 
             // Default state - off/on/off/off
-            assertThat(viewingButtons.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(1).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("btn-success")
                 .doesNotContain("btn-primary");
-            assertThat(mainDivs.get(1).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(1).getDomAttribute(Attribute.CLASS))
                 .contains(
                     "collapse",
                     "show"
                 );
-            assertThat(viewingButtons.get(2).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(2).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(3).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(3).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
 
@@ -218,28 +218,28 @@ class IndexTest {
             }
 
             // New state - off/off/off/off
-            assertThat(viewingButtons.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(1).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(1).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(2).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(2).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(3).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(3).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
 
@@ -252,30 +252,30 @@ class IndexTest {
             }
 
             // New state - on/off/off/off
-            assertThat(viewingButtons.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("btn-success")
                 .doesNotContain("btn-primary");
-            assertThat(mainDivs.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains(
                     "collapse",
                     "show"
                 );
-            assertThat(viewingButtons.get(1).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(1).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(2).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(2).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(3).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(3).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
 
@@ -288,28 +288,28 @@ class IndexTest {
             }
 
             // New state - off/off/off/off
-            assertThat(viewingButtons.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(1).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(1).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(2).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(2).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(3).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(3).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
 
@@ -322,30 +322,30 @@ class IndexTest {
             }
 
             // New state - off/off/on/off
-            assertThat(viewingButtons.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(1).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(1).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(2).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("btn-success")
                 .doesNotContain("btn-primary");
-            assertThat(mainDivs.get(2).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(2).getDomAttribute(Attribute.CLASS))
                 .contains(
                     "collapse",
                     "show"
                 );
-            assertThat(viewingButtons.get(3).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(3).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
 
@@ -358,28 +358,28 @@ class IndexTest {
             }
 
             // New state - off/off/off/off
-            assertThat(viewingButtons.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(1).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(1).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(2).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(2).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(3).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(3).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
 
@@ -392,28 +392,28 @@ class IndexTest {
             }
 
             // New state - off/off/off/on
-            assertThat(viewingButtons.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(1).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(1).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(2).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(2).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(3).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("btn-success")
                 .doesNotContain("btn-primary");
-            assertThat(mainDivs.get(3).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(3).getDomAttribute(Attribute.CLASS))
                 .contains(
                     "collapse",
                     "show"
@@ -428,28 +428,28 @@ class IndexTest {
             }
 
             // New state - off/off/off/off
-            assertThat(viewingButtons.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(1).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(1).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(2).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(2).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(3).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(3).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
 
@@ -462,30 +462,30 @@ class IndexTest {
             }
 
             // Default state - off/on/off/off
-            assertThat(viewingButtons.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.getFirst().getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.getFirst().getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(1).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(1).getDomAttribute(Attribute.CLASS))
                 .contains("btn-success")
                 .doesNotContain("btn-primary");
-            assertThat(mainDivs.get(1).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(1).getDomAttribute(Attribute.CLASS))
                 .contains(
                     "collapse",
                     "show"
                 );
-            assertThat(viewingButtons.get(2).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(2).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(2).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
-            assertThat(viewingButtons.get(3).getAttribute(Attribute.CLASS))
+            assertThat(viewingButtons.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("btn-primary")
                 .doesNotContain("btn-success");
-            assertThat(mainDivs.get(3).getAttribute(Attribute.CLASS))
+            assertThat(mainDivs.get(3).getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
         });
@@ -500,7 +500,7 @@ class IndexTest {
             driver.navigate().to(FRONTEND_LINK.url());
 
             final WebElement summaryDiv = driver.findElement(By.id("summary_div"));
-            assertThat(summaryDiv.getAttribute(Attribute.CLASS))
+            assertThat(summaryDiv.getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
         });
@@ -515,7 +515,7 @@ class IndexTest {
             driver.navigate().to(FRONTEND_LINK.url());
 
             final WebElement leaderboardDiv = driver.findElement(By.id("leaderboard_div"));
-            assertThat(leaderboardDiv.getAttribute(Attribute.CLASS))
+            assertThat(leaderboardDiv.getDomAttribute(Attribute.CLASS))
                 .contains(
                     "collapse",
                     "show"
@@ -532,7 +532,7 @@ class IndexTest {
             driver.navigate().to(FRONTEND_LINK.url());
 
             final WebElement teamStatsDiv = driver.findElement(By.id("stats_div"));
-            assertThat(teamStatsDiv.getAttribute(Attribute.CLASS))
+            assertThat(teamStatsDiv.getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
         });
@@ -547,7 +547,7 @@ class IndexTest {
             driver.navigate().to(FRONTEND_LINK.url());
 
             final WebElement categoryDiv = driver.findElement(By.id("category_div"));
-            assertThat(categoryDiv.getAttribute(Attribute.CLASS))
+            assertThat(categoryDiv.getDomAttribute(Attribute.CLASS))
                 .contains("collapse")
                 .doesNotContain("show");
         });

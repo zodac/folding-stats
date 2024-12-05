@@ -20,7 +20,6 @@ package me.zodac.folding.client.java.request;
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collection;
@@ -41,6 +40,10 @@ import me.zodac.folding.rest.api.util.RestUtilConstants;
  */
 public record UserChangeRequestSender(String requestUrl) {
 
+    private static final String USER_CHANGE_REQUEST_APPROVE_IMMEDIATE_URL = "approve" + RestUri.REST_URI_PATH_SEPARATOR + "immediate";
+    private static final String USER_CHANGE_REQUEST_APPROVE_NEXT_URL = "approve" + RestUri.REST_URI_PATH_SEPARATOR + "next";
+    private static final String USER_CHANGE_REQUEST_REJECT_URL = "reject";
+
     /**
      * Create an instance of {@link UserChangeRequestSender}.
      *
@@ -49,7 +52,7 @@ public record UserChangeRequestSender(String requestUrl) {
      * @return the created {@link UserChangeRequestSender}
      */
     public static UserChangeRequestSender createWithUrl(final String foldingUrl) {
-        final String requestUrl = foldingUrl + "/changes";
+        final String requestUrl = foldingUrl + RestUri.REST_URI_PATH_SEPARATOR + "changes";
         return new UserChangeRequestSender(requestUrl);
     }
 
@@ -64,7 +67,7 @@ public record UserChangeRequestSender(String requestUrl) {
     public HttpResponse<String> getAllWithPasskeys(final String userName, final String password) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(requestUrl + "/passkey"))
+            .uri(RestUri.create(requestUrl, "passkey"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
@@ -97,7 +100,7 @@ public record UserChangeRequestSender(String requestUrl) {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(requestUrl + "/passkey?state=" + commaSeparatedStates))
+            .uri(RestUri.createWithFilter(requestUrl + RestUri.REST_URI_PATH_SEPARATOR + "passkey", "state", commaSeparatedStates))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
@@ -121,7 +124,7 @@ public record UserChangeRequestSender(String requestUrl) {
     public HttpResponse<String> getAllWithoutPasskeys() throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(requestUrl))
+            .uri(RestUri.create(requestUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
@@ -150,7 +153,7 @@ public record UserChangeRequestSender(String requestUrl) {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(requestUrl + "?state=" + commaSeparatedStates))
+            .uri(RestUri.createWithFilter(requestUrl, "state", commaSeparatedStates))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
@@ -176,7 +179,7 @@ public record UserChangeRequestSender(String requestUrl) {
     public HttpResponse<String> get(final int userChangeId, final String userName, final String password) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(requestUrl + '/' + userChangeId))
+            .uri(RestUri.create(requestUrl, userChangeId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
@@ -201,7 +204,7 @@ public record UserChangeRequestSender(String requestUrl) {
     public HttpResponse<String> create(final UserChangeRequest userChangeRequest) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(userChangeRequest)))
-            .uri(URI.create(requestUrl))
+            .uri(RestUri.create(requestUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 
@@ -225,7 +228,7 @@ public record UserChangeRequestSender(String requestUrl) {
      * @throws FoldingRestException thrown if an error occurs sending the {@link HttpRequest}
      */
     public HttpResponse<String> reject(final int userChangeId, final String userName, final String password) throws FoldingRestException {
-        return update(userChangeId, "/reject", userName, password);
+        return update(userChangeId, USER_CHANGE_REQUEST_REJECT_URL, userName, password);
     }
 
     /**
@@ -239,7 +242,7 @@ public record UserChangeRequestSender(String requestUrl) {
      */
     public HttpResponse<String> approveImmediately(final int userChangeId, final String userName, final String password)
         throws FoldingRestException {
-        return update(userChangeId, "/approve/immediate", userName, password);
+        return update(userChangeId, USER_CHANGE_REQUEST_APPROVE_IMMEDIATE_URL, userName, password);
     }
 
     /**
@@ -253,14 +256,14 @@ public record UserChangeRequestSender(String requestUrl) {
      */
     public HttpResponse<String> approveNextMonth(final int userChangeId, final String userName, final String password)
         throws FoldingRestException {
-        return update(userChangeId, "/approve/next", userName, password);
+        return update(userChangeId, USER_CHANGE_REQUEST_APPROVE_NEXT_URL, userName, password);
     }
 
     private HttpResponse<String> update(final int userChangeId, final String endpoint, final String userName, final String password)
         throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.noBody())
-            .uri(URI.create(requestUrl + '/' + userChangeId + endpoint))
+            .uri(RestUri.create(requestUrl, userChangeId, endpoint))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();

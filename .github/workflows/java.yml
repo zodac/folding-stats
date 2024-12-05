@@ -35,7 +35,7 @@ jobs:
         uses: actions/setup-java@v4.5.0
         with:
           distribution: 'temurin'
-          java-version: '22'
+          java-version: '23'
 
       - name: Cache local .m2
         uses: actions/cache@v4.1.2
@@ -46,10 +46,10 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Set up maven
-        uses: s4u/setup-maven-action@v1.15.0
+        uses: s4u/setup-maven-action@v1.16.0
         with:
           java-distribution: 'temurin'
-          java-version: '22'
+          java-version: '23'
           maven-version: '3.9.9'
 
       - name: Deploy docker containers

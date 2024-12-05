@@ -84,7 +84,7 @@ class MockFoldingRepository implements FoldingRepository {
 
     @Override
     public Team getTeam(final int teamId) {
-        return teams.computeIfAbsent(teamId, v -> {
+        return teams.computeIfAbsent(teamId, _ -> {
             throw new NotFoundException(Team.class, teamId);
         });
     }
@@ -121,7 +121,7 @@ class MockFoldingRepository implements FoldingRepository {
 
     @Override
     public User getUserWithPasskey(final int userId) {
-        return users.computeIfAbsent(userId, v -> {
+        return users.computeIfAbsent(userId, _ -> {
             throw new NotFoundException(User.class, userId);
         });
     }
@@ -193,7 +193,7 @@ class MockFoldingRepository implements FoldingRepository {
 
     @Override
     public UserChange getUserChange(final int userChangeId) {
-        return userChanges.computeIfAbsent(userChangeId, v -> {
+        return userChanges.computeIfAbsent(userChangeId, _ -> {
             throw new NotFoundException(UserChange.class, userChangeId);
         });
     }
@@ -206,6 +206,6 @@ class MockFoldingRepository implements FoldingRepository {
 
     @Override
     public void printCacheContents() {
-
+        // Nothing to print for tests
     }
 }

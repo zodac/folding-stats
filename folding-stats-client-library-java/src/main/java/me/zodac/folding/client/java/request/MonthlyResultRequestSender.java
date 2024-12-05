@@ -20,7 +20,6 @@ package me.zodac.folding.client.java.request;
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Month;
@@ -50,7 +49,7 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
      * @return the created {@link MonthlyResultRequestSender}
      */
     public static MonthlyResultRequestSender createWithUrl(final String foldingUrl) {
-        final String monthlyResultUrl = foldingUrl + "/results";
+        final String monthlyResultUrl = foldingUrl + RestUri.REST_URI_PATH_SEPARATOR + "results";
         return new MonthlyResultRequestSender(monthlyResultUrl);
     }
 
@@ -125,7 +124,7 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
     public HttpResponse<String> getMonthlyResult(final Year year, final Month month, final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(monthlyResultUrl + "/result/" + year.getValue() + '/' + month.getValue()))
+            .uri(RestUri.create(monthlyResultUrl, "result", year.getValue(), month.getValue()))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -155,7 +154,7 @@ public record MonthlyResultRequestSender(String monthlyResultUrl) {
     public HttpResponse<Void> manualSave(final String userName, final String password) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.noBody())
-            .uri(URI.create(monthlyResultUrl + "/manual/save"))
+            .uri(RestUri.create(monthlyResultUrl, "manual", "save"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();

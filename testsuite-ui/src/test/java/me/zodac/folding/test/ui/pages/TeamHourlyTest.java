@@ -60,11 +60,11 @@ class TeamHourlyTest {
                 final WebElement navigationBarLinkChild = navigationBarLink.findElement(Tag.A);
 
                 if (i == PAGE_INDEX_IN_NAVIGATION_BAR) {
-                    assertThat(navigationBarLinkChild.getAttribute(Attribute.CLASS))
+                    assertThat(navigationBarLinkChild.getDomAttribute(Attribute.CLASS))
                         .as("Expected '%s' link to be active at index %d", navigationBarLink.getText(), PAGE_INDEX_IN_NAVIGATION_BAR)
                         .contains(NavigationBar.EXPECTED_ACTIVE_LINK_CLASS);
                 } else {
-                    assertThat(navigationBarLinkChild.getAttribute(Attribute.CLASS))
+                    assertThat(navigationBarLinkChild.getDomAttribute(Attribute.CLASS))
                         .as("Did not expect '%s' link to be active at index %d", navigationBarLink.getText(), i)
                         .doesNotContain(NavigationBar.EXPECTED_ACTIVE_LINK_CLASS);
                 }

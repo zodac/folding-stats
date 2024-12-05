@@ -18,7 +18,6 @@
 package me.zodac.folding.client.java.request;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import me.zodac.folding.api.util.EncodingUtils;
@@ -43,7 +42,7 @@ public record LoginRequestSender(String loginUrl) {
      * @return the created {@link LoginRequestSender}
      */
     public static LoginRequestSender createWithUrl(final String foldingUrl) {
-        final String loginUrl = foldingUrl + "/login";
+        final String loginUrl = foldingUrl + RestUri.REST_URI_PATH_SEPARATOR + "login";
         return new LoginRequestSender(loginUrl);
     }
 
@@ -75,7 +74,7 @@ public record LoginRequestSender(String loginUrl) {
 
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(loginCredentials)))
-            .uri(URI.create(loginUrl + "/admin"))
+            .uri(RestUri.create(loginUrl, "admin"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .build();
 

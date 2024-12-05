@@ -60,16 +60,6 @@ public record OffsetTcStats(long pointsOffset, long multipliedPointsOffset, int 
     }
 
     /**
-     * Converts an instance of {@link UserTcStats} to {@link OffsetTcStats}.
-     *
-     * @param userTcStats existing {@link UserTcStats}
-     * @return the created {@link OffsetTcStats}
-     */
-    public static OffsetTcStats createFromUserTcStats(final UserTcStats userTcStats) {
-        return create(userTcStats.points(), userTcStats.multipliedPoints(), userTcStats.units());
-    }
-
-    /**
      * Creates an empty instance of {@link OffsetTcStats}, with no offsets. Can be used where no offset is necessary, but
      * an {@link java.util.Optional} is not clean enough.
      *
@@ -86,8 +76,8 @@ public record OffsetTcStats(long pointsOffset, long multipliedPointsOffset, int 
      * which field is not set.
      *
      * <p>
-     * If both {@code pointsOffset} and {@code multipliedPointsOffset} are set (meaning neither are <b>0</b>), or the
-     * provided {@link OffsetTcStats} instance is equal to {@link OffsetTcStats#empty()}, then no changes are made.
+     * If both {@code pointsOffset} and {@code multipliedPointsOffset} are set (meaning neither are <b>0</b>), nor is the
+     * provided {@link OffsetTcStats} instance equal to {@link OffsetTcStats#empty()}, then no changes are made.
      *
      * @param offsetTcStats the {@link OffsetTcStats} to update
      * @param multiplier    the value to multiply the {@code pointsOffset}, or to divide the {@code multipliedPointsOffset}

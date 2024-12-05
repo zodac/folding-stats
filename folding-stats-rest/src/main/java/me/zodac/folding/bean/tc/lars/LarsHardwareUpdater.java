@@ -69,7 +69,7 @@ public class LarsHardwareUpdater {
      *         If the {@link Hardware} is retrieved from LARS and does not exist in the DB, it will be <b>created</b>.
      *     </li>
      *     <li>
-     *         If the {@link Hardware} is exists in the DB but is not retrieved from LARS, it will be <b>deleted</b>.
+     *         If the {@link Hardware} exists in the DB but is not retrieved from LARS, it will be <b>deleted</b>.
      *     </li>
      *     <li>
      *         If the {@link Hardware} is retrieved from LARS and does exist in the DB and either the {@code multiplier} or {@code averagePpd} is

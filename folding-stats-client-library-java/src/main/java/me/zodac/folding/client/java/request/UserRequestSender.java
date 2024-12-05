@@ -20,7 +20,6 @@ package me.zodac.folding.client.java.request;
 import static me.zodac.folding.api.util.EncodingUtils.encodeBasicAuthentication;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import me.zodac.folding.api.util.StringUtils;
@@ -46,7 +45,7 @@ public record UserRequestSender(String usersUrl) {
      * @return the created {@link UserRequestSender}
      */
     public static UserRequestSender createWithUrl(final String foldingUrl) {
-        final String usersUrl = foldingUrl + "/users";
+        final String usersUrl = foldingUrl + RestUri.REST_URI_PATH_SEPARATOR + "users";
         return new UserRequestSender(usersUrl);
     }
 
@@ -74,7 +73,7 @@ public record UserRequestSender(String usersUrl) {
     public HttpResponse<String> getAllWithoutPasskeys(final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(usersUrl))
+            .uri(RestUri.create(usersUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -122,7 +121,7 @@ public record UserRequestSender(String usersUrl) {
         throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(usersUrl + "/all/passkey"))
+            .uri(RestUri.create(usersUrl, "all", "passkey"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password));
 
@@ -170,7 +169,7 @@ public record UserRequestSender(String usersUrl) {
     public HttpResponse<String> get(final int userId, final @Nullable String entityTag) throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(usersUrl + '/' + userId))
+            .uri(RestUri.create(usersUrl, userId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -222,7 +221,7 @@ public record UserRequestSender(String usersUrl) {
         throws FoldingRestException {
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .GET()
-            .uri(URI.create(usersUrl + '/' + userId + "/passkey"))
+            .uri(RestUri.create(usersUrl, userId, "passkey"))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue());
 
         if (StringUtils.isNotBlank(entityTag)) {
@@ -257,7 +256,7 @@ public record UserRequestSender(String usersUrl) {
     public HttpResponse<String> create(final UserRequest user, final String userName, final String password) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .POST(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(user)))
-            .uri(URI.create(usersUrl))
+            .uri(RestUri.create(usersUrl))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password)).build();
 
@@ -285,7 +284,7 @@ public record UserRequestSender(String usersUrl) {
         throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .PUT(HttpRequest.BodyPublishers.ofString(RestUtilConstants.GSON.toJson(user)))
-            .uri(URI.create(usersUrl + '/' + userId))
+            .uri(RestUri.create(usersUrl, userId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
@@ -312,7 +311,7 @@ public record UserRequestSender(String usersUrl) {
     public HttpResponse<Void> delete(final int userId, final String userName, final String password) throws FoldingRestException {
         final HttpRequest request = HttpRequest.newBuilder()
             .DELETE()
-            .uri(URI.create(usersUrl + '/' + userId))
+            .uri(RestUri.create(usersUrl, userId))
             .header(RestHeader.CONTENT_TYPE.headerName(), ContentType.JSON.contentTypeValue())
             .header(RestHeader.AUTHORIZATION.headerName(), encodeBasicAuthentication(userName, password))
             .build();
