@@ -660,7 +660,7 @@
                     <configuration>
                         <failBuildOnCVSS>0</failBuildOnCVSS>
                         <!--suppress UnresolvedMavenProperty, injected by environment variable -->
-                        <nvdApiServerId>${env.NVD_API_KEY}</nvdApiServerId>
+                        <nvdApiKey>${env.NVD_API_KEY}</nvdApiKey> <!-- Use <nvdApiServerId> to avoid this potentially being exposed in mvn output -->
                         <skip>${skip-linters}</skip>
                         <skipProvidedScope>true</skipProvidedScope>
                         <suppressionFiles>
