@@ -5,6 +5,7 @@ on:
     branches: [ master ]
     paths-ignore:
       - '.github/workflows/doc.yml'
+      - '.github/workflows/license_update.yml'
       - '.github/workflows/other.yml'
       - '.github/workflows/version_update.yml'
       - 'ci/doc/**'
@@ -13,8 +14,8 @@ on:
       - 'LICENSE'
       - 'README.md'
   schedule:
-    # Run once a week to check for new CVEs
-    - cron: '15 0 * * 0'
+    # Run at 3:30 every Sunday to check for new CVEs
+    - cron: '30 3 * * 0'
 
 jobs:
   analyze:
