@@ -22,7 +22,7 @@
         </database>
 
         <target>
-            <packageName>me.zodac.folding.db.postgres.gen</packageName>
+            <packageName>net.zodac.folding.db.postgres.gen</packageName>
             <directory>.</directory>
         </target>
     </generator>

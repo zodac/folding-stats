@@ -88,7 +88,7 @@ existing `.env.template` file and rename it to `.env`. Then open it up and read 
     - All user's stats are reset to **0**
     - The hardware multipliers and average PPD are recalculated from LARS
 
-The defaults should be sufficient for most users, but any variable in the first `Mandatory` section must be updated. These will be credentials, the
+The defaults should be enough for most users, but any variable in the first `Mandatory` section must be updated. These will be credentials, the
 location of any SSL certificates needed, and the URLs to your own frontend.
 
 ### Starting The System
@@ -218,7 +218,7 @@ Notes:
 
 - If *Is Captain* is selected but the user's team already has a captain, the old captain will be replaced as captain. "**There can be only one!**"
 - There is no way to ensure a participant is actually only using their passkey on a single piece of hardware, so there is some level of trust
-  involved. However, since we can view a user's stats on a per-hour basis, any suspicious passkey usage should be possible to find.
+  involved. However, since we can view a user's stats per-hourly, any suspicious passkey usage should be possible to find.
 
 ##### User Categories
 
@@ -235,7 +235,7 @@ Based on these limitations, the current maximum number of users for any team is 
 The number of users per category is configurable though [docker variables](#configuration).
 
 However, adding new categories (like CPU-based categories, or more specific GPU categories) requires updating
-the [Category.java](./folding-stats-api/src/main/java/me/zodac/folding/api/tc/Category.java) class within the source code. Please read
+the [Category.java](./folding-stats-api/src/main/java/net/zodac/folding/api/tc/Category.java) class within the source code. Please read
 the [Contributing](#contributing) section for more information on how to do this.
 
 ### Adjustments During The Competition
@@ -356,14 +356,14 @@ system log there.
 
 The system currently has multiple logs available:
 
-| Log File Name  | Description                                                                                                                                                                                                                        | Log Level | Printed To Console? |
-|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------------------|
-| *audit.log*    | This log is for REST requests on the system. Input payloads will be logged here.                                                                                                                                                   | INFO      | No                  |
-| *lars.log*     | Used to log monthly updates to hardware based on the LARS PPD DB                                                                                                                                                                   | DEBUG     | No                  |
-| *security.log* | This is where all logging for [SecurityInterceptor.java](./folding-stats-rest/src/main/java/me/zodac/folding/rest/interceptor/SecurityInterceptor.java) is written. Details login attempts or access requests to WRITE operations. | DEBUG     | No                  |
-| *server.log*   | This is the general application log, where most logging will be written to.                                                                                                                                                        | INFO      | Yes                 |
-| *sql.log*      | This is used to log all SQL queries made to the DB.                                                                                                                                                                                | INFO      | No                  |
-| *stats.log*    | This is used to log user stats retrieval.                                                                                                                                                                                          | DEBUG     | No                  |
+| Log File Name  | Description                                                                                                                                                                                                                         | Log Level | Printed To Console? |
+|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|---------------------|
+| *audit.log*    | This log is for REST requests on the system. Input payloads will be logged here.                                                                                                                                                    | INFO      | No                  |
+| *lars.log*     | Used to log monthly updates to hardware based on the LARS PPD DB                                                                                                                                                                    | DEBUG     | No                  |
+| *security.log* | This is where all logging for [SecurityInterceptor.java](./folding-stats-rest/src/main/java/net/zodac/folding/rest/interceptor/SecurityInterceptor.java) is written. Details login attempts or access requests to WRITE operations. | DEBUG     | No                  |
+| *server.log*   | This is the general application log, where most logging will be written to.                                                                                                                                                         | INFO      | Yes                 |
+| *sql.log*      | This is used to log all SQL queries made to the DB.                                                                                                                                                                                 | INFO      | No                  |
+| *stats.log*    | This is used to log user stats retrieval.                                                                                                                                                                                           | DEBUG     | No                  |
 
 These can be accessed and viewed by:
 
@@ -396,7 +396,7 @@ We can change the log level printed to the server.log and console by updating th
 </root>
 ```
 
-to:
+To:
 
 ```xml
 <root level="DEBUG">
@@ -413,7 +413,7 @@ packages can have their log levels explicitly, of which there are some examples 
 
 ### Extracting Logs On Container Crash
 
-In the event of a container crash, the logs should be retained as we mount the `logs` directory in a docker volume mount named `backend_logs`.
+In case of a container crash, the logs should be retained as we mount the `logs` directory in a docker volume mount named `backend_logs`.
 However, we cannot retrieve the file directly from the volume. Instead, we create a lightweight docker container, and attach the volume to this
 container. We can then copy the file from the container to the host system.
 

@@ -1,7 +1,7 @@
 <FindBugsFilter>
     <!-- Exclude generated files -->
     <Match>
-        <Package name="~me.zodac.folding.db.postgres.gen.*"/>
+        <Package name="~net.zodac.folding.db.postgres.gen.*"/>
     </Match>
 
     <!-- Lombok-generated issues -->
@@ -20,7 +20,7 @@
 
     <!-- False positive, no null checks being made -->
     <Match>
-        <Class name="me.zodac.folding.db.postgres.PostgresDbManager"/>
+        <Class name="postgres.db.net.zodac.folding.PostgresDbManager"/>
         <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
     </Match>
 </FindBugsFilter>

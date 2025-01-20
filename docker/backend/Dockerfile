@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -yqq --no-install-recommends openssl && \
     keytool \
         -genkey \
         -alias folding-stats \
-        -dname "cn=folding.zodac.me,ou=stats,o=zodac.me,l=Auckland,s=Auckland,C=NZ" \
+        -dname "cn=folding,ou=stats,o=zodac.net,l=Auckland,s=Auckland,C=NZ" \
         -keyalg RSA \
         -keysize 4096 \
         -storetype PKCS12 \

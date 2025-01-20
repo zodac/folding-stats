@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>me.zodac</groupId>
+        <groupId>net.zodac</groupId>
         <artifactId>folding-stats</artifactId>
         <version>2.0.0-SNAPSHOT</version>
     </parent>
@@ -14,7 +14,7 @@
 
     <properties>
         <!-- Spring Configuration -->
-        <main-class>me.zodac.folding.FoldingStatsApplication</main-class>
+        <main-class>net.zodac.folding.FoldingStatsApplication</main-class>
         <!-- Value set for local (non-docker) testing, docker deployments will override this value -->
         <logging-config-location>${project.parent.basedir}/docker/backend/config/log4j2.xml</logging-config-location>
 
@@ -26,12 +26,12 @@
     <dependencies>
         <!-- Project Dependencies -->
         <dependency>
-            <groupId>me.zodac</groupId>
+            <groupId>net.zodac</groupId>
             <artifactId>folding-stats-api</artifactId>
             <classifier>${proguard-classifier}</classifier>
         </dependency>
         <dependency>
-            <groupId>me.zodac</groupId>
+            <groupId>net.zodac</groupId>
             <artifactId>folding-stats-jar</artifactId>
             <classifier>${proguard-classifier}</classifier>
         </dependency>

@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>me.zodac</groupId>
+    <groupId>net.zodac</groupId>
     <artifactId>folding-stats</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>[${project.artifactId}] project</name>
 
     <!-- Not defining any modules at the top-level -->
-    <!-- Instead, we will define a profile which is activated by default -->
+    <!-- Instead, we will define a profile that is activated by default -->
     <!-- This allows us to use another profile with fewer (or no) modules in CI -->
     <!-- However, it does force us to add all modules to any other profile we might define -->
     <modules/>
@@ -141,19 +141,19 @@
         <dependencies>
             <!-- Project Dependencies -->
             <dependency>
-                <groupId>me.zodac</groupId>
+                <groupId>net.zodac</groupId>
                 <artifactId>folding-stats-api</artifactId>
                 <version>${project.version}</version>
                 <classifier>${proguard-classifier}</classifier>
             </dependency>
             <dependency>
-                <groupId>me.zodac</groupId>
+                <groupId>net.zodac</groupId>
                 <artifactId>folding-stats-client-library-java</artifactId>
                 <version>${project.version}</version>
                 <classifier>${proguard-classifier}</classifier>
             </dependency>
             <dependency>
-                <groupId>me.zodac</groupId>
+                <groupId>net.zodac</groupId>
                 <artifactId>folding-stats-jar</artifactId>
                 <version>${project.version}</version>
                 <classifier>${proguard-classifier}</classifier>
@@ -707,7 +707,7 @@
                             <initial-year>2021</initial-year>
                             <!--suppress UnresolvedMavenProperty, defined by build-helper-maven-plugin -->
                             <year>${current-year}</year>
-                            <website>zodac.me</website>
+                            <website>zodac.net</website>
                         </properties>
                         <skip>${skip-linters}</skip>
                     </configuration>
@@ -801,7 +801,7 @@
                                 <ignores>
                                     <!-- Format: <ignore>groupId[:artifactId[:version[:type[:scope:[classifier]]]]]</ignore> -->
                                     <!-- Exclude our own JARs optimised by ProGuard -->
-                                    <ignore>me.zodac:folding-stats-*:*:jar:*:optimized</ignore>
+                                    <ignore>net.zodac:folding-stats-*:*:jar:*:optimized</ignore>
                                 </ignores>
                             </banDynamicVersions>
                             <bannedDependencies>
@@ -840,7 +840,7 @@
                     <configuration>
                         <!-- Excluding 'missing' due to 'use of default constructor, which does not provide a comment' false positive -->
                         <doclint>all,-missing</doclint>
-                        <excludePackageNames>me.zodac.folding.db.postgres.gen:me.zodac.folding.db.postgres.gen.*</excludePackageNames>
+                        <excludePackageNames>net.zodac.folding.db.postgres.gen:net.zodac.folding.db.postgres.gen.*</excludePackageNames>
                         <!-- Would prefer this to be true, but annoying false positive with default constructors -->
                         <failOnWarnings>false</failOnWarnings>
                         <quiet>true</quiet>
