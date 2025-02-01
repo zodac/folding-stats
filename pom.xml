@@ -40,29 +40,29 @@
         <branch-coverage>0.0</branch-coverage>
 
         <!-- 3PP Versions -->
-        <caffeine.version>3.1.8</caffeine.version>
-        <gson.version>2.11.0</gson.version>
+        <caffeine.version>3.2.0</caffeine.version>
+        <gson.version>2.12.1</gson.version>
         <hikariCP.version>6.2.1</hikariCP.version>
         <jakarta.jakartaee-web-api.version>10.0.0</jakarta.jakartaee-web-api.version>
-        <jersey-server.version>3.1.9</jersey-server.version>
-        <jooq.version>3.19.16</jooq.version>
+        <jersey-server.version>3.1.10</jersey-server.version>
+        <jooq.version>3.19.18</jooq.version>
         <log4j.version>2.24.3</log4j.version>
         <lombok.version>1.18.36</lombok.version>
-        <postgresql.version>42.7.4</postgresql.version>
-        <resilience4j.version>2.2.0</resilience4j.version>
+        <postgresql.version>42.7.5</postgresql.version>
+        <resilience4j.version>2.3.0</resilience4j.version>
         <snakeyaml.version>2.3</snakeyaml.version>
-        <spring-boot.version>3.4.1</spring-boot.version>
-        <springdoc-openapi-starter-webmvc-ui.version>2.7.0</springdoc-openapi-starter-webmvc-ui.version>
+        <spring-boot.version>3.4.2</spring-boot.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.8.4</springdoc-openapi-starter-webmvc-ui.version>
         <slf4j-api.version>2.0.16</slf4j-api.version>
-        <swagger-annotations-jakarta.version>2.2.27</swagger-annotations-jakarta.version>
+        <swagger-annotations-jakarta.version>2.2.28</swagger-annotations-jakarta.version>
 
         <!-- Test 3PP Versions -->
-        <assertj-core.version>3.27.1</assertj-core.version>
+        <assertj-core.version>3.27.3</assertj-core.version>
         <embedded-postgres.version>2.1.0</embedded-postgres.version>
         <embedded-postgres-binaries-bom.version>17.2.0</embedded-postgres-binaries-bom.version>
-        <flyway-core.version>11.1.0</flyway-core.version>
+        <flyway-core.version>11.3.0</flyway-core.version>
         <junit-bom.version>5.11.4</junit-bom.version>
-        <selenium-java.version>4.27.0</selenium-java.version>
+        <selenium-java.version>4.28.1</selenium-java.version>
 
         <!-- Plugin Versions -->
         <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
@@ -82,22 +82,22 @@
         <versions-maven-plugin.version>2.18.0</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>10.21.1</checkstyle.version>
+        <checkstyle.version>10.21.2</checkstyle.version>
         <error_prone_core.version>2.36.0</error_prone_core.version>
         <jspecify.version>1.0.0</jspecify.version>
         <licenses.version>1</licenses.version>
-        <nullaway.version>0.12.2</nullaway.version>
+        <nullaway.version>0.12.3</nullaway.version>
         <pitest-junit5-plugin.version>1.2.1</pitest-junit5-plugin.version>
-        <pmd.version>7.9.0</pmd.version>
-        <spotbugs.version>4.8.6</spotbugs.version>
+        <pmd.version>7.10.0</pmd.version>
+        <spotbugs.version>4.9.0</spotbugs.version>
 
         <!-- Linter Plugin Versions -->
-        <dependency-check-maven.version>11.1.1</dependency-check-maven.version>
+        <dependency-check-maven.version>12.0.2</dependency-check-maven.version>
         <license-maven-plugin.version>4.6</license-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
         <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
         <maven-pmd-plugin.version>3.26.0</maven-pmd-plugin.version>
-        <pitest-maven.version>1.17.3</pitest-maven.version>
+        <pitest-maven.version>1.17.4</pitest-maven.version>
         <sonar-maven-plugin.version>5.0.0.4389</sonar-maven-plugin.version>
         <spotbugs-maven-plugin.version>4.8.6.6</spotbugs-maven-plugin.version>
 
