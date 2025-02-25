@@ -26,18 +26,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       # Additional CSS Analysis
       - name: Set up Node.js
-        uses: actions/setup-node@v4.1.0
+        uses: actions/setup-node@v4
         with:
-          node-version: '23.3.0'
+          node-version: '23.8.0'
 
       - name: Install StyleLint
-        run: npm install -g stylelint@16.11.0 stylelint-config-standard@36.0.1
+        run: npm install -g stylelint@16.14.1 stylelint-config-standard@37.0.0
 
       - name: Run StyleLint
         run: stylelint --config ./ci/other/.stylelintrc.json --formatter json --max-warnings 0 --output-file stylelint-report.json "docker/frontend/css/*.css" || true
@@ -73,7 +73,7 @@ jobs:
           --rm \
           -e SONAR_HOST_URL=${{ secrets.SONAR_HOST_URL }} \
           -v "$(pwd):/usr/src/" \
-          sonarsource/sonar-scanner-cli:11.1 \
+          sonarsource/sonar-scanner-cli:11.2 \
             -Dsonar.projectKey=folding-stats-other  \
             -Dsonar.projectName=folding-stats-other  \
             -Dsonar.sources=/usr/src/docker/frontend/css/,/usr/src/docker/frontend/pages/,/usr/src/docker/frontend/js,/usr/src/docker/backend/Dockerfile,/usr/src/docker/database/Dockerfile,/usr/src/docker/frontend/Dockerfile,/usr/src/docker/frontend/scripts/,/usr/src/docker/backend/scripts/ \
