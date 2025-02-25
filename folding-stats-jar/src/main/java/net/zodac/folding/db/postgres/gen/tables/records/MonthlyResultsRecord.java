@@ -76,6 +76,6 @@ public class MonthlyResultsRecord extends UpdatableRecordImpl<MonthlyResultsReco
 
         setUtcTimestamp(utcTimestamp);
         setJsonResult(jsonResult);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

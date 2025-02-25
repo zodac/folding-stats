@@ -152,6 +152,8 @@ public class Users extends TableImpl<UsersRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class UsersPath extends Users implements Path<UsersRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> UsersPath(Table<O> path, ForeignKey<O, UsersRecord> childPath, InverseForeignKey<O, UsersRecord> parentPath) {
             super(path, childPath, parentPath);
         }

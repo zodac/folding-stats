@@ -10,6 +10,7 @@ import net.zodac.folding.db.postgres.gen.Public;
 
 import org.jooq.Parameter;
 import org.jooq.impl.AbstractRoutine;
+import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 
@@ -31,7 +32,7 @@ public class GenRandomUuid extends AbstractRoutine<UUID> {
      * Create a new routine call instance
      */
     public GenRandomUuid() {
-        super("gen_random_uuid", Public.PUBLIC, SQLDataType.UUID);
+        super("gen_random_uuid", Public.PUBLIC, DSL.comment(""), SQLDataType.UUID);
 
         setReturnParameter(RETURN_VALUE);
     }

@@ -123,6 +123,6 @@ public class UserOffsetTcStatsRecord extends UpdatableRecordImpl<UserOffsetTcSta
         setOffsetPoints(offsetPoints);
         setOffsetMultipliedPoints(offsetMultipliedPoints);
         setOffsetUnits(offsetUnits);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

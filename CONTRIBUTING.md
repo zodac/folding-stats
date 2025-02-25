@@ -42,7 +42,7 @@ Since the system is containerised, it is possible to swap out the default Postgr
 - Update docker-compose.yml:
     - Remove the PostgreSQL DB `postgres` container
     - Add the new DB container (if containerised)
-    - Update the `wildfly` container environment variables for "Database configuration"
+    - Update the `backend` container environment variables for "Database configuration"
 - Add support for the new DB container in code:
     - Implement the *DbManager.java* interface, with code stored in the `folding-stats-jar/src/main/java/net/zodac/folding/db/<DB_NAME>` package
     - Update *DatabaseType.java* with an Enum for the new DB name
@@ -56,7 +56,7 @@ query building simpler and able to conform to schemas. This requires a few steps
 
 - Start the test containers (--> "Executing tests" <-- )
 - Update the `docker/postgres/jooq/jooq-config.xml` file with the DB connection properties if not using the default
-- Run the `generate.bat` batch file, which will generate the schemas (starting in a directory named `me`)
+- Run the `generate.bat` batch file, which will generate the schemas (starting in a directory named `net`)
 - Traverse the `net` directory until you get to `gen` (full path is `net/zodac/folding/db/postgres/gen`)
 - Move the `gen` directory and all contents into `folding-stats/folding-stats-jar/src/main/java/net/zodac/folding/db/postgres`
     - Overwrite any existing files (or delete beforehand)

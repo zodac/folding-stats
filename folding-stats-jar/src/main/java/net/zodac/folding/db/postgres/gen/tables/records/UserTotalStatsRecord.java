@@ -106,6 +106,6 @@ public class UserTotalStatsRecord extends UpdatableRecordImpl<UserTotalStatsReco
         setUtcTimestamp(utcTimestamp);
         setTotalPoints(totalPoints);
         setTotalUnits(totalUnits);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

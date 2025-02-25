@@ -64,6 +64,6 @@ public class PgpArmorHeadersRecord extends TableRecordImpl<PgpArmorHeadersRecord
 
         setKey(key);
         setValue(value);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

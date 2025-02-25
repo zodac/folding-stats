@@ -116,6 +116,8 @@ public class UserTotalStats extends TableImpl<UserTotalStatsRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class UserTotalStatsPath extends UserTotalStats implements Path<UserTotalStatsRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> UserTotalStatsPath(Table<O> path, ForeignKey<O, UserTotalStatsRecord> childPath, InverseForeignKey<O, UserTotalStatsRecord> parentPath) {
             super(path, childPath, parentPath);
         }

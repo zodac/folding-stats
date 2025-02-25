@@ -9,6 +9,7 @@ import net.zodac.folding.db.postgres.gen.Public;
 import org.jooq.Field;
 import org.jooq.Parameter;
 import org.jooq.impl.AbstractRoutine;
+import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 
@@ -35,7 +36,7 @@ public class PgpKeyId extends AbstractRoutine<String> {
      * Create a new routine call instance
      */
     public PgpKeyId() {
-        super("pgp_key_id", Public.PUBLIC, SQLDataType.CLOB);
+        super("pgp_key_id", Public.PUBLIC, DSL.comment(""), SQLDataType.CLOB);
 
         setReturnParameter(RETURN_VALUE);
         addInParameter(_1);

@@ -117,6 +117,8 @@ public class Teams extends TableImpl<TeamsRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class TeamsPath extends Teams implements Path<TeamsRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> TeamsPath(Table<O> path, ForeignKey<O, TeamsRecord> childPath, InverseForeignKey<O, TeamsRecord> parentPath) {
             super(path, childPath, parentPath);
         }

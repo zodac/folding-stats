@@ -1675,7 +1675,7 @@ public class Routines {
           Configuration configuration
         , String __1
     ) {
-        return configuration.dsl().selectFrom(PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
+        return configuration.dsl().selectFrom(net.zodac.folding.db.postgres.gen.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
               __1
         )).fetch();
     }
@@ -1686,7 +1686,7 @@ public class Routines {
     public static PgpArmorHeaders pgpArmorHeaders(
           String __1
     ) {
-        return PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
+        return net.zodac.folding.db.postgres.gen.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
             __1
         );
     }
@@ -1697,7 +1697,7 @@ public class Routines {
     public static PgpArmorHeaders pgpArmorHeaders(
           Field<String> __1
     ) {
-        return PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
+        return net.zodac.folding.db.postgres.gen.tables.PgpArmorHeaders.PGP_ARMOR_HEADERS.call(
             __1
         );
     }

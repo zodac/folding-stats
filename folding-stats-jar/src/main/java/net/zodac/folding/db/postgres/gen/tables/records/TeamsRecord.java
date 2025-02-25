@@ -104,6 +104,6 @@ public class TeamsRecord extends UpdatableRecordImpl<TeamsRecord> {
         setTeamName(teamName);
         setTeamDescription(teamDescription);
         setForumLink(forumLink);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

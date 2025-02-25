@@ -138,6 +138,8 @@ public class RetiredUserStats extends TableImpl<RetiredUserStatsRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class RetiredUserStatsPath extends RetiredUserStats implements Path<RetiredUserStatsRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> RetiredUserStatsPath(Table<O> path, ForeignKey<O, RetiredUserStatsRecord> childPath, InverseForeignKey<O, RetiredUserStatsRecord> parentPath) {
             super(path, childPath, parentPath);
         }

@@ -123,6 +123,8 @@ public class UserTcStatsHourly extends TableImpl<UserTcStatsHourlyRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class UserTcStatsHourlyPath extends UserTcStatsHourly implements Path<UserTcStatsHourlyRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> UserTcStatsHourlyPath(Table<O> path, ForeignKey<O, UserTcStatsHourlyRecord> childPath, InverseForeignKey<O, UserTcStatsHourlyRecord> parentPath) {
             super(path, childPath, parentPath);
         }

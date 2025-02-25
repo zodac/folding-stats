@@ -9,6 +9,7 @@ import net.zodac.folding.db.postgres.gen.Public;
 import org.jooq.Field;
 import org.jooq.Parameter;
 import org.jooq.impl.AbstractRoutine;
+import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 
@@ -40,7 +41,7 @@ public class PgpPubDecrypt1 extends AbstractRoutine<String> {
      * Create a new routine call instance
      */
     public PgpPubDecrypt1() {
-        super("pgp_pub_decrypt", Public.PUBLIC, SQLDataType.CLOB);
+        super("pgp_pub_decrypt", Public.PUBLIC, DSL.comment(""), SQLDataType.CLOB);
 
         setReturnParameter(RETURN_VALUE);
         addInParameter(_1);

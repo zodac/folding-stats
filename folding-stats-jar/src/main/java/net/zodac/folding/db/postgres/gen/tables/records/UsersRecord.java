@@ -194,6 +194,6 @@ public class UsersRecord extends UpdatableRecordImpl<UsersRecord> {
         setHardwareId(hardwareId);
         setTeamId(teamId);
         setIsCaptain(isCaptain);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

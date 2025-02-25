@@ -106,6 +106,6 @@ public class UserInitialStatsRecord extends UpdatableRecordImpl<UserInitialStats
         setUtcTimestamp(utcTimestamp);
         setInitialPoints(initialPoints);
         setInitialUnits(initialUnits);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

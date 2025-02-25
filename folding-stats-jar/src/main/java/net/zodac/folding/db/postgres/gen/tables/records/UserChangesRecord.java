@@ -151,6 +151,6 @@ public class UserChangesRecord extends UpdatableRecordImpl<UserChangesRecord> {
         setPreviousUser(previousUser);
         setNewUser(newUser);
         setState(state);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

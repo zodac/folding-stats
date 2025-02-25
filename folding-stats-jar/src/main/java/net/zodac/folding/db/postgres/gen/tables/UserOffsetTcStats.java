@@ -124,6 +124,8 @@ public class UserOffsetTcStats extends TableImpl<UserOffsetTcStatsRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class UserOffsetTcStatsPath extends UserOffsetTcStats implements Path<UserOffsetTcStatsRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> UserOffsetTcStatsPath(Table<O> path, ForeignKey<O, UserOffsetTcStatsRecord> childPath, InverseForeignKey<O, UserOffsetTcStatsRecord> parentPath) {
             super(path, childPath, parentPath);
         }

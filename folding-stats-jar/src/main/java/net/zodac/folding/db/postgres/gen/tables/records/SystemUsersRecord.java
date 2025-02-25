@@ -89,6 +89,6 @@ public class SystemUsersRecord extends UpdatableRecordImpl<SystemUsersRecord> {
         setUserName(userName);
         setUserPasswordHash(userPasswordHash);
         setRoles(roles);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

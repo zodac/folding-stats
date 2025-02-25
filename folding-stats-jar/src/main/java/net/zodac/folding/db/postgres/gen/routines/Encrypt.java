@@ -9,6 +9,7 @@ import net.zodac.folding.db.postgres.gen.Public;
 import org.jooq.Field;
 import org.jooq.Parameter;
 import org.jooq.impl.AbstractRoutine;
+import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 
@@ -45,7 +46,7 @@ public class Encrypt extends AbstractRoutine<byte[]> {
      * Create a new routine call instance
      */
     public Encrypt() {
-        super("encrypt", Public.PUBLIC, SQLDataType.BLOB);
+        super("encrypt", Public.PUBLIC, DSL.comment(""), SQLDataType.BLOB);
 
         setReturnParameter(RETURN_VALUE);
         addInParameter(_1);

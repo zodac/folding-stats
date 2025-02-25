@@ -62,7 +62,7 @@ public class SystemUsers extends TableImpl<SystemUsersRecord> {
     /**
      * The column <code>public.system_users.roles</code>.
      */
-    public final TableField<SystemUsersRecord, String[]> ROLES = createField(DSL.name("roles"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("'{}'::text[]"), SQLDataType.CLOB)).array(), this, "");
+    public final TableField<SystemUsersRecord, String[]> ROLES = createField(DSL.name("roles"), SQLDataType.CLOB.array().defaultValue(DSL.field(DSL.raw("'{}'::text[]"), SQLDataType.CLOB.array())), this, "");
 
     private SystemUsers(Name alias, Table<SystemUsersRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

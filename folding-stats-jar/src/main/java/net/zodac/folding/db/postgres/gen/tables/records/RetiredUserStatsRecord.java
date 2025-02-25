@@ -168,6 +168,6 @@ public class RetiredUserStatsRecord extends UpdatableRecordImpl<RetiredUserStats
         setFinalPoints(finalPoints);
         setFinalMultipliedPoints(finalMultipliedPoints);
         setFinalUnits(finalUnits);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

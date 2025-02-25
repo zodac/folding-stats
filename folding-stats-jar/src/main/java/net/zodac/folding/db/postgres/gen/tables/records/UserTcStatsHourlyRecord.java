@@ -121,6 +121,6 @@ public class UserTcStatsHourlyRecord extends UpdatableRecordImpl<UserTcStatsHour
         setTcPoints(tcPoints);
         setTcPointsMultiplied(tcPointsMultiplied);
         setTcUnits(tcUnits);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

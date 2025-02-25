@@ -1,0 +1,2 @@
+#!/bin/bash
+java -cp jooq-3.20.1.jar:jooq-meta-3.20.1.jar:jooq-codegen-3.20.1.jar:reactive-streams-1.0.3.jar:r2dbc-spi-1.0.0.RELEASE.jar:postgresql-42.7.5.jar:jakarta.xml.bind-api-3.0.0.jar org.jooq.codegen.GenerationTool ./jooq-config.xml

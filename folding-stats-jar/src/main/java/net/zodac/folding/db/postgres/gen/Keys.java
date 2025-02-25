@@ -32,6 +32,7 @@ import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
+import org.jooq.impl.QOM.ForeignKeyRule;
 
 
 /**
@@ -66,12 +67,12 @@ public class Keys {
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final ForeignKey<RetiredUserStatsRecord, TeamsRecord> RETIRED_USER_STATS__FK_TEAM_ID = Internal.createForeignKey(RetiredUserStats.RETIRED_USER_STATS, DSL.name("fk_team_id"), new TableField[] { RetiredUserStats.RETIRED_USER_STATS.TEAM_ID }, Keys.TEAMS_PKEY, new TableField[] { Teams.TEAMS.TEAM_ID }, true);
-    public static final ForeignKey<UserChangesRecord, UsersRecord> USER_CHANGES__FK_USER_ID = Internal.createForeignKey(UserChanges.USER_CHANGES, DSL.name("fk_user_id"), new TableField[] { UserChanges.USER_CHANGES.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.USER_ID }, true);
-    public static final ForeignKey<UserInitialStatsRecord, UsersRecord> USER_INITIAL_STATS__FK_USER_ID = Internal.createForeignKey(UserInitialStats.USER_INITIAL_STATS, DSL.name("fk_user_id"), new TableField[] { UserInitialStats.USER_INITIAL_STATS.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.USER_ID }, true);
-    public static final ForeignKey<UserOffsetTcStatsRecord, UsersRecord> USER_OFFSET_TC_STATS__FK_USER_ID = Internal.createForeignKey(UserOffsetTcStats.USER_OFFSET_TC_STATS, DSL.name("fk_user_id"), new TableField[] { UserOffsetTcStats.USER_OFFSET_TC_STATS.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.USER_ID }, true);
-    public static final ForeignKey<UserTcStatsHourlyRecord, UsersRecord> USER_TC_STATS_HOURLY__FK_USER_ID = Internal.createForeignKey(UserTcStatsHourly.USER_TC_STATS_HOURLY, DSL.name("fk_user_id"), new TableField[] { UserTcStatsHourly.USER_TC_STATS_HOURLY.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.USER_ID }, true);
-    public static final ForeignKey<UserTotalStatsRecord, UsersRecord> USER_TOTAL_STATS__FK_USER_ID = Internal.createForeignKey(UserTotalStats.USER_TOTAL_STATS, DSL.name("fk_user_id"), new TableField[] { UserTotalStats.USER_TOTAL_STATS.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.USER_ID }, true);
-    public static final ForeignKey<UsersRecord, HardwareRecord> USERS__FK_HARDWARE_ID = Internal.createForeignKey(Users.USERS, DSL.name("fk_hardware_id"), new TableField[] { Users.USERS.HARDWARE_ID }, Keys.HARDWARE_PKEY, new TableField[] { Hardware.HARDWARE.HARDWARE_ID }, true);
-    public static final ForeignKey<UsersRecord, TeamsRecord> USERS__FK_TEAM_ID = Internal.createForeignKey(Users.USERS, DSL.name("fk_team_id"), new TableField[] { Users.USERS.TEAM_ID }, Keys.TEAMS_PKEY, new TableField[] { Teams.TEAMS.TEAM_ID }, true);
+    public static final ForeignKey<RetiredUserStatsRecord, TeamsRecord> RETIRED_USER_STATS__FK_TEAM_ID = Internal.createForeignKey(RetiredUserStats.RETIRED_USER_STATS, DSL.name("fk_team_id"), new TableField[] { RetiredUserStats.RETIRED_USER_STATS.TEAM_ID }, Keys.TEAMS_PKEY, new TableField[] { Teams.TEAMS.TEAM_ID }, true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION);
+    public static final ForeignKey<UserChangesRecord, UsersRecord> USER_CHANGES__FK_USER_ID = Internal.createForeignKey(UserChanges.USER_CHANGES, DSL.name("fk_user_id"), new TableField[] { UserChanges.USER_CHANGES.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.USER_ID }, true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION);
+    public static final ForeignKey<UserInitialStatsRecord, UsersRecord> USER_INITIAL_STATS__FK_USER_ID = Internal.createForeignKey(UserInitialStats.USER_INITIAL_STATS, DSL.name("fk_user_id"), new TableField[] { UserInitialStats.USER_INITIAL_STATS.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.USER_ID }, true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION);
+    public static final ForeignKey<UserOffsetTcStatsRecord, UsersRecord> USER_OFFSET_TC_STATS__FK_USER_ID = Internal.createForeignKey(UserOffsetTcStats.USER_OFFSET_TC_STATS, DSL.name("fk_user_id"), new TableField[] { UserOffsetTcStats.USER_OFFSET_TC_STATS.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.USER_ID }, true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION);
+    public static final ForeignKey<UserTcStatsHourlyRecord, UsersRecord> USER_TC_STATS_HOURLY__FK_USER_ID = Internal.createForeignKey(UserTcStatsHourly.USER_TC_STATS_HOURLY, DSL.name("fk_user_id"), new TableField[] { UserTcStatsHourly.USER_TC_STATS_HOURLY.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.USER_ID }, true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION);
+    public static final ForeignKey<UserTotalStatsRecord, UsersRecord> USER_TOTAL_STATS__FK_USER_ID = Internal.createForeignKey(UserTotalStats.USER_TOTAL_STATS, DSL.name("fk_user_id"), new TableField[] { UserTotalStats.USER_TOTAL_STATS.USER_ID }, Keys.USERS_PKEY, new TableField[] { Users.USERS.USER_ID }, true, ForeignKeyRule.CASCADE, ForeignKeyRule.NO_ACTION);
+    public static final ForeignKey<UsersRecord, HardwareRecord> USERS__FK_HARDWARE_ID = Internal.createForeignKey(Users.USERS, DSL.name("fk_hardware_id"), new TableField[] { Users.USERS.HARDWARE_ID }, Keys.HARDWARE_PKEY, new TableField[] { Hardware.HARDWARE.HARDWARE_ID }, true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION);
+    public static final ForeignKey<UsersRecord, TeamsRecord> USERS__FK_TEAM_ID = Internal.createForeignKey(Users.USERS, DSL.name("fk_team_id"), new TableField[] { Users.USERS.TEAM_ID }, Keys.TEAMS_PKEY, new TableField[] { Teams.TEAMS.TEAM_ID }, true, ForeignKeyRule.NO_ACTION, ForeignKeyRule.NO_ACTION);
 }

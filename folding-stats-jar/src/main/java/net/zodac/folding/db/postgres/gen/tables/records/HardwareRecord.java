@@ -151,6 +151,6 @@ public class HardwareRecord extends UpdatableRecordImpl<HardwareRecord> {
         setHardwareType(hardwareType);
         setMultiplier(multiplier);
         setAveragePpd(averagePpd);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

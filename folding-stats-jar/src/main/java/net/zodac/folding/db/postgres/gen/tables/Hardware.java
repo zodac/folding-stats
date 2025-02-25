@@ -132,6 +132,8 @@ public class Hardware extends TableImpl<HardwareRecord> {
      * A subtype implementing {@link Path} for simplified path-based joins.
      */
     public static class HardwarePath extends Hardware implements Path<HardwareRecord> {
+
+        private static final long serialVersionUID = 1L;
         public <O extends Record> HardwarePath(Table<O> path, ForeignKey<O, HardwareRecord> childPath, InverseForeignKey<O, HardwareRecord> parentPath) {
             super(path, childPath, parentPath);
         }
