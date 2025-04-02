@@ -23,6 +23,7 @@ import net.zodac.folding.api.tc.Hardware;
 /**
  * Interface defining a class that can retrieve LARS PPD data.
  */
+@FunctionalInterface
 public interface LarsRetriever {
 
     /**

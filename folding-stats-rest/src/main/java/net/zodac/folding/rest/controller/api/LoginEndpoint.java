@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * REST endpoints to log in as a system user.
  */
 @Tag(name = "Login Endpoints", description = "REST endpoints to login as a system user")
-public interface LoginEndpoint {
+public interface LoginEndpoint { // NOPMD: ImplicitFunctionalInterface - Not intended as a functional endpoint
 
     /**
      * {@link PostMapping} request to log in as an admin system user.
