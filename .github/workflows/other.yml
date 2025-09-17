@@ -34,7 +34,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '23.8.0'
+          node-version: '24.8.0'
 
       - name: Install StyleLint
         run: npm install -g stylelint@16.14.1 stylelint-config-standard@37.0.0
