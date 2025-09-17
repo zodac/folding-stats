@@ -20,7 +20,7 @@
         <!-- Project Properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java-release>23</java-release>
-        <maven-release>3.9.9</maven-release>
+        <maven-release>3.9.11</maven-release>
 
         <!-- Lint Properties -->
         <!-- All disabled by default, activated through profiles -->
@@ -40,66 +40,66 @@
         <branch-coverage>0.0</branch-coverage>
 
         <!-- 3PP Versions -->
-        <caffeine.version>3.2.0</caffeine.version>
-        <gson.version>2.13.1</gson.version>
-        <hikariCP.version>6.3.0</hikariCP.version>
+        <caffeine.version>3.2.2</caffeine.version>
+        <gson.version>2.13.2</gson.version>
+        <hikariCP.version>7.0.2</hikariCP.version>
         <jakarta.jakartaee-web-api.version>11.0.0</jakarta.jakartaee-web-api.version>
-        <jersey-server.version>3.1.10</jersey-server.version>
-        <jooq.version>3.20.3</jooq.version>
-        <log4j.version>2.24.3</log4j.version>
-        <lombok.version>1.18.38</lombok.version>
-        <postgresql.version>42.7.5</postgresql.version>
+        <jersey-server.version>3.1.11</jersey-server.version>
+        <jooq.version>3.20.7</jooq.version>
+        <log4j.version>2.25.1</log4j.version>
+        <lombok.version>1.18.40</lombok.version>
+        <postgresql.version>42.7.7</postgresql.version>
         <resilience4j.version>2.3.0</resilience4j.version>
-        <snakeyaml.version>2.4</snakeyaml.version>
-        <spring-boot.version>3.4.5</spring-boot.version>
-        <springdoc-openapi-starter-webmvc-ui.version>2.8.6</springdoc-openapi-starter-webmvc-ui.version>
+        <snakeyaml.version>2.5</snakeyaml.version>
+        <spring-boot.version>3.5.5</spring-boot.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.8.13</springdoc-openapi-starter-webmvc-ui.version>
         <slf4j-api.version>2.0.17</slf4j-api.version>
-        <swagger-annotations-jakarta.version>2.2.30</swagger-annotations-jakarta.version>
+        <swagger-annotations-jakarta.version>2.2.37</swagger-annotations-jakarta.version>
 
         <!-- Test 3PP Versions -->
-        <assertj-core.version>3.27.3</assertj-core.version>
-        <embedded-postgres.version>2.1.0</embedded-postgres.version>
-        <embedded-postgres-binaries-bom.version>17.4.0</embedded-postgres-binaries-bom.version>
-        <flyway-core.version>11.8.0</flyway-core.version>
-        <junit-bom.version>5.12.2</junit-bom.version>
-        <selenium-java.version>4.31.0</selenium-java.version>
+        <assertj-core.version>3.27.4</assertj-core.version>
+        <embedded-postgres.version>2.1.1</embedded-postgres.version>
+        <embedded-postgres-binaries-bom.version>17.6.0</embedded-postgres-binaries-bom.version>
+        <flyway-core.version>11.13.1</flyway-core.version>
+        <junit-bom.version>6.0.0-RC3</junit-bom.version>
+        <selenium-java.version>4.35.0</selenium-java.version>
 
         <!-- Plugin Versions -->
-        <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
+        <build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
         <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
         <jmeter-maven-plugin.version>3.8.0</jmeter-maven-plugin.version>
-        <maven-clean-plugin.version>3.4.1</maven-clean-plugin.version>
+        <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
-        <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
-        <maven-failsafe-plugin.version>3.5.3</maven-failsafe-plugin.version>
+        <maven-enforcer-plugin.version>3.6.1</maven-enforcer-plugin.version>
+        <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
         <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
         <maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
         <maven-project-info-reports-plugin.version>3.9.0</maven-project-info-reports-plugin.version>
         <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
         <maven-site-plugin.version>3.21.0</maven-site-plugin.version>
-        <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
-        <versions-maven-plugin.version>2.18.0</versions-maven-plugin.version>
+        <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
+        <versions-maven-plugin.version>2.19.0</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>10.23.1</checkstyle.version>
-        <error_prone_core.version>2.38.0</error_prone_core.version>
+        <checkstyle.version>11.0.1</checkstyle.version>
+        <error_prone_core.version>2.41.0</error_prone_core.version>
         <jspecify.version>1.0.0</jspecify.version>
         <licenses.version>1</licenses.version>
-        <nullaway.version>0.12.7</nullaway.version>
-        <pitest-junit5-plugin.version>1.2.2</pitest-junit5-plugin.version>
-        <pmd.version>7.13.0</pmd.version>
-        <spotbugs.version>4.9.3</spotbugs.version>
+        <nullaway.version>0.12.10</nullaway.version>
+        <pitest-junit5-plugin.version>1.2.3</pitest-junit5-plugin.version>
+        <pmd.version>7.17.0</pmd.version>
+        <spotbugs.version>4.9.6</spotbugs.version>
 
         <!-- Linter Plugin Versions -->
-        <dependency-check-maven.version>12.1.1</dependency-check-maven.version>
+        <dependency-check-maven.version>12.1.3</dependency-check-maven.version>
         <license-maven-plugin.version>5.0.0</license-maven-plugin.version>
         <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
-        <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
-        <maven-pmd-plugin.version>3.26.0</maven-pmd-plugin.version>
-        <pitest-maven.version>1.19.1</pitest-maven.version>
-        <sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
-        <spotbugs-maven-plugin.version>4.9.3.0</spotbugs-maven-plugin.version>
+        <maven-javadoc-plugin.version>3.11.3</maven-javadoc-plugin.version>
+        <maven-pmd-plugin.version>3.27.0</maven-pmd-plugin.version>
+        <pitest-maven.version>1.20.3</pitest-maven.version>
+        <sonar-maven-plugin.version>5.2.0.4988</sonar-maven-plugin.version>
+        <spotbugs-maven-plugin.version>4.9.6.0</spotbugs-maven-plugin.version>
 
         <!-- Linter Properties -->
         <!--suppress UnresolvedMavenProperty, files are only used in child modules -->
@@ -419,6 +419,20 @@
                 <groupId>io.micrometer</groupId>
                 <artifactId>micrometer-observation</artifactId>
                 <version>1.13.1</version>
+            </dependency>
+
+            <!-- CVEs -->
+            <!-- TODO: [CVE-2025-41248] -->
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-core</artifactId>
+                <version>6.2.11</version>
+            </dependency>
+            <!-- TODO: [CVE-2025-41249] -->
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-core</artifactId>
+                <version>6.5.5</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

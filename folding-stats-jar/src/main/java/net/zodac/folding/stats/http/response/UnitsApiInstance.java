@@ -18,6 +18,7 @@
 package net.zodac.folding.stats.http.response;
 
 import java.util.Comparator;
+import java.util.Objects;
 import net.zodac.folding.stats.http.request.UnitsUrlBuilder;
 
 /**
@@ -28,7 +29,7 @@ import net.zodac.folding.stats.http.request.UnitsUrlBuilder;
  * <pre>
  *     [
  *         {
- *             "finished":21260, (Value we are interested in)
+ *             "finished":21260, <- Value we are interested in
  *             "expired":60,
  *             "active":1
  *         },
@@ -48,5 +49,18 @@ record UnitsApiInstance(int finished, int expired, int active) implements Compar
             .thenComparingInt(UnitsApiInstance::active)
             .thenComparingInt(UnitsApiInstance::expired)
             .compare(o, this);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (!(obj instanceof UnitsApiInstance(final int otherFinished, final int otherExpired, final int otherActive))) {
+            return false;
+        }
+        return active == otherActive && expired == otherExpired && finished == otherFinished;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(finished, expired, active);
     }
 }

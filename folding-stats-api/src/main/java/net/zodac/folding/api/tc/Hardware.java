@@ -154,7 +154,7 @@ public final class Hardware implements Comparable<Hardware>, ResponsePojo {
     }
 
     @Override
-    public int compareTo(final Hardware other) {
+    public int compareTo(final Hardware other) { // NOPMD - OverrideBothEqualsAndHashCodeOnComparable: Lombok is being used for this
         // First, compare displayName
         final int displayNameComparison = displayName.compareTo(other.displayName);
         if (displayNameComparison != 0) {

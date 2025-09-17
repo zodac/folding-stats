@@ -13,9 +13,9 @@ services:
       dockerfile: docker/frontend/Dockerfile
       args:
         # Docker image versions
-        HTTPD_VERSION: "2.4.63"     # https://hub.docker.com/_/httpd/tags
-        MINIFY_VERSION: "v2.22.4"   # https://hub.docker.com/r/tdewolff/minify/tags
-        NODE_VERSION: "23.11.0"     # https://hub.docker.com/_/node/tags
+        HTTPD_VERSION: "2.4.65"     # https://hub.docker.com/_/httpd/tags
+        MINIFY_VERSION: "v2.24.3"   # https://hub.docker.com/r/tdewolff/minify/tags
+        NODE_VERSION: "24.8.0"      # https://hub.docker.com/_/node/tags
         # Build arguments
         ADMIN_EMAIL_ADDRESS: "${ADMIN_EMAIL_ADDRESS}"
         FORUM_LINK: "${FORUM_LINK}"
@@ -41,9 +41,9 @@ services:
       dockerfile: docker/backend/Dockerfile
       args:
         # Docker image versions
-        DEBIAN_VERSION: "12.10"    # https://hub.docker.com/_/debian/tags
+        DEBIAN_VERSION: "13.1"    # https://hub.docker.com/_/debian/tags
         JAVA_VERSION: "23.0.2_7"  # https://hub.docker.com/_/eclipse-temurin/tags
-        MAVEN_VERSION: "3.9.9"    # https://hub.docker.com/_/maven/tags
+        MAVEN_VERSION: "3.9.11"   # https://hub.docker.com/_/maven/tags
         # Build arguments
         KEYSTORE_PASSWORD: "${KEYSTORE_PASSWORD}"
     container_name: backend
@@ -97,7 +97,7 @@ services:
       dockerfile: docker/database/Dockerfile
       args:
         # Docker image versions
-        POSTGRES_VERSION: "17.4" # https://hub.docker.com/_/postgres/tags
+        POSTGRES_VERSION: "17.6" # https://hub.docker.com/_/postgres/tags
         # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"

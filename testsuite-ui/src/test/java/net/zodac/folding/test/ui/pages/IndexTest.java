@@ -161,7 +161,7 @@ class IndexTest {
 
     @ParameterizedTest
     @EnumSource(BrowserType.class)
-    void testViewingButtons(final BrowserType browserType) { // NOPMD: NPathComplexity - Will refine this model eventually
+    void testViewingButtons(final BrowserType browserType) {
         log("Loading '%s' browser at '%s'", browserType.displayName(), FRONTEND_LINK.url());
 
         executeWithDriver(browserType, driver -> {

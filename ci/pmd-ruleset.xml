@@ -43,7 +43,7 @@
         <!-- Caught by SonarQube analysis -->
         <exclude name="UnnecessaryModifier"/>
         <!-- I'm happy to use 'var', no need to forbid it -->
-        <exclude name="UseExplicitTypes" />
+        <exclude name="UseExplicitTypes"/>
 
         <!-- Issues for a style guide -->
         <exclude name="ClassNamingConventions"/>
@@ -114,6 +114,19 @@
         <exclude name="AvoidDuplicateLiterals"/>
         <!-- Disagree, nicer to have getters with the field name -->
         <exclude name="AvoidFieldNameMatchingMethodName"/>
+        <!-- TODO: Need to use Timestamp for persistence (possible to remove?) -->
+        <exclude name="ReplaceJavaUtilDate"/>
+    </rule>
+    <!-- Fine to allow increment/decrement -->
+    <rule ref="category/java/errorprone.xml/AssignmentInOperand">
+        <properties>
+            <property name="allowIf" value="false" />
+            <property name="allowFor" value="false" />
+            <property name="allowWhile" value="false" />
+            <property name="allowIncrementDecrement" value="true" />
+            <property name="allowDoWhile" value="false" />
+            <property name="allowSwitch" value="false" />
+        </properties>
     </rule>
 
     <rule ref="category/java/multithreading.xml">

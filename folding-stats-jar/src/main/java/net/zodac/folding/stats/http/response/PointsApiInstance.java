@@ -18,6 +18,7 @@
 package net.zodac.folding.stats.http.response;
 
 import java.util.Comparator;
+import java.util.Objects;
 import net.zodac.folding.stats.http.request.PointsUrlBuilder;
 
 /**
@@ -27,8 +28,8 @@ import net.zodac.folding.stats.http.request.PointsUrlBuilder;
  * Expected response:
  * <pre>
  *     {
- *         "earned": 97802740,      This is the total points earned by the user/passkey combo, for all teams, which is what we want
- *         "contributed": 76694831, This is the total points earned by the user/passkey combo, but only for the specified team (can be null)
+ *         "earned": 97802740,      <- This is the total points earned by the user/passkey combo, for all teams, which is what we want
+ *         "contributed": 76694831, <- This is the total points earned by the user/passkey combo, but only for the specified team (can be null)
  *         "team_total": 5526874925,
  *         "team_name": "ExtremeHW",
  *         "team_url": "https://extremehw.net/",
@@ -44,5 +45,15 @@ record PointsApiInstance(long earned) implements Comparable<PointsApiInstance> {
     public int compareTo(final PointsApiInstance o) {
         return Comparator.comparingLong(PointsApiInstance::earned)
             .compare(o, this);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return (obj instanceof PointsApiInstance(final long otherEarned)) && earned == otherEarned;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(earned);
     }
 }
