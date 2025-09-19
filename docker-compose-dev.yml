@@ -61,9 +61,9 @@ services:
       ENABLE_MONTHLY_RESULT_STORAGE: "false"
       ENABLE_STATS_MONTHLY_RESET: "false"
       # Stats parsing configuration
-      ENABLE_STATS_SCHEDULED_PARSING: "false"
-      SECONDS_BETWEEN_HTTP_REQUEST_ATTEMPTS: "0"
       MAXIMUM_HTTP_REQUEST_ATTEMPTS: "3"
+      SECONDS_BETWEEN_HTTP_REQUEST_ATTEMPTS: "0"
+      STATS_SCHEDULED_PARSING_ENABLED: "false"
       # Category configuration
       USERS_IN_AMD_GPU: "1"
       USERS_IN_NVIDIA_GPU: "1"

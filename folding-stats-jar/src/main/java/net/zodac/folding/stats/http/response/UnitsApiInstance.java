@@ -29,7 +29,7 @@ import net.zodac.folding.stats.http.request.UnitsUrlBuilder;
  * <pre>
  *     [
  *         {
- *             "finished":21260, <- Value we are interested in
+ *             "finished":21260, [Value we are interested in]
  *             "expired":60,
  *             "active":1
  *         },
