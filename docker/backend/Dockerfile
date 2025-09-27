@@ -3,14 +3,17 @@ ARG JAVA_VERSION
 ARG MAVEN_VERSION
 ARG DEBIAN_VERSION
 
+############################
+# Stage 1: Generate certs
+############################
 FROM eclipse-temurin:${JAVA_VERSION}-jdk AS cert_builder
 
 RUN mkdir --parents /usr/local/certs/stats/
 WORKDIR /usr/local/certs/stats/
 
-# Generate PCKS12 keystore with self-signed certificate, and extract public crt and private key
 ARG KEYSTORE_PASSWORD
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# Generate PCKS12 keystore with self-signed certificate, and extract public crt and private key
 RUN apt-get update && apt-get install -yqq --no-install-recommends openssl && \
     keytool \
         -genkey \
@@ -26,103 +29,100 @@ RUN apt-get update && apt-get install -yqq --no-install-recommends openssl && \
     sed -n '/^-----BEGIN CERTIFICATE-----/,/^-----END CERTIFICATE-----/{p;/^-----END CERTIFICATE-----/q}' folding-stats.pem > folding-stats.crt && \
     sed -n '/^-----BEGIN PRIVATE KEY-----/,/^-----END PRIVATE KEY-----/{p;/^-----END PRIVATE KEY-----/q}' folding-stats.pem > folding-stats.key
 
-# Pulling maven image but only to retrieve the binary - we don't mind the JDK version here
+############################
+# Stage 2: Maven binary
+############################
 FROM maven:${MAVEN_VERSION}-eclipse-temurin-21 AS maven_builder
 
-ARG JAVA_VERSION
+############################
+# Stage 3: Build application
+############################
 FROM eclipse-temurin:${JAVA_VERSION}-jdk AS application_builder
 
 COPY --from=maven_builder /usr/share/maven/ /usr/share/maven/
+ENV MAVEN_HOME="/usr/share/maven/"
+ENV PATH="${PATH}:${MAVEN_HOME}/bin/"
 
-ENV MAVEN_HOME "/usr/share/maven/"
-ENV PATH "${PATH}:${MAVEN_HOME}/bin/"
-
-# Build folding-stats
 RUN mkdir --parents /folding-stats-spring-boot
-
 WORKDIR /folding-stats-spring-boot
 
-# Copy source code
-# Adding and building each module incrementally so we can retain some docker caches when building for tests
+# Root pom
 COPY ./pom.xml ./pom.xml
 RUN --mount=type=cache,target=/root/.m2 mvn install -P docker
 
+# API module
 COPY ./folding-stats-api/pom.xml ./folding-stats-api/proguard-rules.cfg ./folding-stats-api/
 COPY ./folding-stats-api/src/main ./folding-stats-api/src/main
 WORKDIR /folding-stats-spring-boot/folding-stats-api
 RUN --mount=type=cache,target=/root/.m2 mvn install -P docker
 
+# JAR module
 WORKDIR /folding-stats-spring-boot
 COPY ./folding-stats-jar/pom.xml ./folding-stats-jar/proguard-rules.cfg ./folding-stats-jar/
 COPY ./folding-stats-jar/src/main ./folding-stats-jar/src/main
 WORKDIR /folding-stats-spring-boot/folding-stats-jar
 RUN --mount=type=cache,target=/root/.m2 mvn install -P docker
 
+# REST module
 WORKDIR /folding-stats-spring-boot
 COPY ./folding-stats-rest/pom.xml ./folding-stats-rest/pom.xml
 COPY ./folding-stats-rest/src/main ./folding-stats-rest/src/main
-
 WORKDIR /folding-stats-spring-boot/folding-stats-rest
 RUN --mount=type=cache,target=/root/.m2 mvn verify -P docker -Dlogging-config-location="/var/backend/log4j2.xml" && \
     mv ./target/folding-stats-rest*.jar /folding-stats.jar
 
-ARG JAVA_VERSION
+############################
+# Stage 4: Custom JDK via jlink
+############################
 FROM eclipse-temurin:${JAVA_VERSION}-jdk AS jdk_builder
 
-RUN apt-get update && apt-get install -yqq --no-install-recommends binutils
-RUN jlink --compress=2 \
-    --no-header-files \
-    --no-man-pages \
-    --strip-debug \
-    --add-modules java.se,jdk.crypto.cryptoki,jdk.management,jdk.unsupported \
-    --output "/opt/jdk" && \
+RUN apt-get update && apt-get install -yqq --no-install-recommends binutils && \
+        jlink --compress=2 \
+        --no-header-files \
+        --no-man-pages \
+        --strip-debug \
+        --add-modules java.se,jdk.crypto.cryptoki,jdk.management,jdk.unsupported \
+        --output "/opt/jdk" && \
     strip -p --strip-unneeded "/opt/jdk/lib/server/libjvm.so"
 
-FROM debian:${DEBIAN_VERSION}-slim AS spring_base
+############################
+# Stage 5: Prep scripts
+#############################
+FROM debian:bookworm-slim AS prep_scripts
+COPY ./docker/backend/scripts/startup.sh /startup.sh
+COPY ./docker/backend/scripts/healthcheck.sh /healthcheck.sh
+RUN chmod +x /startup.sh /healthcheck.sh
 
+############################
+# Stage 6: Install busybox
+#############################
+FROM debian:bookworm-slim AS shell_builder
+RUN apt-get update && apt-get install -y busybox-static
+
+############################
+# Stage 7: Distroless runtime
+############################
+FROM gcr.io/distroless/base-debian${DEBIAN_VERSION}:nonroot AS runtime
+
+# Copy custom JDK and app
 COPY --from=jdk_builder /opt/jdk /opt/jdk
 COPY --from=application_builder /folding-stats.jar /folding-stats.jar
-COPY ./docker/backend/scripts/startup.sh /startup.sh
+# Certs
+COPY --from=cert_builder /usr/local/certs/stats/ /usr/local/certs/stats/
+# Config and startup script
+COPY ./docker/backend/config/log4j2.xml /var/backend/log4j2.xml
+#COPY ./docker/backend/scripts/startup.sh /startup.sh
+COPY --from=prep_scripts /startup.sh /startup.sh
+COPY --from=prep_scripts /healthcheck.sh /healthcheck.sh
+COPY --from=shell_builder /bin/busybox /busybox
 
-# Create non-root user, make owner of log directory
-RUN useradd -ms /bin/bash backend_user && \
-    mkdir --parents /var/backend/logs && \
-    chown -R backend_user:backend_user /var/backend/logs
-COPY --chown=backend_user:backend_user ./docker/backend/config/log4j2.xml /var/backend/log4j2.xml
+# Env
+ENV JAVA_HOME="/opt/jdk"
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
-ENV JAVA_HOME "/opt/jdk/"
-ENV PATH "${PATH}:${JAVA_HOME}/bin"
+WORKDIR /var/backend/logs
 
-# Updating system packages, and installing:
-# - vi to allow user to edit log4j2.xml
-# - wget to run healthcheck
-RUN --mount=type=cache,target=/var/cache/apt apt-get update && apt-get upgrade -y && \
-    apt-get install -yqq --no-install-recommends \
-      vim \
-      wget \
-    && \
-    apt-get autoremove && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Copy SSL certs
-COPY --from=cert_builder /usr/local/certs/stats/folding-stats.p12 /usr/local/certs/stats/folding-stats.p12
-COPY --from=cert_builder /usr/local/certs/stats/folding-stats.crt /usr/local/certs/stats/folding-stats.crt
-COPY --from=cert_builder /usr/local/certs/stats/folding-stats.key /usr/local/certs/stats/folding-stats.key
-
-USER backend_user
-
-# Set default directory to the log directory
-WORKDIR /var/backend/logs/
-
-HEALTHCHECK --interval=30s \
-            --timeout=5s \
-            --start-period=10s \
-            --retries=3 \
-            CMD /usr/bin/wget --no-check-certificate --no-verbose --tries=1 --spider https://127.0.0.1:8443/folding/actuator/health \
-                || \
-                /usr/bin/wget --no-check-certificate --no-verbose --tries=1 --spider http://127.0.0.1:8443/folding/actuator/health \
-                || \
-                exit 1
+# Set up the healthcheck
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD ["/healthcheck.sh"]
 
 ENTRYPOINT [ "/startup.sh" ]
