@@ -374,42 +374,20 @@ The logs are rotated each day, where each previous day's logs will be zipped and
 
 #### Changing Log Levels
 
-For additional information to debug issues, we can change the log level from **INFO** to **DEBUG** or **TRACE**. This requires us to connect to
-the `backend` container:
+For additional information to troubleshoot issues, we can change the log level. Open a terminal and run the following command to set all logs to
+**DEBUG** level:
 
 ```bash
-docker exec -it backend bash
+curl -X POST -H "Content-Type: application/json" -d '{"configuredLevel": "DEBUG"}' 'http://folding.example.com/folding/actuator/loggers/ROOT'
 ```
 
-We can now edit the */var/backend/log4j2.xml.xml* configuration for our logging. You can use the available `vi` command:
+To only update the application logs, run this command:
 
 ```bash
-vi /var/backend/log4j2.xml
+curl -X POST -H "Content-Type: application/json" -d '{"configuredLevel": "DEBUG"}' 'http://folding.example.com/folding/actuator/loggers/net.zodac'
 ```
 
-We can change the log level printed to the server.log and console by updating this line:
-
-```xml
-<root level="INFO">
-    <Appender-ref ref="SERVER_LOG"/>
-    <Appender-ref ref="CONSOLE"/>
-</root>
-```
-
-To:
-
-```xml
-<root level="DEBUG">
-    <Appender-ref ref="SERVER_LOG"/>
-    <Appender-ref ref="CONSOLE"/>
-</root>
-```
-
-Save and exit the `vi` editor. After 60 seconds, re-run the failing use-case and the log level will be changed. Remember to reset the log level back
-to **INFO** when finished to avoid the logs getting too large.
-
-Also note, that for those more familiar with logback, additional loggers are defined here and can also have their log levels changes. And specific
-packages can have their log levels explicitly, of which there are some examples already.
+When done, don't forget to set the log levels back to **INFO**!
 
 ### Extracting Logs On Container Crash
 

@@ -41,7 +41,7 @@ services:
       dockerfile: docker/backend/Dockerfile
       args:
         # Docker image versions
-        DEBIAN_VERSION: "13.1"    # https://hub.docker.com/_/debian/tags
+        DEBIAN_VERSION: "12"      # https://console.cloud.google.com/artifacts/docker/distroless/us/gcr.io
         JAVA_VERSION: "23.0.2_7"  # https://hub.docker.com/_/eclipse-temurin/tags
         MAVEN_VERSION: "3.9.11"   # https://hub.docker.com/_/maven/tags
         # Build arguments
@@ -54,10 +54,18 @@ services:
       STATS_URL_ROOT: "${STATS_URL_ROOT}"
       REDIRECT_URL: "${ROOT_URL}"
       # Spring configuration
+      LOG_LEVEL: "INFO"
       DEPLOYMENT_TYPE: "production"
       JVM_MAX: "1024m"
       JVM_MIN: "128m"
       MULTIPLE_LOG_FILES: "true"
+      SERVER_SSL_KEY_STORE_PASSWORD: "${KEYSTORE_PASSWORD}"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://database:${POSTGRES_PORT}/${POSTGRES_DB_NAME}"
+      SPRING_DATASOURCE_DRIVER: "org.postgresql.Driver"
+      SPRING_DATASOURCE_USERNAME: "${DB_USER}"
+      SPRING_DATASOURCE_PASSWORD: "${DB_PASSWORD}"
+      SPRING_DATASOURCE_DATABASE_TYPE: "postgresql"
+      # Application config
       # NOTE: The monthly reset, result storage and LARS update will always occur at 23:57:00 on the last day of the month
       ENABLE_LARS_HARDWARE_UPDATE: "${ENABLE_LARS_HARDWARE_UPDATE}"
       ENABLE_MONTHLY_RESULT_STORAGE: "${ENABLE_MONTHLY_RESULT_STORAGE}"
@@ -71,13 +79,6 @@ services:
       USERS_IN_AMD_GPU: "${USERS_IN_AMD_GPU}"
       USERS_IN_NVIDIA_GPU: "${USERS_IN_NVIDIA_GPU}"
       USERS_IN_WILDCARD: "${USERS_IN_WILDCARD}"
-      # Spring configuration
-      spring.datasource.url: "jdbc:postgresql://database:${POSTGRES_PORT}/${POSTGRES_DB_NAME}"
-      spring.datasource.driver: "org.postgresql.Driver"
-      spring.datasource.username: "${DB_USER}"
-      spring.datasource.password: "${DB_PASSWORD}"
-      spring.datasource.database.type: "postgresql"
-      server.ssl.key-store-password: "${KEYSTORE_PASSWORD}"
       # Swagger documentation
       CONTACT_NAME: "${CONTACT_NAME}"
       FORUM_LINK: "${FORUM_LINK}"

@@ -12,7 +12,7 @@ target/
 pom.xml.versionsBackup
 
 # Generated jOOQ schema files
-docker/database/jooq/me/
+docker/database/jooq/net/
 !docker/postgres/jooq/*.jar
 
 # Environment files

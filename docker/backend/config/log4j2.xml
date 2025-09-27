@@ -2,12 +2,13 @@
 <Configuration monitorInterval="60">
     <Properties>
         <Property name="LOG_DIRECTORY">/var/backend/logs</Property>
+        <Property name="LOG_LEVEL">${env:LOG_LEVEL:-INFO}</Property>
         <Property name="ROLLOVER_LOG_FILE_EXTENSION">log</Property>
     </Properties>
 
     <Appenders>
         <Console name="CONSOLE" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%-55logger{55}] %msg%n"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%highlight{%-5level}{FATAL=red, ERROR=bold red, WARN=bold yellow, INFO=bold blue, DEBUG=bold green, TRACE=bold magenta}] [%-55logger{55}] %msg%n" />
         </Console>
 
         <!-- General application log -->
@@ -127,7 +128,7 @@
     </Appenders>
 
     <Loggers>
-        <root level="INFO">
+        <root level="${LOG_LEVEL}">
             <Appender-ref ref="SERVER_LOG"/>
             <Appender-ref ref="CONSOLE"/>
         </root>
