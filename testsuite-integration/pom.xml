@@ -17,13 +17,11 @@
         <dependency>
             <groupId>net.zodac</groupId>
             <artifactId>folding-stats-api</artifactId>
-            <classifier>${proguard-classifier}</classifier>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.zodac</groupId>
             <artifactId>folding-stats-client-library-java</artifactId>
-            <classifier>${proguard-classifier}</classifier>
             <scope>test</scope>
         </dependency>
 

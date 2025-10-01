@@ -125,18 +125,6 @@
         <sonar.token>${env.SONARQUBE_PAT}</sonar.token>
         <spotbugs-include-file>${ci-config-directory}/spotbugs-include-filter-file.xml</spotbugs-include-file>
         <spotbugs-exclude-file>${ci-config-directory}/spotbugs-exclude-filter-file.xml</spotbugs-exclude-file>
-
-        <!-- ProGuard 3PP Versions -->
-        <proguard-base.version>7.7.0</proguard-base.version>
-        <proguard-core.version>9.1.10</proguard-core.version>
-
-        <!-- ProGuard Plugin Versions -->
-        <proguard-maven-plugin.version>2.7.0</proguard-maven-plugin.version>
-
-        <!-- ProGuard Properties -->
-        <!-- Each module must have own ProGuard definition -->
-        <proguard-file>${project.basedir}/proguard-rules.cfg</proguard-file>
-        <proguard-classifier>optimized</proguard-classifier>
     </properties>
 
     <dependencyManagement>
@@ -146,19 +134,16 @@
                 <groupId>net.zodac</groupId>
                 <artifactId>folding-stats-api</artifactId>
                 <version>${project.version}</version>
-                <classifier>${proguard-classifier}</classifier>
             </dependency>
             <dependency>
                 <groupId>net.zodac</groupId>
                 <artifactId>folding-stats-client-library-java</artifactId>
                 <version>${project.version}</version>
-                <classifier>${proguard-classifier}</classifier>
             </dependency>
             <dependency>
                 <groupId>net.zodac</groupId>
                 <artifactId>folding-stats-jar</artifactId>
                 <version>${project.version}</version>
-                <classifier>${proguard-classifier}</classifier>
             </dependency>
 
             <!-- 3PP Dependencies -->
@@ -585,10 +570,7 @@
                     <configuration>
                         <!-- List of dependencies to not be updated, due to incompatible versions -->
                         <!-- If a valid update becomes available, it can be updated and removed from below -->
-                        <excludes>
-                            <!-- TODO: Waiting for v9.1.12+: https://github.com/Guardsquare/proguard-core/issues/143 -->
-                            <exclude>com.guardsquare:proguard-core:*</exclude>
-                        </excludes>
+                        <excludes/>
                         <generateBackupPoms>false</generateBackupPoms>
                         <ruleSet>
                             <ignoreVersions>
@@ -812,8 +794,8 @@
                                 <excludedScopes/>
                                 <ignores>
                                     <!-- Format: <ignore>groupId[:artifactId[:version[:type[:scope:[classifier]]]]]</ignore> -->
-                                    <!-- Exclude our own JARs optimised by ProGuard -->
-                                    <ignore>net.zodac:folding-stats-*:*:jar:*:optimized</ignore>
+                                    <!-- Exclude our own JARs -->
+                                    <ignore>net.zodac:folding-stats-*:*:jar:*</ignore>
                                 </ignores>
                             </banDynamicVersions>
                             <bannedDependencies>
@@ -1003,46 +985,6 @@
                             <groupId>com.github.spotbugs</groupId>
                             <artifactId>spotbugs</artifactId>
                             <version>${spotbugs.version}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-
-                <!-- ProGuard Obfuscation Plugin -->
-                <plugin>
-                    <groupId>com.github.wvengen</groupId>
-                    <artifactId>proguard-maven-plugin</artifactId>
-                    <version>${proguard-maven-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>proguard</goal>
-                            </goals>
-                            <configuration>
-                                <attachArtifactClassifier>${proguard-classifier}</attachArtifactClassifier>
-                                <includeDependency>true</includeDependency>
-                                <attach>true</attach>
-                                <options>
-                                    <option>-include ${proguard-file}</option>
-                                </options>
-                                <libs>
-                                    <lib>${java.home}/jmods</lib>
-                                </libs>
-                            </configuration>
-                        </execution>
-                    </executions>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.guardsquare</groupId>
-                            <artifactId>proguard-base</artifactId>
-                            <version>${proguard-base.version}</version>
-                            <scope>runtime</scope>
-                        </dependency>
-                        <dependency>
-                            <groupId>com.guardsquare</groupId>
-                            <artifactId>proguard-core</artifactId>
-                            <version>${proguard-core.version}</version>
-                            <scope>runtime</scope>
                         </dependency>
                     </dependencies>
                 </plugin>

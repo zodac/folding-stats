@@ -28,12 +28,10 @@
         <dependency>
             <groupId>net.zodac</groupId>
             <artifactId>folding-stats-api</artifactId>
-            <classifier>${proguard-classifier}</classifier>
         </dependency>
         <dependency>
             <groupId>net.zodac</groupId>
             <artifactId>folding-stats-jar</artifactId>
-            <classifier>${proguard-classifier}</classifier>
         </dependency>
 
         <!-- 3PP Dependencies -->

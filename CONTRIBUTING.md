@@ -24,8 +24,6 @@
         - [PMD](#pmd)
         - [SpotBugs](#spotbugs)
     - [Running Linters](#running-linters)
-- [ProGuard Obfuscation](#proguard-obfuscation)
-    - [Configuration](#configuration)
 
 ## Java
 
@@ -102,7 +100,3 @@ Once this is done, it will be possible to reference the DB tables/fields/schema 
 #### SpotBugs
 
 ### Running Linters
-
-## ProGuard Obfuscation
-
-## Configuration

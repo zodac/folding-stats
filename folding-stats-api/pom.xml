@@ -65,12 +65,6 @@
 
     <build>
         <plugins>
-            <!-- Enable ProGuard -->
-            <plugin>
-                <groupId>com.github.wvengen</groupId>
-                <artifactId>proguard-maven-plugin</artifactId>
-            </plugin>
-
             <!-- Execute tests -->
             <plugin>
                 <groupId>org.jacoco</groupId>
