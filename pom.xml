@@ -45,7 +45,7 @@
         <hikariCP.version>7.0.2</hikariCP.version>
         <jakarta.jakartaee-web-api.version>11.0.0</jakarta.jakartaee-web-api.version>
         <jersey-server.version>3.1.11</jersey-server.version>
-        <jooq.version>3.20.7</jooq.version>
+        <jooq.version>3.20.8</jooq.version>
         <log4j.version>2.25.2</log4j.version>
         <lombok.version>1.18.42</lombok.version>
         <micrometer.version>1.15.4</micrometer.version>
