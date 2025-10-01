@@ -56,14 +56,14 @@
         <springdoc-openapi-starter-webmvc-ui.version>2.8.13</springdoc-openapi-starter-webmvc-ui.version>
         <slf4j-api.version>2.0.17</slf4j-api.version>
         <slf4j-impl.version>2.0.17</slf4j-impl.version>
-        <swagger-annotations-jakarta.version>2.2.37</swagger-annotations-jakarta.version>
+        <swagger-annotations-jakarta.version>2.2.38</swagger-annotations-jakarta.version>
 
         <!-- Test 3PP Versions -->
         <assertj-core.version>3.27.6</assertj-core.version>
         <embedded-postgres.version>2.1.1</embedded-postgres.version>
         <embedded-postgres-binaries-bom.version>17.6.0</embedded-postgres-binaries-bom.version>
         <flyway-core.version>11.13.2</flyway-core.version>
-        <junit-bom.version>6.0.0-RC3</junit-bom.version>
+        <junit-bom.version>6.0.0</junit-bom.version>
         <selenium-java.version>4.35.0</selenium-java.version>
 
         <!-- Plugin Versions -->
@@ -84,7 +84,7 @@
         <versions-maven-plugin.version>2.19.1</versions-maven-plugin.version>
 
         <!-- Linter 3PP Versions -->
-        <checkstyle.version>11.0.1</checkstyle.version>
+        <checkstyle.version>11.1.0</checkstyle.version>
         <error_prone_core.version>2.42.0</error_prone_core.version>
         <jspecify.version>1.0.0</jspecify.version>
         <licenses.version>1</licenses.version>
