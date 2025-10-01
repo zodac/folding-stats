@@ -42,7 +42,7 @@ services:
       args:
         # Docker image versions
         DEBIAN_VERSION: "12"      # https://console.cloud.google.com/artifacts/docker/distroless/us/gcr.io
-        JAVA_VERSION: "23.0.2_7"  # https://hub.docker.com/_/eclipse-temurin/tags
+        JAVA_VERSION: "25_36"     # https://hub.docker.com/_/eclipse-temurin/tags
         MAVEN_VERSION: "3.9.11"   # https://hub.docker.com/_/maven/tags
         # Build arguments
         KEYSTORE_PASSWORD: "${KEYSTORE_PASSWORD}"
