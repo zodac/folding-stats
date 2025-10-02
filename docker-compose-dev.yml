@@ -93,7 +93,7 @@ services:
       dockerfile: docker/database/Dockerfile
       args:
         # Docker image versions
-        POSTGRES_VERSION: "17.6"  # https://hub.docker.com/_/postgres/tags
+        POSTGRES_VERSION: "18.0"  # https://hub.docker.com/_/postgres/
         # Build arguments
         ADMIN_USERNAME: "root"
         ADMIN_PASSWORD: "shroot"
@@ -108,7 +108,7 @@ services:
       POSTGRES_USER: "folding_user"
       POSTGRES_PASSWORD: "shroot"
       POSTGRES_PORT: "5432"
-      PGDATA: "/var/lib/postgresql/data/pgdata"
+      PGDATA: "/var/lib/postgresql/system/data"
       # Next 3 variables needed to avoid "FATAL role 'root' does not exist" error
       PGDATABASE: "folding_db"
       PGUSER: "folding_user"

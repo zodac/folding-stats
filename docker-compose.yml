@@ -98,7 +98,7 @@ services:
       dockerfile: docker/database/Dockerfile
       args:
         # Docker image versions
-        POSTGRES_VERSION: "17.6" # https://hub.docker.com/_/postgres/tags
+        POSTGRES_VERSION: "18.0" # https://hub.docker.com/_/postgres/
         # Build arguments
         ADMIN_USERNAME: "${ADMIN_USER}"
         ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
@@ -113,7 +113,7 @@ services:
       POSTGRES_USER: "${DB_USER}"
       POSTGRES_PASSWORD: "${DB_PASSWORD}"
       POSTGRES_PORT: "${POSTGRES_PORT}"
-      PGDATA: "/var/lib/postgresql/data/pgdata"
+      PGDATA: "/var/lib/postgresql/system/data"
       # Next 3 variables needed to avoid "FATAL role 'root' does not exist" error
       PGDATABASE: "${POSTGRES_DB_NAME}"
       PGUSER: "${DB_USER}"

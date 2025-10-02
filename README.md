@@ -444,8 +444,7 @@ docker cp database:/export.tar ~/export_$(date +%F).tar
 
 The first line will create a backup of the DB in the `database` container, and the second will copy it out to the host.
 
-Assuming a backup was previously created, it can be restored using the following commands against the `database`
-container:
+Assuming a backup was previously created, it can be restored using the following commands against the `database` container:
 
 ```bash
 docker cp ~/export_<TIMESTAMP>.tar database:/export.tar
