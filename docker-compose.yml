@@ -122,7 +122,7 @@ services:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     restart: "unless-stopped"
     volumes:
-      - database_content:/var/lib/postgresql/data
+      - database_content:/var/lib/postgresql/system/data
 
 volumes:
   # Volume to save the database contents
